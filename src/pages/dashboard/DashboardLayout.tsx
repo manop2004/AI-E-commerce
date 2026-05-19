@@ -13,6 +13,7 @@ import {
   BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, ShoppingBag, Package,
 } from "lucide-react";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { BotMasterSwitch } from "@/components/BotMasterSwitch";
 
 function AppSidebar() {
   const { t } = useTranslation();
@@ -99,9 +100,12 @@ export default function DashboardLayout() {
       <div className="min-h-screen bg-background flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-12 flex items-center border-b border-border/40 px-2 sticky top-0 bg-background/80 backdrop-blur z-10">
+          <header className="h-12 flex items-center border-b border-border/40 px-2 sticky top-0 bg-background/80 backdrop-blur z-10 gap-2">
             <SidebarTrigger />
-            <div className="ml-auto pr-2"><NotificationsBell /></div>
+            <div className="ml-auto flex items-center gap-2 pr-2">
+              <BotMasterSwitch />
+              <NotificationsBell />
+            </div>
           </header>
           <main className="flex-1 overflow-auto">
             <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
