@@ -57,8 +57,40 @@ Deno.serve(async (req) => {
       .eq("user_id", ownerId)
       .limit(20);
 
-    // Pull profile/company name
-    const { data: profile } = await admin.from("profiles").select("full_name, company_name").eq("id", ownerId).maybeSingle();
+    // Pull profile/company name + master bot switch + locale
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("full_name, company_name, bot_enabled, locale")
+      .eq("id", ownerId)
+      .maybeSingle();
+
+    // MASTER BOT SWITCH: if the owner turned the bot off, save the customer message
+    // (so the human operator can see it), mark for human takeover, and skip AI reply.
+    if (profile && profile.bot_enabled === false) {
+      if (conversationId) {
+        await admin.from("messages").insert({
+          conversation_id: conversationId,
+          user_id: ownerId,
+          sender: "customer",
+          content: userMessageContent,
+        });
+        await admin
+          .from("conversations")
+          .update({
+            last_message: userMessageContent,
+            last_message_at: new Date().toISOString(),
+            status: "human_takeover",
+            unread_count: 1,
+          })
+          .eq("id", conversationId);
+      }
+      return json({
+        reply: "",
+        skipped: true,
+        reason: "bot_disabled",
+        conversationId: conversationId ?? null,
+      });
+    }
 
     // Build conversation history + resolve customer name from conversation
     let history: { role: string; content: string }[] = [];
@@ -117,9 +149,20 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Language hint
+    const LOCALE_NAMES: Record<string, string> = {
+      th: "Thai", en: "English", zh: "Simplified Chinese", "zh-TW": "Traditional Chinese",
+      ja: "Japanese", ko: "Korean", vi: "Vietnamese", id: "Indonesian", ms: "Malay",
+      tl: "Filipino", hi: "Hindi", ar: "Arabic", es: "Spanish", pt: "Portuguese",
+      fr: "French", de: "German", ru: "Russian", it: "Italian", tr: "Turkish", nl: "Dutch",
+    };
+    const localeKey = (profile?.locale || "th").toString();
+    const localeName = LOCALE_NAMES[localeKey] || LOCALE_NAMES[localeKey.split("-")[0]] || "Thai";
+
     const systemPrompt = `You are an expert AI Sales & Customer Service agent for ${profile?.company_name || "this online store"}.
 Your goals: greet warmly, answer product questions, RECOMMEND products from the live catalog based on the customer's intent and purchase history, close sales, handle warranty/returns, and escalate to human when needed.
-Tone: friendly, helpful, concise. Match the customer's language (Thai or English) automatically.
+Tone: friendly, helpful, concise.
+PRIMARY LANGUAGE: ${localeName} (locale ${localeKey}). Always answer in ${localeName} unless the customer clearly writes in another language, in which case match their language.
 
 LIVE PRODUCT CATALOG (ใช้ข้อมูลนี้ในการแนะนำ — อย่าแต่งราคา/สต็อก):
 ${catalogContext || "(no catalog available)"}
