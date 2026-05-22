@@ -160,9 +160,10 @@ export default function LiveChat() {
                         if (speech.listening) speech.stop();
                         else { speech.reset(); setSuggested([]); speech.start(); }
                       }}
+                      title="เปิดไมค์ฟังเสียงตอนคุยโทรศัพท์ → AI หาสินค้ามาแนะนำ"
                     >
                       {speech.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                      {speech.listening ? "หยุดฟัง" : "Voice AI"}
+                      {speech.listening ? "หยุดฟังสาย" : "ฟังสายโทร"}
                     </Button>
                   )}
                   <Button size="sm" variant="outline" onClick={askAI} disabled={aiLoading}>
@@ -178,7 +179,7 @@ export default function LiveChat() {
                 <div className="px-4 py-3 border-b border-border/40 bg-card/40 space-y-2">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Mic className={`h-3 w-3 ${speech.listening ? "text-destructive animate-pulse" : ""}`} />
-                    {speech.listening ? "กำลังฟัง..." : "ฟังคำพูดล่าสุด"}
+                    {speech.listening ? "🔴 กำลังฟังสายโทร — AI จะแนะนำสินค้าอัตโนมัติ" : "คำพูดล่าสุดที่ได้ยิน"}
                     {searching && <Loader2 className="h-3 w-3 animate-spin ml-1" />}
                   </div>
                   {speech.transcript && (
