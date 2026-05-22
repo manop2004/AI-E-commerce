@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Copy, ExternalLink } from "lucide-react";
 
-type Provider = "line_oa" | "messenger" | "instagram";
+type Provider = "line_oa" | "messenger" | "instagram" | "woocommerce";
 
 const FIELDS: Record<Provider, { key: string; label: string; help: string; placeholder?: string }[]> = {
   line_oa: [
@@ -45,12 +45,18 @@ const FIELDS: Record<Provider, { key: string; label: string; help: string; place
     },
     { key: "verify_token", label: "Verify Token", help: "เหมือน Messenger" },
   ],
+  woocommerce: [
+    { key: "store_url", label: "Store URL", help: "เช่น https://yourshop.com (ไม่ต้องใส่ / ท้าย)", placeholder: "https://yourshop.com" },
+    { key: "consumer_key", label: "Consumer Key", help: "WooCommerce → Settings → Advanced → REST API → Add key (Read permission)" },
+    { key: "consumer_secret", label: "Consumer Secret", help: "ได้พร้อมกับ Consumer Key — เก็บไว้ดีๆ ไม่แสดงอีกหลังสร้าง" },
+  ],
 };
 
 const TITLES: Record<Provider, string> = {
   line_oa: "ตั้งค่า LINE OA",
   messenger: "ตั้งค่า Facebook Messenger",
   instagram: "ตั้งค่า Instagram DM",
+  woocommerce: "เชื่อมต่อ WooCommerce",
 };
 
 export function ChannelSetupDialog({
@@ -83,8 +89,8 @@ export function ChannelSetupDialog({
 
   const fields = FIELDS[provider];
   const projectUrl = import.meta.env.VITE_SUPABASE_URL;
-  const webhookFunction = provider === "line_oa" ? "line-webhook" : "meta-webhook";
-  const webhookUrl = user ? `${projectUrl}/functions/v1/${webhookFunction}?owner=${user.id}` : "";
+  const webhookFunction = provider === "line_oa" ? "line-webhook" : provider === "woocommerce" ? null : "meta-webhook";
+  const webhookUrl = user && webhookFunction ? `${projectUrl}/functions/v1/${webhookFunction}?owner=${user.id}` : "";
 
   const copy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -100,7 +106,12 @@ export function ChannelSetupDialog({
           user_id: user.id,
           provider: provider as any,
           status: "connected",
-          store_name: provider === "line_oa" ? "LINE OA" : provider === "messenger" ? "Facebook Page" : "Instagram",
+          store_name:
+            provider === "line_oa" ? "LINE OA"
+            : provider === "messenger" ? "Facebook Page"
+            : provider === "instagram" ? "Instagram"
+            : provider === "woocommerce" ? (config.store_url || "WooCommerce")
+            : "Channel",
           connected_at: new Date().toISOString(),
           config,
         },
@@ -126,15 +137,17 @@ export function ChannelSetupDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div>
-            <Label>Webhook URL (วางในช่อง Webhook ของ developer console)</Label>
-            <div className="flex gap-2 mt-1">
-              <Input value={webhookUrl} readOnly className="font-mono text-xs" />
-              <Button variant="outline" size="icon" onClick={() => copy(webhookUrl)}>
-                <Copy className="h-4 w-4" />
-              </Button>
+          {webhookUrl && (
+            <div>
+              <Label>Webhook URL (วางในช่อง Webhook ของ developer console)</Label>
+              <div className="flex gap-2 mt-1">
+                <Input value={webhookUrl} readOnly className="font-mono text-xs" />
+                <Button variant="outline" size="icon" onClick={() => copy(webhookUrl)}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
 
           {fields.map((f) => (
             <div key={f.key}>
@@ -158,6 +171,11 @@ export function ChannelSetupDialog({
             <a href="https://developers.facebook.com/apps" target="_blank" rel="noreferrer" className="text-sm text-primary inline-flex items-center gap-1">
               เปิด Meta for Developers <ExternalLink className="h-3 w-3" />
             </a>
+          )}
+          {provider === "woocommerce" && (
+            <div className="text-xs text-muted-foreground">
+              💡 สร้าง API Key ที่: <code className="bg-muted px-1 rounded">WooCommerce → Settings → Advanced → REST API → Add key</code> เลือก Permission = Read แล้วคัดลอกมาวางที่นี่
+            </div>
           )}
 
           <Button onClick={save} disabled={saving} className="w-full bg-gradient-primary">

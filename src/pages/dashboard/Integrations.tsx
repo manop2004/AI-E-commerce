@@ -24,10 +24,10 @@ export default function Integrations() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [list, setList] = useState<any[]>([]);
-  const [setupProvider, setSetupProvider] = useState<"line_oa" | "messenger" | "instagram" | null>(null);
+  const [setupProvider, setSetupProvider] = useState<"line_oa" | "messenger" | "instagram" | "woocommerce" | null>(null);
   const [showToken, setShowToken] = useState(false);
 
-  const SETUP_KEYS = new Set(["line_oa", "messenger", "instagram"]);
+  const SETUP_KEYS = new Set(["line_oa", "messenger", "instagram", "woocommerce"]);
 
   const load = async () => {
     if (!user) return;

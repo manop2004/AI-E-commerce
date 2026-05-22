@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Send, Bot, User, Sparkles, Loader2 } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { useSpeechRecognition, speak } from "@/hooks/useSpeech";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -16,6 +17,13 @@ export default function ChatWidget() {
   const [convId, setConvId] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [voiceOut, setVoiceOut] = useState(true);
+  const speech = useSpeechRecognition("th-TH");
+
+  // Push live transcript into the input
+  useEffect(() => {
+    if (speech.transcript) setDraft(speech.transcript.replace(/\s*\(…\).*$/, "").trim());
+  }, [speech.transcript]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -46,7 +54,10 @@ export default function ChatWidget() {
       });
       const data = await res.json();
       if (data.conversationId) setConvId(data.conversationId);
-      if (data.reply) setMsgs((m) => [...m, { role: "assistant", content: data.reply }]);
+      if (data.reply) {
+        setMsgs((m) => [...m, { role: "assistant", content: data.reply }]);
+        if (voiceOut) speak(data.reply, "th-TH");
+      }
       else if (data.error) setMsgs((m) => [...m, { role: "assistant", content: `⚠️ ${data.error}` }]);
     } catch (e: any) {
       setMsgs((m) => [...m, { role: "assistant", content: "⚠️ Connection error. Please try again." }]);
@@ -103,13 +114,34 @@ export default function ChatWidget() {
 
       <div className="border-t border-border/50 p-3 bg-card/40">
         <div className="flex gap-2">
+          {speech.supported && (
+            <button
+              type="button"
+              onClick={() => {
+                if (speech.listening) { speech.stop(); }
+                else { speech.reset(); setDraft(""); speech.start(); }
+              }}
+              title={speech.listening ? "หยุดฟัง" : "พูดใส่ไมค์"}
+              className={`h-10 w-10 grid place-items-center rounded-xl border border-border/50 ${speech.listening ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-background"}`}
+            >
+              {speech.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          )}
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="พิมพ์ข้อความ..."
+            placeholder={speech.listening ? "🎤 กำลังฟัง..." : "พิมพ์หรือกดไมค์เพื่อพูด..."}
             className="flex-1 bg-background border border-border/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
+          <button
+            type="button"
+            onClick={() => setVoiceOut((v) => !v)}
+            title={voiceOut ? "ปิดเสียงตอบ" : "เปิดเสียงตอบ"}
+            className="h-10 w-10 grid place-items-center rounded-xl border border-border/50 bg-background"
+          >
+            {voiceOut ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
+          </button>
           <button
             onClick={send}
             disabled={loading || !draft.trim()}
@@ -118,7 +150,9 @@ export default function ChatWidget() {
             <Send className="h-4 w-4" />
           </button>
         </div>
-        <div className="text-[10px] text-muted-foreground text-center mt-2">Powered by AI Commerce Agent</div>
+        <div className="text-[10px] text-muted-foreground text-center mt-2">
+          {speech.supported ? "🎤 รองรับเสียง · " : ""}Powered by AI Commerce Agent
+        </div>
       </div>
     </div>
   );
