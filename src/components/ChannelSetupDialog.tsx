@@ -106,7 +106,12 @@ export function ChannelSetupDialog({
           user_id: user.id,
           provider: provider as any,
           status: "connected",
-          store_name: provider === "line_oa" ? "LINE OA" : provider === "messenger" ? "Facebook Page" : "Instagram",
+          store_name:
+            provider === "line_oa" ? "LINE OA"
+            : provider === "messenger" ? "Facebook Page"
+            : provider === "instagram" ? "Instagram"
+            : provider === "woocommerce" ? (config.store_url || "WooCommerce")
+            : "Channel",
           connected_at: new Date().toISOString(),
           config,
         },
