@@ -29,7 +29,10 @@ export default function Login() {
 
   const onGoogle = async () => {
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/dashboard" });
-    if (result.error) toast.error(String(result.error));
+    if (result.redirected) return;
+    if (result.error) return toast.error(result.error.message || String(result.error));
+    toast.success("Welcome back!");
+    nav("/dashboard");
   };
 
   return (
