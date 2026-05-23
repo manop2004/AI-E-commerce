@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard, Plug, ToggleRight, GraduationCap, MessagesSquare,
-  BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, ShoppingBag, Package,
+  BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, ShoppingBag, Package, PhoneCall,
 } from "lucide-react";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { BotMasterSwitch } from "@/components/BotMasterSwitch";
@@ -31,6 +31,7 @@ function AppSidebar() {
     { to: "/dashboard/features", icon: ToggleRight, label: t("dash.features") },
     { to: "/dashboard/training", icon: GraduationCap, label: t("dash.training") },
     { to: "/dashboard/livechat", icon: MessagesSquare, label: t("dash.livechat") },
+    { to: "/dashboard/voice", icon: PhoneCall, label: "Voice AI (ตอนโทร)" },
     { to: "/dashboard/analytics", icon: BarChart3, label: t("dash.analytics") },
     { to: "/dashboard/billing", icon: CreditCard, label: t("dash.billing") },
   ];

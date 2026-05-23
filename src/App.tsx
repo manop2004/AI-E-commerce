@@ -16,6 +16,7 @@ import Integrations from "./pages/dashboard/Integrations";
 import BotFeatures from "./pages/dashboard/BotFeatures";
 import Training from "./pages/dashboard/Training";
 import LiveChat from "./pages/dashboard/LiveChat";
+import VoiceAssistant from "./pages/dashboard/VoiceAssistant";
 import Analytics from "./pages/dashboard/Analytics";
 import Billing from "./pages/dashboard/Billing";
 import Admin from "./pages/dashboard/Admin";
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="features" element={<BotFeatures />} />
               <Route path="training" element={<Training />} />
               <Route path="livechat" element={<LiveChat />} />
+              <Route path="voice" element={<VoiceAssistant />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="billing" element={<Billing />} />
               <Route path="admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
