@@ -46,22 +46,23 @@ export function useSpeechRecognition(lang = "th-TH") {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang, supported]);
 
-  const start = async () => {
+  // IMPORTANT: must be called synchronously from a user gesture (click).
+  // Do NOT await getUserMedia before rec.start() — that breaks the gesture chain
+  // and Chrome will silently refuse to capture audio.
+  const start = () => {
     if (!recRef.current) return;
     setError(null);
-    // Request mic permission explicitly so we can show a clear error instead of failing silently
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((t) => t.stop());
-    } catch (e: any) {
-      setError("ไม่ได้รับสิทธิ์ใช้ไมโครโฟน — กรุณาอนุญาตในเบราว์เซอร์");
-      return;
-    }
     try {
       recRef.current.start();
       setListening(true);
     } catch (e: any) {
-      setError(e?.message || "เริ่มฟังไม่ได้");
+      // InvalidStateError when already started — stop and retry once
+      try { recRef.current.stop(); } catch {}
+      setTimeout(() => {
+        try { recRef.current.start(); setListening(true); } catch (err: any) {
+          setError(err?.message || "เริ่มฟังไม่ได้");
+        }
+      }, 200);
     }
   };
   const stop = () => { try { recRef.current?.stop(); } catch {} setListening(false); };
