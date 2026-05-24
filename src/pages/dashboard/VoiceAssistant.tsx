@@ -14,7 +14,7 @@ export default function VoiceAssistant() {
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
-    const t = speech.transcript.replace(/\s*\(…\).*$/, "").trim();
+    const t = speech.transcript.trim();
     if (!user || !t || t.length < 3) return;
     const handle = setTimeout(async () => {
       setSearching(true);
@@ -78,6 +78,7 @@ export default function VoiceAssistant() {
                   <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" /> กำลังฟัง...
                 </span>
               )}
+              <span className="text-xs text-muted-foreground">{speech.status}</span>
               {searching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
               {speech.transcript && (
                 <Button size="sm" variant="ghost" onClick={() => { speech.reset(); setSuggested([]); }}>
@@ -89,7 +90,7 @@ export default function VoiceAssistant() {
             {speech.transcript && (
               <div className="mt-4 p-3 rounded-lg bg-background/60 border border-border/50">
                 <div className="text-xs text-muted-foreground mb-1">คำพูดที่จับได้</div>
-                <div className="text-sm italic">"{speech.transcript.replace(/\s*\(…\).*$/, "")}"</div>
+                <div className="text-sm italic">"{speech.transcript}"</div>
               </div>
             )}
             {speech.error && (
