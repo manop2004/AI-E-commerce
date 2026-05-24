@@ -92,6 +92,16 @@ export default function VoiceAssistant() {
                 <div className="text-sm italic">"{speech.transcript.replace(/\s*\(…\).*$/, "")}"</div>
               </div>
             )}
+            {speech.error && (
+              <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/40 text-sm text-destructive">
+                {speech.error}
+              </div>
+            )}
+            <div className="mt-4 text-xs text-muted-foreground space-y-1">
+              <div>• ต้องเปิดผ่าน HTTPS และใช้ Chrome / Edge (Safari iOS รองรับบางส่วน)</div>
+              <div>• อนุญาตไมโครโฟนเมื่อเบราว์เซอร์ถาม — ถ้ากดปฏิเสธไปแล้ว ให้กดไอคอน 🔒 ที่ URL แล้วเปลี่ยนเป็น Allow</div>
+              <div>• พูดเป็นภาษาไทยใกล้ไมค์ ระบบจะค้นหาสินค้าในสต็อกอัตโนมัติ</div>
+            </div>
           </>
         )}
       </Card>
