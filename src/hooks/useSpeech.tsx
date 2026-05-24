@@ -8,6 +8,7 @@ export function useSpeechRecognition(lang = "th-TH") {
   const supported = !!SR;
   const recRef = useRef<any>(null);
   const finalTranscriptRef = useRef("");
+  const keepListeningRef = useRef(false);
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +39,19 @@ export function useSpeechRecognition(lang = "th-TH") {
       setTranscript(next);
       setStatus(next ? "กำลังจับคำพูดได้แล้ว" : "กำลังฟัง...");
     };
-    rec.onend = () => { setListening(false); setStatus("หยุดฟังแล้ว"); };
+    rec.onend = () => {
+      setListening(false);
+      if (keepListeningRef.current) {
+        setStatus("ระบบตัดรอบฟัง กำลังต่อไมค์ให้อัตโนมัติ...");
+        window.setTimeout(() => {
+          if (!keepListeningRef.current || !recRef.current) return;
+          try { recRef.current.start(); setListening(true); }
+          catch { setStatus("กำลังรอฟังเสียงรอบถัดไป..."); }
+        }, 250);
+        return;
+      }
+      setStatus("หยุดฟังแล้ว");
+    };
     rec.onerror = (e: any) => {
       setListening(false);
       const code = e?.error || "unknown";
@@ -50,6 +63,11 @@ export function useSpeechRecognition(lang = "th-TH") {
         "network": "การเชื่อมต่อ Speech API ขัดข้อง",
         "aborted": "หยุดการฟัง",
       };
+      if (code === "no-speech" && keepListeningRef.current) {
+        setError(null);
+        setStatus("ยังไม่ได้ยินเสียงชัดเจน กำลังฟังต่อ...");
+        return;
+      }
       setError(map[code] || `เกิดข้อผิดพลาด: ${code}`);
       setStatus("จับเสียงไม่ได้");
     };
@@ -63,6 +81,7 @@ export function useSpeechRecognition(lang = "th-TH") {
   // and Chrome will silently refuse to capture audio.
   const start = () => {
     if (!recRef.current) return;
+    keepListeningRef.current = true;
     setError(null);
     setStatus("กำลังเปิดไมค์...");
     try {
@@ -73,13 +92,14 @@ export function useSpeechRecognition(lang = "th-TH") {
       try { recRef.current.stop(); } catch {}
       setTimeout(() => {
         try { recRef.current.start(); setListening(true); } catch (err: any) {
+          keepListeningRef.current = false;
           setError(err?.message || "เริ่มฟังไม่ได้");
           setStatus("เริ่มฟังไม่ได้");
         }
       }, 200);
     }
   };
-  const stop = () => { try { recRef.current?.stop(); } catch {} setListening(false); setStatus("หยุดฟังแล้ว"); };
+  const stop = () => { keepListeningRef.current = false; try { recRef.current?.stop(); } catch {} setListening(false); setStatus("หยุดฟังแล้ว"); };
   const reset = () => { finalTranscriptRef.current = ""; setTranscript(""); setError(null); setStatus("พร้อมฟังเสียง"); };
 
   return { supported, listening, transcript, error, status, start, stop, reset, setTranscript };
