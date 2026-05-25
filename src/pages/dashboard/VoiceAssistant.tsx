@@ -7,34 +7,78 @@ import { Mic, MicOff, Loader2, ShoppingBag, PhoneCall, Sparkles } from "lucide-r
 import { useSpeechRecognition } from "@/hooks/useSpeech";
 import { toast } from "sonner";
 
+type VoiceProduct = {
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  image_url: string | null;
+  category: string | null;
+  description: string | null;
+  sku: string | null;
+};
+
+const stopWords = new Set(["ครับ", "ค่ะ", "คะ", "มี", "ไหม", "มั้ย", "ราคา", "อยาก", "ต้องการ", "สนใจ", "ขอ", "หน่อย", "ตัว", "แบบ", "สินค้า"]);
+const normalize = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
+const extractTerms = (text: string) => normalize(text).split(" ").filter((w) => w.length >= 2 && !stopWords.has(w)).slice(-12);
+
+const scoreProduct = (product: VoiceProduct, transcript: string) => {
+  const text = normalize(transcript);
+  const compactText = text.replace(/\s/g, "");
+  const fields = normalize([product.name, product.category, product.description, product.sku].filter(Boolean).join(" "));
+  const compactFields = fields.replace(/\s/g, "");
+  const productName = normalize(product.name);
+  let score = 0;
+
+  if (productName && (text.includes(productName) || compactText.includes(productName.replace(/\s/g, "")))) score += 80;
+  extractTerms(transcript).forEach((term) => {
+    const compactTerm = term.replace(/\s/g, "");
+    if (fields.includes(term) || compactFields.includes(compactTerm)) score += Math.min(28, term.length * 4);
+    if (productName.includes(term)) score += 20;
+  });
+  productName.split(" ").filter((w) => w.length >= 2).forEach((part) => {
+    if (text.includes(part) || compactText.includes(part)) score += 14;
+  });
+  if (/(ถูก|ประหยัด|ไม่แพง|งบ|budget)/i.test(transcript)) score += Math.max(0, 12 - Number(product.price) / 1000);
+  if (/(พร้อมส่ง|มีของ|ด่วน|วันนี้)/i.test(transcript)) score += Math.min(16, product.stock);
+  return score;
+};
+
 export default function VoiceAssistant() {
   const { user } = useAuth();
   const speech = useSpeechRecognition("th-TH");
-  const [suggested, setSuggested] = useState<any[]>([]);
+  const [products, setProducts] = useState<VoiceProduct[]>([]);
+  const [suggested, setSuggested] = useState<VoiceProduct[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("products")
+      .select("id,name,price,stock,image_url,category,description,sku")
+      .eq("status", "active")
+      .gt("stock", 0)
+      .order("updated_at", { ascending: false })
+      .limit(500)
+      .then(({ data }) => setProducts((data as VoiceProduct[]) || []));
+  }, [user]);
+
+  useEffect(() => {
     const t = speech.transcript.trim();
-    if (!user || !t || t.length < 3) return;
-    const handle = setTimeout(async () => {
+    if (!user || !t || t.length < 3 || products.length === 0) return;
+    const handle = setTimeout(() => {
       setSearching(true);
-      const words = t.split(/\s+/).slice(-8).join(" ");
-      const tokens = words.split(/\s+/).filter((w) => w.length >= 2).slice(-4);
-      if (!tokens.length) { setSearching(false); return; }
-      const orExpr = tokens
-        .map((w) => `name.ilike.%${w}%,description.ilike.%${w}%,category.ilike.%${w}%`)
-        .join(",");
-      const { data } = await supabase
-        .from("products")
-        .select("id,name,price,stock,image_url,category,description")
-        .gt("stock", 0)
-        .or(orExpr)
-        .limit(8);
-      setSuggested(data || []);
+      const ranked = products
+        .map((p) => ({ product: p, score: scoreProduct(p, t) }))
+        .filter((x) => x.score > 0)
+        .sort((a, b) => b.score - a.score || b.product.stock - a.product.stock)
+        .slice(0, 8)
+        .map((x) => x.product);
+      setSuggested(ranked.length ? ranked : products.slice(0, 4));
       setSearching(false);
-    }, 700);
+    }, 300);
     return () => clearTimeout(handle);
-  }, [speech.transcript, user]);
+  }, [speech.transcript, user, products]);
 
   const copyPitch = (p: any) => {
     const text = `${p.name} ราคา ${Number(p.price).toLocaleString()} บาท (คงเหลือ ${p.stock} ชิ้น)`;
