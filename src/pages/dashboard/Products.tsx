@@ -129,6 +129,8 @@ export default function Products() {
   const [editing, setEditing] = useState<Partial<Product>>(empty);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     setLoading(true);
@@ -196,6 +198,55 @@ export default function Products() {
     load();
   };
 
+  const importStockFile = async (file?: File) => {
+    if (!user || !file) return;
+    setImporting(true);
+    try {
+      const isCsv = file.name.toLowerCase().endsWith(".csv");
+      const rows = isCsv ? csvToRows(await file.text()) : ((await readXlsxFile(file)) as unknown[][]);
+      const imported = rowsToProducts(rows).slice(0, 1000);
+      if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
+
+      const existingBySku = new Map(items.filter((p) => p.sku).map((p) => [p.sku!.toLowerCase(), p]));
+      const existingByName = new Map(items.map((p) => [p.name.toLowerCase(), p]));
+      const inserts: any[] = [];
+      const updates: { id: string; payload: any }[] = [];
+
+      imported.forEach((p) => {
+        const matched = (p.sku && existingBySku.get(p.sku.toLowerCase())) || existingByName.get(p.name.toLowerCase());
+        const payload = { user_id: user.id, ...p };
+        if (matched) updates.push({ id: matched.id, payload });
+        else inserts.push(payload);
+      });
+
+      if (inserts.length) {
+        const { error } = await supabase.from("products").insert(inserts);
+        if (error) throw error;
+      }
+      if (updates.length) {
+        const results = await Promise.all(updates.map((u) => supabase.from("products").update(u.payload).eq("id", u.id)));
+        const failed = results.find((r) => r.error);
+        if (failed?.error) throw failed.error;
+      }
+
+      await supabase.from("training_documents").insert({
+        user_id: user.id,
+        doc_type: "excel",
+        title: `สต็อกสินค้า: ${file.name}`,
+        content: imported.map((p) => `${p.name} | ${p.category || "ไม่ระบุหมวด"} | ${p.price} บาท | สต็อก ${p.stock}${p.description ? ` | ${p.description}` : ""}`).join("\n").slice(0, 20000),
+        status: "ready",
+      });
+
+      toast.success(`นำเข้าสำเร็จ ${imported.length} รายการ — AI ใช้แนะนำสินค้าได้ทันที`);
+      await load();
+    } catch (e: any) {
+      toast.error(e.message || "นำเข้าไฟล์ไม่สำเร็จ");
+    } finally {
+      setImporting(false);
+      if (importInputRef.current) importInputRef.current.value = "";
+    }
+  };
+
   const stockBadge = (p: Product) => {
     if (p.stock === 0) return <Badge variant="outline" className="border-destructive/40 text-destructive"><AlertTriangle className="h-3 w-3 mr-1" />หมด</Badge>;
     if (p.stock <= p.low_stock_threshold) return <Badge variant="outline" className="border-warning/40 text-warning">ใกล้หมด ({p.stock})</Badge>;
@@ -209,8 +260,31 @@ export default function Products() {
           <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2"><Package className="h-7 w-7" />สินค้าของร้าน</h1>
           <p className="text-sm text-muted-foreground">จัดการสินค้า สต็อก และราคา — AI จะใช้ข้อมูลนี้แนะนำลูกค้า</p>
         </div>
-        <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4" />เพิ่มสินค้า</Button>
+        <div className="flex gap-2 flex-wrap">
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".csv,.xlsx"
+            className="hidden"
+            onChange={(e) => importStockFile(e.target.files?.[0])}
+          />
+          <Button variant="outline" onClick={() => importInputRef.current?.click()} disabled={importing}>
+            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            นำเข้าไฟล์สต็อก
+          </Button>
+          <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4" />เพิ่มสินค้า</Button>
+        </div>
       </div>
+
+      <Card className="p-4 bg-gradient-card border-border/50">
+        <div className="flex items-start gap-3 text-sm text-muted-foreground">
+          <FileSpreadsheet className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+          <div>
+            <div className="font-medium text-foreground">โยนไฟล์ CSV / XLSX เพื่อให้ AI เรียนรู้สต็อกสินค้า</div>
+            <div>รองรับหัวคอลัมน์: ชื่อสินค้า, SKU/รหัสสินค้า, ราคา, สต็อก/จำนวน, หมวดหมู่, รายละเอียด — รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม</div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-3 bg-gradient-card border-border/50">
         <div className="relative">
