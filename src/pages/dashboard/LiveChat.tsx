@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,8 +6,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Bot, User, Send, Flame, Sparkles, Loader2, Trash2 } from "lucide-react";
+import { Bot, User, Send, Flame, Sparkles, Loader2, Trash2, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
+import { useSpeechToText } from "@/hooks/use-speech-to-text";
 
 export default function LiveChat() {
   const { t } = useTranslation();
@@ -16,7 +17,12 @@ export default function LiveChat() {
   const [active, setActive] = useState<any>(null);
   const [msgs, setMsgs] = useState<any[]>([]);
   const [draft, setDraft] = useState("");
+  const draftRef = useRef("");
   const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
 
   useEffect(() => {
     if (!user) return;
@@ -33,12 +39,24 @@ export default function LiveChat() {
     return () => { supabase.removeChannel(ch); };
   }, [active]);
 
-  const send = async () => {
-    if (!user || !active || !draft.trim()) return;
-    await supabase.from("messages").insert({ conversation_id: active.id, user_id: user.id, sender: "human", content: draft });
-    await supabase.from("conversations").update({ last_message: draft, last_message_at: new Date().toISOString() }).eq("id", active.id);
+  const send = async (overrideText?: string) => {
+    const text = (overrideText || draftRef.current).trim();
+    if (!user || !active || !text) return;
+    await supabase.from("messages").insert({ conversation_id: active.id, user_id: user.id, sender: "human", content: text });
+    await supabase.from("conversations").update({ last_message: text, last_message_at: new Date().toISOString() }).eq("id", active.id);
     setDraft("");
   };
+
+  const { isListening, toggleListening, isSupported } = useSpeechToText({
+    onResult: (text) => {
+      setDraft((prev) => prev + text);
+    },
+    onEnd: () => {
+      if (draftRef.current.trim()) {
+        send();
+      }
+    },
+  });
 
   const askAI = async () => {
     if (!user || !active) return;
@@ -139,6 +157,16 @@ export default function LiveChat() {
                 })}
               </div>
               <div className="p-4 border-t border-border/40 flex gap-2">
+                {isSupported && (
+                  <Button
+                    onClick={toggleListening}
+                    variant={isListening ? "destructive" : "outline"}
+                    className={`shrink-0 ${isListening ? "animate-pulse" : ""}`}
+                    title={isListening ? "กำลังฟัง..." : "เริ่มพูด"}
+                  >
+                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  </Button>
+                )}
                 <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t("dash.typeMessage")} onKeyDown={(e) => e.key === "Enter" && send()} />
                 <Button onClick={send} className="bg-gradient-primary"><Send className="h-4 w-4" /></Button>
               </div>

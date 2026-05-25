@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+<<<<<<< HEAD
 import { Send, Bot, User, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react";
 import { speak } from "@/hooks/useSpeech";
+=======
+import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff } from "lucide-react";
+import { useSpeechToText } from "@/hooks/use-speech-to-text";
+>>>>>>> 66fa002 (Torr)
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -14,18 +19,24 @@ export default function ChatWidget() {
     { role: "assistant", content: "สวัสดีค่ะ ดิฉันเป็นผู้ช่วย AI พร้อมตอบทุกคำถามค่ะ มีอะไรให้ช่วยไหมคะ?" },
   ]);
   const [draft, setDraft] = useState("");
+  const draftRef = useRef("");
   const [convId, setConvId] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [voiceOut, setVoiceOut] = useState(true);
 
   useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
+
+  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs, loading]);
 
-  const send = async () => {
-    if (!draft.trim() || !userId || loading) return;
-    const text = draft.trim();
+  const send = async (overrideText?: string) => {
+    const text = (overrideText || draftRef.current).trim();
+    if (!text || !userId || loading) return;
+    
     setDraft("");
     setMsgs((m) => [...m, { role: "user", content: text }]);
     setLoading(true);
@@ -59,6 +70,17 @@ export default function ChatWidget() {
       setLoading(false);
     }
   };
+
+  const { isListening, toggleListening, isSupported } = useSpeechToText({
+    onResult: (text) => {
+      setDraft((prev) => prev + text);
+    },
+    onEnd: () => {
+      if (draftRef.current.trim()) {
+        send();
+      }
+    },
+  });
 
   return (
     <div className="h-screen w-screen flex flex-col bg-background text-foreground">
@@ -108,6 +130,19 @@ export default function ChatWidget() {
 
       <div className="border-t border-border/50 p-3 bg-card/40">
         <div className="flex gap-2">
+          {isSupported && (
+            <button
+              onClick={toggleListening}
+              className={`h-10 w-10 grid place-items-center rounded-xl transition-colors ${
+                isListening 
+                  ? "bg-red-500 text-white animate-pulse" 
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+              title={isListening ? "กำลังฟัง..." : "เริ่มพูด"}
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          )}
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}

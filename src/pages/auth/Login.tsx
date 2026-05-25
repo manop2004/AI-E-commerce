@@ -22,7 +22,10 @@ export default function Login() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      console.error("Login error:", error);
+      return toast.error(error.message);
+    }
     toast.success("Welcome back!");
     nav("/dashboard");
   };

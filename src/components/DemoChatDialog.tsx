@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Send, Bot, User, Sparkles, Loader2, Package } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, Package, Mic, MicOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSpeechToText } from "@/hooks/use-speech-to-text";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -72,6 +73,7 @@ export function DemoChatDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     { role: "assistant", content: "สวัสดีค่ะ ดิฉันเป็น AI Sales Assistant 🤖✨\nลองทักทาย, ถามสินค้า, สั่งซื้อ หรือพิมพ์ 'ขอคุยกับแอดมิน' เพื่อดูระบบแจ้งเตือนค่ะ" },
   ]);
   const [draft, setDraft] = useState("");
+  const draftRef = useRef("");
   const [loading, setLoading] = useState(false);
   const stateRef = useRef<DemoState>({
     products: JSON.parse(JSON.stringify(DEMO_PRODUCTS)),
@@ -79,6 +81,10 @@ export function DemoChatDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     takeover: false,
   });
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -91,8 +97,8 @@ export function DemoChatDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     }
   }, [open]);
 
-  const send = () => {
-    const text = draft.trim();
+  const send = (overrideText?: string) => {
+    const text = (overrideText || draftRef.current).trim();
     if (!text || loading) return;
     setDraft("");
     setMsgs((m) => [...m, { role: "user", content: text }]);
@@ -112,6 +118,17 @@ export function DemoChatDialog({ open, onOpenChange }: { open: boolean; onOpenCh
       setLoading(false);
     }, 700 + Math.random() * 500);
   };
+
+  const { isListening, toggleListening, isSupported } = useSpeechToText({
+    onResult: (text) => {
+      setDraft((prev) => prev + text);
+    },
+    onEnd: () => {
+      if (draftRef.current.trim()) {
+        send();
+      }
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -167,6 +184,19 @@ export function DemoChatDialog({ open, onOpenChange }: { open: boolean; onOpenCh
             ))}
           </div>
           <div className="flex gap-2">
+            {isSupported && (
+              <button
+                onClick={toggleListening}
+                className={`h-10 w-10 grid place-items-center rounded-xl transition-colors ${
+                  isListening 
+                    ? "bg-red-500 text-white animate-pulse" 
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+                title={isListening ? "กำลังฟัง..." : "เริ่มพูด"}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </button>
+            )}
             <input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
