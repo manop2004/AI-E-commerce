@@ -203,7 +203,7 @@ export default function Products() {
     setImporting(true);
     try {
       const isCsv = file.name.toLowerCase().endsWith(".csv");
-      const rows = isCsv ? csvToRows(await file.text()) : ((await readXlsxFile(file)) as unknown[][]);
+      const rows = isCsv ? csvToRows(await file.text()) : ((await readXlsxFile(file)) as unknown as unknown[][]);
       const imported = rowsToProducts(rows).slice(0, 1000);
       if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
 
