@@ -53,10 +53,16 @@ const headerAliases: Record<keyof ImportedProduct, string[]> = {
   status: ["status", "สถานะ"],
 };
 
-const normalizeHeader = (value: unknown) => String(value || "").toLowerCase().replace(/[\s_\-()]/g, "").trim();
+const normalizeHeader = (value: unknown) => String(value || "").toLowerCase().replace(/^\uFEFF/, "").replace(/[\s_\-()]/g, "").trim();
 const parseNumber = (value: unknown, fallback = 0) => {
   const n = Number(String(value ?? "").replace(/[^0-9.-]/g, ""));
   return Number.isFinite(n) ? n : fallback;
+};
+const normalizeStatus = (value: unknown) => {
+  const raw = normalizeHeader(value);
+  if (["draft", "ฉบับร่าง", "ร่าง"].includes(raw)) return "draft";
+  if (["archived", "inactive", "เลิกขาย", "ปิดขาย"].includes(raw)) return "archived";
+  return "active";
 };
 
 const csvToRows = (text: string) => {
@@ -92,7 +98,10 @@ const rowsToProducts = (rows: unknown[][]): ImportedProduct[] => {
   const hasHeader = Object.values(headerAliases).some((aliases) => aliases.some((a) => first.includes(normalizeHeader(a))));
   const headers = hasHeader ? cleanRows[0] : ["name", "sku", "price", "stock", "category", "description"];
   const body = hasHeader ? cleanRows.slice(1) : cleanRows;
-  const findIndex = (field: keyof ImportedProduct) => headers.findIndex((h) => headerAliases[field].some((a) => normalizeHeader(h) === normalizeHeader(a)));
+  const findIndex = (field: keyof ImportedProduct) => headers.findIndex((h) => {
+    const header = normalizeHeader(h);
+    return headerAliases[field].some((a) => header === normalizeHeader(a) || header.includes(normalizeHeader(a)));
+  });
   const index = {
     name: findIndex("name"),
     description: findIndex("description"),
@@ -115,7 +124,7 @@ const rowsToProducts = (rows: unknown[][]): ImportedProduct[] => {
       stock: Math.max(0, Math.round(parseNumber(pick(index.stock), 0))),
       low_stock_threshold: Math.max(0, Math.round(parseNumber(pick(index.low_stock_threshold), 5))),
       category: String(pick(index.category) || "").trim() || null,
-      status: String(pick(index.status) || "active").trim() || "active",
+      status: normalizeStatus(pick(index.status)),
     };
   }).filter((p) => p.name);
 };
