@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import readXlsxFile from "read-excel-file";
+import readXlsxFile from "read-excel-file/browser";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
