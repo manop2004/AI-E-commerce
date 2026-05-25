@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import readXlsxFile from "read-excel-file/browser";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Pencil, Trash2, Search, ImageIcon, Loader2, AlertTriangle } from "lucide-react";
+import { Package, Plus, Pencil, Trash2, Search, ImageIcon, Loader2, AlertTriangle, Upload, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 
 type Product = {
@@ -28,6 +29,106 @@ type Product = {
 
 const empty: Partial<Product> = { name: "", description: "", sku: "", price: 0, stock: 0, low_stock_threshold: 5, status: "active", category: "" };
 
+type ImportedProduct = {
+  name: string;
+  description: string | null;
+  sku: string | null;
+  price: number;
+  compare_at_price: number | null;
+  stock: number;
+  low_stock_threshold: number;
+  category: string | null;
+  status: string;
+};
+
+const headerAliases: Record<keyof ImportedProduct, string[]> = {
+  name: ["name", "title", "product", "productname", "ชื่อ", "ชื่อสินค้า", "สินค้า", "รายการสินค้า"],
+  description: ["description", "detail", "details", "รายละเอียด", "คำอธิบาย"],
+  sku: ["sku", "code", "รหัส", "รหัสสินค้า", "บาร์โค้ด", "barcode"],
+  price: ["price", "sellprice", "saleprice", "ราคา", "ราคาขาย"],
+  compare_at_price: ["compareatprice", "originalprice", "ราคาเต็ม", "ราคาปกติ"],
+  stock: ["stock", "inventory", "qty", "quantity", "จำนวน", "สต็อก", "คงเหลือ", "เหลือ"],
+  low_stock_threshold: ["lowstockthreshold", "แจ้งเตือนสต็อก", "เตือนเมื่อเหลือ"],
+  category: ["category", "type", "หมวดหมู่", "ประเภท"],
+  status: ["status", "สถานะ"],
+};
+
+const normalizeHeader = (value: unknown) => String(value || "").toLowerCase().replace(/^\uFEFF/, "").replace(/[\s_\-()]/g, "").trim();
+const parseNumber = (value: unknown, fallback = 0) => {
+  const n = Number(String(value ?? "").replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(n) ? n : fallback;
+};
+const normalizeStatus = (value: unknown) => {
+  const raw = normalizeHeader(value);
+  if (["draft", "ฉบับร่าง", "ร่าง"].includes(raw)) return "draft";
+  if (["archived", "inactive", "เลิกขาย", "ปิดขาย"].includes(raw)) return "archived";
+  return "active";
+};
+
+const csvToRows = (text: string) => {
+  const rows: string[][] = [];
+  let current = "";
+  let row: string[] = [];
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (ch === '"' && quoted && next === '"') { current += '"'; i++; continue; }
+    if (ch === '"') { quoted = !quoted; continue; }
+    if (ch === "," && !quoted) { row.push(current.trim()); current = ""; continue; }
+    if ((ch === "\n" || ch === "\r") && !quoted) {
+      if (ch === "\r" && next === "\n") i++;
+      row.push(current.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = [];
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  row.push(current.trim());
+  if (row.some(Boolean)) rows.push(row);
+  return rows;
+};
+
+const rowsToProducts = (rows: unknown[][]): ImportedProduct[] => {
+  const cleanRows = rows.filter((r) => r.some((c) => String(c ?? "").trim()));
+  if (cleanRows.length === 0) return [];
+  const first = cleanRows[0].map(normalizeHeader);
+  const hasHeader = Object.values(headerAliases).some((aliases) => aliases.some((a) => first.includes(normalizeHeader(a))));
+  const headers = hasHeader ? cleanRows[0] : ["name", "sku", "price", "stock", "category", "description"];
+  const body = hasHeader ? cleanRows.slice(1) : cleanRows;
+  const findIndex = (field: keyof ImportedProduct) => headers.findIndex((h) => {
+    const header = normalizeHeader(h);
+    return headerAliases[field].some((a) => header === normalizeHeader(a) || header.includes(normalizeHeader(a)));
+  });
+  const index = {
+    name: findIndex("name"),
+    description: findIndex("description"),
+    sku: findIndex("sku"),
+    price: findIndex("price"),
+    compare_at_price: findIndex("compare_at_price"),
+    stock: findIndex("stock"),
+    low_stock_threshold: findIndex("low_stock_threshold"),
+    category: findIndex("category"),
+    status: findIndex("status"),
+  };
+  return body.map((row) => {
+    const pick = (i: number) => (i >= 0 ? row[i] : "");
+    return {
+      name: String(pick(index.name) || "").trim(),
+      description: String(pick(index.description) || "").trim() || null,
+      sku: String(pick(index.sku) || "").trim() || null,
+      price: parseNumber(pick(index.price), 0),
+      compare_at_price: index.compare_at_price >= 0 ? parseNumber(pick(index.compare_at_price), 0) || null : null,
+      stock: Math.max(0, Math.round(parseNumber(pick(index.stock), 0))),
+      low_stock_threshold: Math.max(0, Math.round(parseNumber(pick(index.low_stock_threshold), 5))),
+      category: String(pick(index.category) || "").trim() || null,
+      status: normalizeStatus(pick(index.status)),
+    };
+  }).filter((p) => p.name);
+};
+
 export default function Products() {
   const { user } = useAuth();
   const [items, setItems] = useState<Product[]>([]);
@@ -37,6 +138,8 @@ export default function Products() {
   const [editing, setEditing] = useState<Partial<Product>>(empty);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     setLoading(true);
@@ -104,6 +207,55 @@ export default function Products() {
     load();
   };
 
+  const importStockFile = async (file?: File) => {
+    if (!user || !file) return;
+    setImporting(true);
+    try {
+      const isCsv = file.name.toLowerCase().endsWith(".csv");
+      const rows = isCsv ? csvToRows(await file.text()) : ((await readXlsxFile(file)) as unknown as unknown[][]);
+      const imported = rowsToProducts(rows).slice(0, 1000);
+      if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
+
+      const existingBySku = new Map(items.filter((p) => p.sku).map((p) => [p.sku!.toLowerCase(), p]));
+      const existingByName = new Map(items.map((p) => [p.name.toLowerCase(), p]));
+      const inserts: any[] = [];
+      const updates: { id: string; payload: any }[] = [];
+
+      imported.forEach((p) => {
+        const matched = (p.sku && existingBySku.get(p.sku.toLowerCase())) || existingByName.get(p.name.toLowerCase());
+        const payload = { user_id: user.id, ...p };
+        if (matched) updates.push({ id: matched.id, payload });
+        else inserts.push(payload);
+      });
+
+      if (inserts.length) {
+        const { error } = await supabase.from("products").insert(inserts);
+        if (error) throw error;
+      }
+      if (updates.length) {
+        const results = await Promise.all(updates.map((u) => supabase.from("products").update(u.payload).eq("id", u.id)));
+        const failed = results.find((r) => r.error);
+        if (failed?.error) throw failed.error;
+      }
+
+      await supabase.from("training_documents").insert({
+        user_id: user.id,
+        doc_type: "excel",
+        title: `สต็อกสินค้า: ${file.name}`,
+        content: imported.map((p) => `${p.name} | ${p.category || "ไม่ระบุหมวด"} | ${p.price} บาท | สต็อก ${p.stock}${p.description ? ` | ${p.description}` : ""}`).join("\n").slice(0, 20000),
+        status: "ready",
+      });
+
+      toast.success(`นำเข้าสำเร็จ ${imported.length} รายการ — AI ใช้แนะนำสินค้าได้ทันที`);
+      await load();
+    } catch (e: any) {
+      toast.error(e.message || "นำเข้าไฟล์ไม่สำเร็จ");
+    } finally {
+      setImporting(false);
+      if (importInputRef.current) importInputRef.current.value = "";
+    }
+  };
+
   const stockBadge = (p: Product) => {
     if (p.stock === 0) return <Badge variant="outline" className="border-destructive/40 text-destructive"><AlertTriangle className="h-3 w-3 mr-1" />หมด</Badge>;
     if (p.stock <= p.low_stock_threshold) return <Badge variant="outline" className="border-warning/40 text-warning">ใกล้หมด ({p.stock})</Badge>;
@@ -117,8 +269,31 @@ export default function Products() {
           <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2"><Package className="h-7 w-7" />สินค้าของร้าน</h1>
           <p className="text-sm text-muted-foreground">จัดการสินค้า สต็อก และราคา — AI จะใช้ข้อมูลนี้แนะนำลูกค้า</p>
         </div>
-        <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4" />เพิ่มสินค้า</Button>
+        <div className="flex gap-2 flex-wrap">
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".csv,.xlsx"
+            className="hidden"
+            onChange={(e) => importStockFile(e.target.files?.[0])}
+          />
+          <Button variant="outline" onClick={() => importInputRef.current?.click()} disabled={importing}>
+            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            นำเข้าไฟล์สต็อก
+          </Button>
+          <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4" />เพิ่มสินค้า</Button>
+        </div>
       </div>
+
+      <Card className="p-4 bg-gradient-card border-border/50">
+        <div className="flex items-start gap-3 text-sm text-muted-foreground">
+          <FileSpreadsheet className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+          <div>
+            <div className="font-medium text-foreground">โยนไฟล์ CSV / XLSX เพื่อให้ AI เรียนรู้สต็อกสินค้า</div>
+            <div>รองรับหัวคอลัมน์: ชื่อสินค้า, SKU/รหัสสินค้า, ราคา, สต็อก/จำนวน, หมวดหมู่, รายละเอียด — รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม</div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-3 bg-gradient-card border-border/50">
         <div className="relative">
