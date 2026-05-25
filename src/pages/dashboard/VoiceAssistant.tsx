@@ -124,6 +124,7 @@ export default function VoiceAssistant() {
               )}
               <span className="text-xs text-muted-foreground">{speech.status}</span>
               {searching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+              <span className="text-xs text-muted-foreground">สินค้าในสต็อก {products.length} รายการ</span>
               {speech.transcript && (
                 <Button size="sm" variant="ghost" onClick={() => { speech.reset(); setSuggested([]); }}>
                   ล้างข้อความ
@@ -157,7 +158,9 @@ export default function VoiceAssistant() {
         </h2>
         {suggested.length === 0 ? (
           <Card className="p-8 text-center text-sm text-muted-foreground bg-gradient-card border-border/50 border-dashed">
-            {speech.listening
+            {products.length === 0
+              ? "ยังไม่มีสินค้าในสต็อก — ไปที่หน้า “สินค้าของร้าน” แล้วนำเข้าไฟล์ CSV/XLSX ก่อน"
+              : speech.listening
               ? "พูดชื่อสินค้า หมวดหมู่ หรือสิ่งที่ลูกค้าถาม แล้ว AI จะแนะนำให้อัตโนมัติ"
               : "กดปุ่ม “เริ่มฟังสายโทร” แล้วเริ่มคุยกับลูกค้า"}
           </Card>
