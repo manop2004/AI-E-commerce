@@ -18,37 +18,47 @@ type VoiceProduct = {
   sku: string | null;
 };
 
-const stopWords = new Set(["ครับ", "ค่ะ", "คะ", "มี", "ไหม", "มั้ย", "ราคา", "อยาก", "ต้องการ", "สนใจ", "ขอ", "หน่อย", "ตัว", "แบบ", "สินค้า"]);
+type RankedProduct = { product: VoiceProduct; score: number; reason: string };
+
+const stopWords = new Set(["ครับ", "ค่ะ", "คะ", "มี", "ไหม", "มั้ย", "ราคา", "อยาก", "ต้องการ", "สนใจ", "ขอ", "หน่อย", "ตัว", "แบบ", "สินค้า", "ของ", "ให้", "หา", "เอา", "ดู", "ซื้อ", "ขาย", "แนะนำ", "ลูกค้า", "แล้ว", "หน่อยครับ", "หน่อยค่ะ"]);
 const normalize = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
-const extractTerms = (text: string) => normalize(text).split(" ").filter((w) => w.length >= 2 && !stopWords.has(w)).slice(-12);
+const compact = (text: string) => normalize(text).replace(/\s/g, "");
+const extractTerms = (text: string) => normalize(text).split(" ").filter((w) => w.length >= 2 && !stopWords.has(w)).slice(-16);
+const productTerms = (p: VoiceProduct) => extractTerms([p.name, p.category, p.sku].filter(Boolean).join(" ")).filter((term) => term.length >= 3);
 
 const scoreProduct = (product: VoiceProduct, transcript: string) => {
   const text = normalize(transcript);
-  const compactText = text.replace(/\s/g, "");
+  const compactText = compact(transcript);
   const fields = normalize([product.name, product.category, product.description, product.sku].filter(Boolean).join(" "));
-  const compactFields = fields.replace(/\s/g, "");
+  const compactFields = compact(fields);
   const productName = normalize(product.name);
+  const compactName = compact(product.name);
+  const compactCategory = compact(product.category || "");
   let score = 0;
+  const reasons: string[] = [];
 
-  if (productName && (text.includes(productName) || compactText.includes(productName.replace(/\s/g, "")))) score += 80;
+  if (product.sku && compactText.includes(compact(product.sku))) { score += 120; reasons.push("ตรงรหัสสินค้า"); }
+  if (compactName.length >= 4 && compactText.includes(compactName)) { score += 100; reasons.push("ตรงชื่อสินค้า"); }
+  if (compactCategory.length >= 3 && compactText.includes(compactCategory)) { score += 38; reasons.push(`ตรงหมวด ${product.category}`); }
+
   extractTerms(transcript).forEach((term) => {
-    const compactTerm = term.replace(/\s/g, "");
-    if (fields.includes(term) || compactFields.includes(compactTerm)) score += Math.min(28, term.length * 4);
-    if (productName.includes(term)) score += 20;
+    const compactTerm = compact(term);
+    if (productName.includes(term) || compactName.includes(compactTerm)) { score += Math.min(34, term.length * 5); reasons.push(`พบคำว่า “${term}” ในชื่อ`); }
+    else if (fields.includes(term) || compactFields.includes(compactTerm)) { score += Math.min(18, term.length * 3); }
   });
-  productName.split(" ").filter((w) => w.length >= 2).forEach((part) => {
-    if (text.includes(part) || compactText.includes(part)) score += 14;
+  productTerms(product).forEach((term) => {
+    if (text.includes(term) || compactText.includes(compact(term))) score += 12;
   });
   if (/(ถูก|ประหยัด|ไม่แพง|งบ|budget)/i.test(transcript)) score += Math.max(0, 12 - Number(product.price) / 1000);
   if (/(พร้อมส่ง|มีของ|ด่วน|วันนี้)/i.test(transcript)) score += Math.min(16, product.stock);
-  return score;
+  return { score, reason: reasons[0] || "ตรงกับคำที่ลูกค้าพูด" };
 };
 
 export default function VoiceAssistant() {
   const { user } = useAuth();
   const speech = useSpeechRecognition("th-TH");
   const [products, setProducts] = useState<VoiceProduct[]>([]);
-  const [suggested, setSuggested] = useState<VoiceProduct[]>([]);
+  const [suggested, setSuggested] = useState<RankedProduct[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
@@ -69,12 +79,11 @@ export default function VoiceAssistant() {
     const handle = setTimeout(() => {
       setSearching(true);
       const ranked = products
-        .map((p) => ({ product: p, score: scoreProduct(p, t) }))
-        .filter((x) => x.score > 0)
+        .map((p) => ({ product: p, ...scoreProduct(p, t) }))
+        .filter((x) => x.score >= 36)
         .sort((a, b) => b.score - a.score || b.product.stock - a.product.stock)
-        .slice(0, 8)
-        .map((x) => x.product);
-      setSuggested(ranked.length ? ranked : products.slice(0, 4));
+        .slice(0, 6);
+      setSuggested(ranked);
       setSearching(false);
     }, 300);
     return () => clearTimeout(handle);
@@ -160,13 +169,15 @@ export default function VoiceAssistant() {
           <Card className="p-8 text-center text-sm text-muted-foreground bg-gradient-card border-border/50 border-dashed">
             {products.length === 0
               ? "ยังไม่มีสินค้าในสต็อก — ไปที่หน้า “สินค้าของร้าน” แล้วนำเข้าไฟล์ CSV/XLSX ก่อน"
+              : speech.transcript.trim().length >= 3
+              ? "ยังไม่พบสินค้าที่ตรงกับคำพูดนี้ — ลองพูดชื่อสินค้า หมวดหมู่ หรือ SKU ให้ชัดขึ้น"
               : speech.listening
               ? "พูดชื่อสินค้า หมวดหมู่ หรือสิ่งที่ลูกค้าถาม แล้ว AI จะแนะนำให้อัตโนมัติ"
               : "กดปุ่ม “เริ่มฟังสายโทร” แล้วเริ่มคุยกับลูกค้า"}
           </Card>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {suggested.map((p) => (
+            {suggested.map(({ product: p, reason }) => (
               <Card key={p.id} className="p-3 bg-gradient-card border-border/50 hover:border-primary/50 hover:shadow-glow transition">
                 <div className="aspect-square rounded-md bg-muted overflow-hidden mb-2 grid place-items-center">
                   {p.image_url ? (
@@ -176,6 +187,7 @@ export default function VoiceAssistant() {
                   )}
                 </div>
                 <div className="text-sm font-semibold line-clamp-2">{p.name}</div>
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{reason}</div>
                 <div className="text-primary font-bold mt-1">฿{Number(p.price).toLocaleString()}</div>
                 <div className="text-xs text-muted-foreground mb-2">คงเหลือ {p.stock} ชิ้น</div>
                 <Button size="sm" variant="outline" className="w-full" onClick={() => copyPitch(p)}>

@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-<<<<<<< HEAD
-import { Send, Bot, User, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
 import { speak } from "@/hooks/useSpeech";
-=======
-import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff } from "lucide-react";
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
->>>>>>> 66fa002 (Torr)
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -159,7 +155,7 @@ export default function ChatWidget() {
             {voiceOut ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
           </button>
           <button
-            onClick={send}
+            onClick={() => send()}
             disabled={loading || !draft.trim()}
             className="h-10 w-10 grid place-items-center rounded-xl bg-gradient-primary text-primary-foreground disabled:opacity-50"
           >

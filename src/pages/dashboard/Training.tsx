@@ -31,6 +31,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { buildStockTrainingContent, parseStockFile } from "@/lib/stockImport";
 
 const TYPES = [
   { type: "pdf", icon: FileText, label: "PDF Documents" },
@@ -53,6 +54,7 @@ export default function Training() {
   const [editingDoc, setEditingDoc] = useState<any>(null);
   const [viewingDoc, setViewingDoc] = useState<any>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [draggingFile, setDraggingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -100,24 +102,60 @@ export default function Training() {
   };
 
   const add = async () => {
-    if (!user || !title) {
-      toast.error("Please enter a title");
+    const resolvedTitle = title.trim() || file?.name || "ข้อมูลฝึกสอน";
+    if (!user || !resolvedTitle) {
+      toast.error("กรุณาใส่หัวข้อ");
       return;
     }
-    
-    let url = null;
-    if (file) {
-      url = await handleFileUpload(file);
-      if (!url) return;
-    }
+    setUploading(true);
+    try {
+      let url = null;
+      let resolvedContent = content;
+      if (file) {
+        if (type === "excel") {
+          const imported = (await parseStockFile(file)).slice(0, 1000);
+          if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
 
-    const { error } = await supabase.from("training_documents").insert({
-      user_id: user.id,
-      doc_type: type,
-      title,
-      content,
-      url,
-    });
+          const { data: existing } = await supabase
+            .from("products")
+            .select("id,name,sku")
+            .eq("user_id", user.id);
+          const existingBySku = new Map(((existing || []) as any[]).filter((p) => p.sku).map((p) => [String(p.sku).toLowerCase(), p]));
+          const existingByName = new Map(((existing || []) as any[]).map((p) => [String(p.name).toLowerCase(), p]));
+          const inserts: any[] = [];
+          const updates: { id: string; payload: any }[] = [];
+
+          imported.forEach((p) => {
+            const matched = (p.sku && existingBySku.get(p.sku.toLowerCase())) || existingByName.get(p.name.toLowerCase());
+            const payload = { user_id: user.id, ...p };
+            if (matched) updates.push({ id: matched.id, payload });
+            else inserts.push(payload);
+          });
+
+        if (inserts.length) {
+          const { error } = await supabase.from("products").insert(inserts);
+          if (error) throw error;
+        }
+        if (updates.length) {
+          const results = await Promise.all(updates.map((u) => supabase.from("products").update(u.payload).eq("id", u.id)));
+          const failed = results.find((r) => r.error);
+          if (failed?.error) throw failed.error;
+        }
+
+          resolvedContent = `${content ? `${content.trim()}\n\n` : ""}${buildStockTrainingContent(imported)}`;
+        }
+        url = await handleFileUpload(file);
+        if (!url) return;
+      }
+
+      const { error } = await supabase.from("training_documents").insert({
+        user_id: user.id,
+        doc_type: type,
+        title: resolvedTitle,
+        content: resolvedContent,
+        url,
+        status: "ready",
+      });
 
     if (error) {
       toast.error(error.message);
@@ -126,8 +164,13 @@ export default function Training() {
       setContent("");
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.success("Added to training");
-      load();
+        toast.success(type === "excel" ? "นำเข้าสต็อกและสอนบอทเรียบร้อย" : "เพิ่มข้อมูลสอนบอทแล้ว");
+        load();
+      }
+    } catch (error: any) {
+      toast.error(error.message || "เพิ่มข้อมูลสอนบอทไม่สำเร็จ");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -205,14 +248,24 @@ export default function Training() {
               />
             </div>
             {isFileType && (
-              <div className="space-y-2">
-                <Label>อัปโหลดไฟล์ (PDF, Excel)</Label>
+              <div
+                className={`space-y-2 rounded-lg border border-dashed border-border/60 p-3 transition ${draggingFile ? "border-primary shadow-glow" : ""}`}
+                onDragOver={(e) => { e.preventDefault(); setDraggingFile(true); }}
+                onDragLeave={() => setDraggingFile(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDraggingFile(false);
+                  const dropped = e.dataTransfer.files?.[0];
+                  if (dropped) setFile(dropped);
+                }}
+              >
+                <Label>ลากไฟล์มาวาง หรือเลือกไฟล์ (PDF, CSV, XLSX)</Label>
                 <div className="flex gap-2">
                   <Input
                     type="file"
                     ref={fileInputRef}
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    accept={type === "pdf" ? ".pdf" : ".xlsx,.xls,.csv"}
+                    accept={type === "pdf" ? ".pdf" : ".xlsx,.csv"}
                     className="flex-1"
                   />
                   {file && (
