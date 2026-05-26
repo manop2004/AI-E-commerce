@@ -111,9 +111,7 @@ export default function Products() {
     if (!user || !file) return;
     setImporting(true);
     try {
-      const isCsv = file.name.toLowerCase().endsWith(".csv");
-      const rows = isCsv ? csvToRows(await file.text()) : ((await readXlsxFile(file)) as unknown as unknown[][]);
-      const imported = rowsToProducts(rows).slice(0, 1000);
+      const imported = (await parseStockFile(file)).slice(0, 1000);
       if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
 
       const existingBySku = new Map(items.filter((p) => p.sku).map((p) => [p.sku!.toLowerCase(), p]));
@@ -142,7 +140,7 @@ export default function Products() {
         user_id: user.id,
         doc_type: "excel",
         title: `สต็อกสินค้า: ${file.name}`,
-        content: imported.map((p) => `${p.name} | ${p.category || "ไม่ระบุหมวด"} | ${p.price} บาท | สต็อก ${p.stock}${p.description ? ` | ${p.description}` : ""}`).join("\n").slice(0, 20000),
+        content: buildStockTrainingContent(imported),
         status: "ready",
       });
 
