@@ -56,7 +56,7 @@ export default function Analytics() {
         <p className="text-sm text-muted-foreground">
           ถ้า “แชทเยอะ แต่ออเดอร์น้อย” ให้เพิ่มข้อมูลสินค้า/FAQ ในหน้าสอนบอท และเปิดหน้า Voice AI เพื่อดูว่าสินค้าไหนถูกถามบ่อย
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
