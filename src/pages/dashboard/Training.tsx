@@ -265,7 +265,7 @@ export default function Training() {
                     type="file"
                     ref={fileInputRef}
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    accept={type === "pdf" ? ".pdf" : ".xlsx,.xls,.csv"}
+                    accept={type === "pdf" ? ".pdf" : ".xlsx,.csv"}
                     className="flex-1"
                   />
                   {file && (
