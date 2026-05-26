@@ -39,6 +39,7 @@ export default function Products() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [draggingStock, setDraggingStock] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -183,11 +184,20 @@ export default function Products() {
         </div>
       </div>
 
-      <Card className="p-4 bg-gradient-card border-border/50">
+      <Card
+        className={`p-4 bg-gradient-card border-border/50 border-dashed transition ${draggingStock ? "border-primary shadow-glow" : ""}`}
+        onDragOver={(e) => { e.preventDefault(); setDraggingStock(true); }}
+        onDragLeave={() => setDraggingStock(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDraggingStock(false);
+          importStockFile(e.dataTransfer.files?.[0]);
+        }}
+      >
         <div className="flex items-start gap-3 text-sm text-muted-foreground">
           <FileSpreadsheet className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>
-            <div className="font-medium text-foreground">โยนไฟล์ CSV / XLSX เพื่อให้ AI เรียนรู้สต็อกสินค้า</div>
+            <div className="font-medium text-foreground">ลากไฟล์ CSV / XLSX มาวางตรงนี้ หรือกดปุ่มนำเข้าไฟล์สต็อก</div>
             <div>รองรับหัวคอลัมน์: ชื่อสินค้า, SKU/รหัสสินค้า, ราคา, สต็อก/จำนวน, หมวดหมู่, รายละเอียด — รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม</div>
           </div>
         </div>
