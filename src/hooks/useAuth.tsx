@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (s?.user) {
         setTimeout(async () => {
           const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-          setIsAdmin(!!data?.some((r) => r.role === "admin"));
+          setIsAdmin(Array.isArray(data) && data.some((r) => r.role === "admin"));
         }, 0);
       } else setIsAdmin(false);
     });
