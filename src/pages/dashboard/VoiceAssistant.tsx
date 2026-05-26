@@ -58,7 +58,7 @@ export default function VoiceAssistant() {
   const { user } = useAuth();
   const speech = useSpeechRecognition("th-TH");
   const [products, setProducts] = useState<VoiceProduct[]>([]);
-  const [suggested, setSuggested] = useState<VoiceProduct[]>([]);
+  const [suggested, setSuggested] = useState<RankedProduct[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
@@ -79,12 +79,11 @@ export default function VoiceAssistant() {
     const handle = setTimeout(() => {
       setSearching(true);
       const ranked = products
-        .map((p) => ({ product: p, score: scoreProduct(p, t) }))
-        .filter((x) => x.score > 0)
+        .map((p) => ({ product: p, ...scoreProduct(p, t) }))
+        .filter((x) => x.score >= 36)
         .sort((a, b) => b.score - a.score || b.product.stock - a.product.stock)
-        .slice(0, 8)
-        .map((x) => x.product);
-      setSuggested(ranked.length ? ranked : products.slice(0, 4));
+        .slice(0, 6);
+      setSuggested(ranked);
       setSearching(false);
     }, 300);
     return () => clearTimeout(handle);
@@ -176,7 +175,7 @@ export default function VoiceAssistant() {
           </Card>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {suggested.map((p) => (
+            {suggested.map(({ product: p, reason }) => (
               <Card key={p.id} className="p-3 bg-gradient-card border-border/50 hover:border-primary/50 hover:shadow-glow transition">
                 <div className="aspect-square rounded-md bg-muted overflow-hidden mb-2 grid place-items-center">
                   {p.image_url ? (
@@ -186,6 +185,7 @@ export default function VoiceAssistant() {
                   )}
                 </div>
                 <div className="text-sm font-semibold line-clamp-2">{p.name}</div>
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{reason}</div>
                 <div className="text-primary font-bold mt-1">฿{Number(p.price).toLocaleString()}</div>
                 <div className="text-xs text-muted-foreground mb-2">คงเหลือ {p.stock} ชิ้น</div>
                 <Button size="sm" variant="outline" className="w-full" onClick={() => copyPitch(p)}>
