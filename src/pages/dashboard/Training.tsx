@@ -54,6 +54,7 @@ export default function Training() {
   const [editingDoc, setEditingDoc] = useState<any>(null);
   const [viewingDoc, setViewingDoc] = useState<any>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [draggingFile, setDraggingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -247,8 +248,18 @@ export default function Training() {
               />
             </div>
             {isFileType && (
-              <div className="space-y-2">
-                <Label>อัปโหลดไฟล์ (PDF, Excel)</Label>
+              <div
+                className={`space-y-2 rounded-lg border border-dashed border-border/60 p-3 transition ${draggingFile ? "border-primary shadow-glow" : ""}`}
+                onDragOver={(e) => { e.preventDefault(); setDraggingFile(true); }}
+                onDragLeave={() => setDraggingFile(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDraggingFile(false);
+                  const dropped = e.dataTransfer.files?.[0];
+                  if (dropped) setFile(dropped);
+                }}
+              >
+                <Label>ลากไฟล์มาวาง หรือเลือกไฟล์ (PDF, CSV, XLSX)</Label>
                 <div className="flex gap-2">
                   <Input
                     type="file"
