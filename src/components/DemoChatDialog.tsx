@@ -205,7 +205,7 @@ export function DemoChatDialog({ open, onOpenChange }: { open: boolean; onOpenCh
               className="flex-1 bg-background border border-border/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
-              onClick={send}
+              onClick={() => send()}
               disabled={loading || !draft.trim()}
               className="h-10 w-10 grid place-items-center rounded-xl bg-gradient-primary text-primary-foreground disabled:opacity-50"
             >

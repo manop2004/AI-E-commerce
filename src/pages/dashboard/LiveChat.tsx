@@ -168,7 +168,7 @@ export default function LiveChat() {
                   </Button>
                 )}
                 <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t("dash.typeMessage")} onKeyDown={(e) => e.key === "Enter" && send()} />
-                <Button onClick={send} className="bg-gradient-primary"><Send className="h-4 w-4" /></Button>
+                <Button onClick={() => send()} className="bg-gradient-primary"><Send className="h-4 w-4" /></Button>
               </div>
             </>
           ) : <div className="grid place-items-center flex-1 text-muted-foreground">Select a conversation</div>}

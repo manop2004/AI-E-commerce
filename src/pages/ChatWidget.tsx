@@ -155,7 +155,7 @@ export default function ChatWidget() {
             {voiceOut ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
           </button>
           <button
-            onClick={send}
+            onClick={() => send()}
             disabled={loading || !draft.trim()}
             className="h-10 w-10 grid place-items-center rounded-xl bg-gradient-primary text-primary-foreground disabled:opacity-50"
           >
