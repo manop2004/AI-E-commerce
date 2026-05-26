@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-<<<<<<< HEAD
-import { Send, Bot, User, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
 import { speak } from "@/hooks/useSpeech";
-=======
-import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff } from "lucide-react";
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
->>>>>>> 66fa002 (Torr)
 
 type Msg = { role: "user" | "assistant"; content: string };
 
