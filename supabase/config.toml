@@ -1,1 +1,4 @@
 project_id = "scjbepgyhpnnjuzclrmm"
+
+[functions.voice-recommend]
+verify_jwt = false

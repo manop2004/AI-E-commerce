@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Plus, Pencil, Trash2, Search, ImageIcon, Loader2, AlertTriangle, Upload, FileSpreadsheet } from "lucide-react";
+import { Package, Plus, Pencil, Trash2, Search, ImageIcon, Loader2, AlertTriangle, Upload, FileSpreadsheet, Download } from "lucide-react";
 import { toast } from "sonner";
-import { buildStockTrainingContent, parseStockFile } from "@/lib/stockImport";
+import { buildStockTrainingContent, parseStockFile, downloadStockTemplate } from "@/lib/stockImport";
 
 type Product = {
   id: string;
@@ -112,8 +112,15 @@ export default function Products() {
     if (!user || !file) return;
     setImporting(true);
     try {
-      const imported = (await parseStockFile(file)).slice(0, 1000);
-      if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
+      const parsed = await parseStockFile(file);
+      const imported = parsed.slice(0, 1000);
+      if (!imported.length) {
+        throw new Error("ไม่พบข้อมูลสินค้าในไฟล์ — กรุณาดาวน์โหลดเทมเพลตและกรอกตามตัวอย่าง (แถวแรกต้องเป็นหัวคอลัมน์: ชื่อสินค้า, ราคา, สต็อก ...)");
+      }
+      const noName = imported.filter((p) => !p.name?.trim()).length;
+      if (noName === imported.length) {
+        throw new Error("ทุกแถวไม่มีชื่อสินค้า — เช็คคอลัมน์ 'ชื่อสินค้า' (name) ในไฟล์");
+      }
 
       const existingBySku = new Map(items.filter((p) => p.sku).map((p) => [p.sku!.toLowerCase(), p]));
       const existingByName = new Map(items.map((p) => [p.name.toLowerCase(), p]));
@@ -129,26 +136,34 @@ export default function Products() {
 
       if (inserts.length) {
         const { error } = await supabase.from("products").insert(inserts);
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error", error);
+          throw new Error(`บันทึกสินค้าใหม่ไม่สำเร็จ: ${error.message}`);
+        }
       }
       if (updates.length) {
         const results = await Promise.all(updates.map((u) => supabase.from("products").update(u.payload).eq("id", u.id)));
         const failed = results.find((r) => r.error);
-        if (failed?.error) throw failed.error;
+        if (failed?.error) {
+          console.error("Update error", failed.error);
+          throw new Error(`อัปเดตสินค้าเดิมไม่สำเร็จ: ${failed.error.message}`);
+        }
       }
 
-      await supabase.from("training_documents").insert({
+      const { error: trainErr } = await supabase.from("training_documents").insert({
         user_id: user.id,
         doc_type: "excel",
         title: `สต็อกสินค้า: ${file.name}`,
         content: buildStockTrainingContent(imported),
         status: "ready",
       });
+      if (trainErr) console.error("Training insert error", trainErr);
 
-      toast.success(`นำเข้าสำเร็จ ${imported.length} รายการ — AI ใช้แนะนำสินค้าได้ทันที`);
+      toast.success(`นำเข้าสำเร็จ ${imported.length} รายการ (เพิ่มใหม่ ${inserts.length} / อัปเดต ${updates.length}) — AI พร้อมแนะนำสินค้าทันที`);
       await load();
     } catch (e: any) {
-      toast.error(e.message || "นำเข้าไฟล์ไม่สำเร็จ");
+      console.error("Stock import error", e);
+      toast.error(e.message || "นำเข้าไฟล์ไม่สำเร็จ", { duration: 8000 });
     } finally {
       setImporting(false);
       if (importInputRef.current) importInputRef.current.value = "";
@@ -176,6 +191,9 @@ export default function Products() {
             className="hidden"
             onChange={(e) => importStockFile(e.target.files?.[0])}
           />
+          <Button variant="ghost" onClick={downloadStockTemplate}>
+            <Download className="h-4 w-4" />ดาวน์โหลดเทมเพลต
+          </Button>
           <Button variant="outline" onClick={() => importInputRef.current?.click()} disabled={importing}>
             {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             นำเข้าไฟล์สต็อก
@@ -196,9 +214,16 @@ export default function Products() {
       >
         <div className="flex items-start gap-3 text-sm text-muted-foreground">
           <FileSpreadsheet className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-          <div>
+          <div className="space-y-2">
             <div className="font-medium text-foreground">ลากไฟล์ CSV / XLSX มาวางตรงนี้ หรือกดปุ่มนำเข้าไฟล์สต็อก</div>
-            <div>รองรับหัวคอลัมน์: ชื่อสินค้า, SKU/รหัสสินค้า, ราคา, สต็อก/จำนวน, หมวดหมู่, รายละเอียด — รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม</div>
+            <div>รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม สูงสุด 1,000 รายการต่อครั้ง</div>
+            <div className="rounded-md border border-border/40 bg-background/60 p-2 font-mono text-[11px] leading-5 overflow-x-auto">
+              <div className="text-foreground">ชื่อสินค้า, รหัสสินค้า, ราคา, ราคาเต็ม, สต็อก, หมวดหมู่, รายละเอียด</div>
+              <div>เสื้อยืดคอกลมสีขาว, TS-WHT-M, 290, 390, 25, เสื้อผ้า, ผ้าฝ้าย 100%</div>
+              <div>กางเกงยีนส์ทรงสลิม, JN-SLM-32, 890, 1290, 12, เสื้อผ้า, ทรงสลิม</div>
+              <div>รองเท้าผ้าใบสีดำ, SK-BLK-42, 1290, 1590, 8, รองเท้า, รุ่นคลาสสิก</div>
+            </div>
+            <div className="text-xs">ต้องมีแถวแรกเป็นหัวคอลัมน์ — กดปุ่ม "ดาวน์โหลดเทมเพลต" เพื่อรับไฟล์ตัวอย่าง</div>
           </div>
         </div>
       </Card>
