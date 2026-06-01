@@ -79,7 +79,7 @@ export const rowsToProducts = (rows: unknown[][]): ImportedProduct[] => {
 
   const first = cleanRows[0].map(normalizeHeader);
   const hasHeader = Object.values(headerAliases).some((aliases) => aliases.some((alias) => first.includes(normalizeHeader(alias))));
-  const headers = hasHeader ? cleanRows[0] : ["name", "sku", "price", "stock", "category", "description"];
+  const headers = hasHeader ? cleanRows[0] : ["name", "price", "stock", "sku", "category", "description"];
   const body = hasHeader ? cleanRows.slice(1) : cleanRows;
 
   const findIndex = (field: keyof ImportedProduct) => headers.findIndex((h) => {
@@ -98,6 +98,9 @@ export const rowsToProducts = (rows: unknown[][]): ImportedProduct[] => {
     category: findIndex("category"),
     status: findIndex("status"),
   };
+
+  // Fallback: if "name" header not detected, use the first non-empty column as name.
+  if (index.name < 0) index.name = 0;
 
   return body.map((row) => {
     const pick = (i: number) => (i >= 0 ? row[i] : "");
@@ -130,3 +133,24 @@ export const buildStockTrainingContent = (products: ImportedProduct[]) =>
     .map((p) => `${p.name} | ${p.category || "ไม่ระบุหมวด"} | ราคา ${p.price} บาท | สต็อก ${p.stock} ชิ้น${p.sku ? ` | SKU ${p.sku}` : ""}${p.description ? ` | ${p.description}` : ""}`)
     .join("\n")
     .slice(0, 20000);
+
+// Sample CSV the user can download to see the expected format.
+export const STOCK_TEMPLATE_CSV = `ชื่อสินค้า,รหัสสินค้า,ราคา,ราคาเต็ม,สต็อก,หมวดหมู่,รายละเอียด
+เสื้อยืดคอกลมสีขาว,TS-WHT-M,290,390,25,เสื้อผ้า,ผ้าฝ้าย 100% ไซส์ M
+กางเกงยีนส์ทรงสลิม,JN-SLM-32,890,1290,12,เสื้อผ้า,ทรงสลิม เอว 32
+รองเท้าผ้าใบสีดำ,SK-BLK-42,1290,1590,8,รองเท้า,รุ่นคลาสสิก ไซส์ 42
+กระเป๋าสะพายข้าง,BG-BRN-01,690,890,15,กระเป๋า,หนัง PU สีน้ำตาล
+หมวกแก๊ปสีกรม,CP-NVY-01,290,,30,เครื่องประดับ,ปรับขนาดได้
+`;
+
+export const downloadStockTemplate = () => {
+  const blob = new Blob(["\uFEFF" + STOCK_TEMPLATE_CSV], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "stock-template.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
