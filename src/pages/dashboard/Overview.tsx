@@ -9,9 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp, MessageSquare, Target, ShoppingCart, DollarSign, Package, UserPlus, RotateCcw, Sparkles
 } from "lucide-react";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, CartesianGrid } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-const COLORS = ["hsl(250 95% 65%)", "hsl(220 90% 60%)", "hsl(190 95% 55%)", "hsl(280 80% 65%)"];
+const CHANNEL_LABEL: Record<string, string> = {
+  shopify: "Shopify", line_oa: "LINE OA", messenger: "Messenger",
+  instagram: "Instagram", web_widget: "เว็บไซต์", other: "อื่นๆ",
+};
 
 export default function Overview() {
   const { t } = useTranslation();
@@ -42,8 +45,16 @@ export default function Overview() {
   };
 
   const today = metrics[metrics.length - 1] || { revenue: 0, ai_revenue: 0, chats_count: 0, orders_count: 0, conversion_rate: 0, new_customers: 0, returning_customers: 0 };
-  const channelData = orders.reduce((acc: Record<string, number>, o) => { acc[o.channel || "other"] = (acc[o.channel || "other"] || 0) + Number(o.amount); return acc; }, {});
-  const pieData = Object.entries(channelData).map(([name, value]) => ({ name, value }));
+  const last7 = metrics.slice(-7).map((m) => ({
+    day: new Date(m.metric_date).toLocaleDateString("th-TH", { weekday: "short" }),
+    revenue: Number(m.revenue || 0),
+  }));
+  const channelTotals = orders.reduce((acc: Record<string, number>, o) => {
+    const k = o.channel || "other"; acc[k] = (acc[k] || 0) + Number(o.amount); return acc;
+  }, {});
+  const channels = Object.entries(channelTotals).map(([k, v]) => ({ name: CHANNEL_LABEL[k] || k, value: v as number }))
+    .sort((a, b) => b.value - a.value);
+  const channelMax = channels.reduce((m, c) => Math.max(m, c.value), 0);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -66,42 +77,48 @@ export default function Overview() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 p-6 bg-gradient-card border-border/50">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <div>
-              <h3 className="font-display font-semibold text-lg">{t("dash.revenueTrend")}</h3>
-              <p className="text-sm text-muted-foreground">AI revenue vs Total</p>
+              <h3 className="font-display font-semibold text-lg">ยอดขาย 7 วันล่าสุด</h3>
+              <p className="text-sm text-muted-foreground">รวมทุกช่องทาง (บาท)</p>
             </div>
-            <Badge variant="outline" className="border-success/40 text-success">{t("dash.aiRevenue")}: ฿{Number(today.ai_revenue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</Badge>
+            <Badge variant="outline" className="border-success/40 text-success">วันนี้: ฿{Number(today.revenue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</Badge>
           </div>
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={metrics}>
-              <defs>
-                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(250 95% 65%)" stopOpacity={0.5} /><stop offset="100%" stopColor="hsl(250 95% 65%)" stopOpacity={0} /></linearGradient>
-                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(220 90% 60%)" stopOpacity={0.4} /><stop offset="100%" stopColor="hsl(220 90% 60%)" stopOpacity={0} /></linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-              <XAxis dataKey="metric_date" stroke="hsl(var(--muted-foreground))" fontSize={11} tickFormatter={(v) => new Date(v).getDate().toString()} />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-              <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-              <Area type="monotone" dataKey="revenue" stroke="hsl(250 95% 65%)" strokeWidth={2} fill="url(#g1)" />
-              <Area type="monotone" dataKey="ai_revenue" stroke="hsl(220 90% 60%)" strokeWidth={2} fill="url(#g2)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          {last7.length === 0 ? (
+            <div className="h-[240px] grid place-items-center text-sm text-muted-foreground">ยังไม่มีข้อมูล</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={last7} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.25} vertical={false} />
+                <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} width={48} tickFormatter={(v) => v >= 1000 ? `${Math.round(v/1000)}k` : v} />
+                <Tooltip cursor={{ fill: "hsl(var(--muted))", opacity: 0.2 }} contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} formatter={(v) => [`฿${Number(v).toLocaleString()}`, "ยอดขาย"]} />
+                <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </Card>
 
         <Card className="p-6 bg-gradient-card border-border/50">
-          <h3 className="font-display font-semibold text-lg mb-1">{t("dash.channelBreakdown")}</h3>
-          <p className="text-sm text-muted-foreground mb-4">By revenue</p>
-          {pieData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} paddingAngle={4}>
-                  {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                </Pie>
-                <Tooltip contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <div className="h-[240px] grid place-items-center text-sm text-muted-foreground">No data yet</div>}
+          <h3 className="font-display font-semibold text-lg mb-1">ช่องทางที่ขายดี</h3>
+          <p className="text-sm text-muted-foreground mb-4">จากออเดอร์ล่าสุด</p>
+          {channels.length === 0 ? (
+            <div className="h-[200px] grid place-items-center text-sm text-muted-foreground">ยังไม่มีข้อมูล</div>
+          ) : (
+            <div className="space-y-3">
+              {channels.map((c) => (
+                <div key={c.name}>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="font-medium">{c.name}</span>
+                    <span className="text-muted-foreground">฿{c.value.toLocaleString()}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted/40 overflow-hidden">
+                    <div className="h-full bg-gradient-primary rounded-full" style={{ width: `${channelMax ? (c.value / channelMax) * 100 : 0}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
