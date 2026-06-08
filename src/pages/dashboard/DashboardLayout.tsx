@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard, Plug, ToggleRight, GraduationCap, MessagesSquare,
-  BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, ShoppingBag, Package, PhoneCall,
+  BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, Package, PhoneCall,
 } from "lucide-react";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { BotMasterSwitch } from "@/components/BotMasterSwitch";
