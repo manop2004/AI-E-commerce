@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard, Plug, ToggleRight, GraduationCap, MessagesSquare,
-  BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, ShoppingBag, Package, PhoneCall,
+  BarChart3, CreditCard, Shield, LogOut, Sparkles, Rocket, Package, PhoneCall,
 } from "lucide-react";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { BotMasterSwitch } from "@/components/BotMasterSwitch";
@@ -27,7 +27,6 @@ function AppSidebar() {
     { to: "/dashboard/getting-started", icon: Rocket, label: "Getting Started" },
     { to: "/dashboard/integrations", icon: Plug, label: t("dash.integrations") },
     { to: "/dashboard/products", icon: Package, label: "สินค้าของร้าน" },
-    { to: "/dashboard/shopify", icon: ShoppingBag, label: "Shopify" },
     { to: "/dashboard/features", icon: ToggleRight, label: t("dash.features") },
     { to: "/dashboard/training", icon: GraduationCap, label: t("dash.training") },
     { to: "/dashboard/livechat", icon: MessagesSquare, label: t("dash.livechat") },
