@@ -27,7 +27,6 @@ function AppSidebar() {
     { to: "/dashboard/getting-started", icon: Rocket, label: "Getting Started" },
     { to: "/dashboard/integrations", icon: Plug, label: t("dash.integrations") },
     { to: "/dashboard/products", icon: Package, label: "สินค้าของร้าน" },
-    { to: "/dashboard/shopify", icon: ShoppingBag, label: "Shopify" },
     { to: "/dashboard/features", icon: ToggleRight, label: t("dash.features") },
     { to: "/dashboard/training", icon: GraduationCap, label: t("dash.training") },
     { to: "/dashboard/livechat", icon: MessagesSquare, label: t("dash.livechat") },
