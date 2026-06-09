@@ -1,0 +1,1 @@
+ALTER TABLE public.integrations ADD COLUMN IF NOT EXISTS reply_mode TEXT NOT NULL DEFAULT 'auto' CHECK (reply_mode IN ('auto', 'human_only', 'trained_only'));
