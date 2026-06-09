@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff } from "lucide-react";
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
+import { ChatMessageContent } from "@/components/ChatMessageContent";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -96,11 +97,11 @@ export default function ChatWidget() {
               </div>
             )}
             <div
-              className={`max-w-[78%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
+              className={`max-w-[78%] px-3 py-2 rounded-2xl text-sm ${
                 m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
               }`}
             >
-              {m.content}
+              <ChatMessageContent content={m.content} />
             </div>
             {m.role === "user" && (
               <div className="h-7 w-7 rounded-full bg-muted grid place-items-center shrink-0">

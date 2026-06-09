@@ -141,6 +141,7 @@ export type Database = {
           created_at: string
           id: string
           provider: Database["public"]["Enums"]["integration_provider"]
+          reply_mode: string
           status: Database["public"]["Enums"]["integration_status"]
           store_name: string | null
           user_id: string
@@ -151,6 +152,7 @@ export type Database = {
           created_at?: string
           id?: string
           provider: Database["public"]["Enums"]["integration_provider"]
+          reply_mode?: string
           status?: Database["public"]["Enums"]["integration_status"]
           store_name?: string | null
           user_id: string
@@ -161,6 +163,7 @@ export type Database = {
           created_at?: string
           id?: string
           provider?: Database["public"]["Enums"]["integration_provider"]
+          reply_mode?: string
           status?: Database["public"]["Enums"]["integration_status"]
           store_name?: string | null
           user_id?: string

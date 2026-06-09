@@ -1,4 +1,4 @@
-import readXlsxFile from "read-excel-file/browser";
+import * as XLSX from "xlsx";
 
 export type ImportedProduct = {
   name: string;
@@ -120,11 +120,19 @@ export const rowsToProducts = (rows: unknown[][]): ImportedProduct[] => {
 
 export const parseStockFile = async (file: File) => {
   const lowerName = file.name.toLowerCase();
-  const rows = lowerName.endsWith(".csv") || lowerName.endsWith(".txt")
-    ? csvToRows(await file.text())
-    : lowerName.endsWith(".xlsx")
-      ? ((await readXlsxFile(file)) as unknown as unknown[][])
-      : (() => { throw new Error("รองรับเฉพาะไฟล์ .csv และ .xlsx"); })();
+  let rows: unknown[][];
+  if (lowerName.endsWith(".csv") || lowerName.endsWith(".txt")) {
+    rows = csvToRows(await file.text());
+  } else if (lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls") || lowerName.endsWith(".xlsm") || lowerName.endsWith(".ods")) {
+    const buffer = await file.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: "array", cellDates: false });
+    const sheetName = wb.SheetNames[0];
+    if (!sheetName) throw new Error("ไฟล์ Excel ว่างเปล่า");
+    const sheet = wb.Sheets[sheetName];
+    rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, raw: false, defval: "" }) as unknown[][];
+  } else {
+    throw new Error("รองรับเฉพาะไฟล์ .csv, .xlsx, .xls");
+  }
   return rowsToProducts(rows);
 };
 

@@ -76,7 +76,7 @@ const Landing = () => {
         <div className="container">
           <p className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-widest">เชื่อมต่อได้ทุกแพลตฟอร์ม · Connect everywhere</p>
           <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-muted-foreground">
-            {["Shopify", "WooCommerce", "Lazada", "Shopee", "LINE OA", "Messenger", "Instagram", "Web Widget"].map((n) => (
+            {["WooCommerce", "Lazada", "Shopee", "LINE OA", "Messenger", "Instagram", "WhatsApp", "Web Widget"].map((n) => (
               <div key={n} className="font-display text-xl md:text-2xl font-semibold opacity-60 hover:opacity-100 hover:text-foreground transition">{n}</div>
             ))}
           </div>

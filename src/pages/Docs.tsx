@@ -18,7 +18,7 @@ const sections = [
     icon: Plug,
     title: "เชื่อมต่อร้านค้า / ช่องทางขาย",
     items: [
-      ["Shopify", "ไปที่ Integrations เลือก Shopify → กรอก store URL ระบบจะ sync สินค้าและสต็อกอัตโนมัติ"],
+      ["WooCommerce", "ไปที่ Integrations เลือก WooCommerce → กรอก store URL ระบบจะ sync สินค้าและสต็อกอัตโนมัติ"],
       ["LINE OA", "สร้าง Channel ที่ developers.line.biz → คัดลอก Channel Access Token ใส่ในหน้า Integrations"],
       ["Messenger / Instagram", "เชื่อม Facebook Page ผ่าน Meta App → AI จะตอบใน Messenger/IG DM อัตโนมัติ"],
       ["Lazada / Shopee", "ใช้ OAuth ของ marketplace เพื่อ sync ออเดอร์และตอบ chat"],

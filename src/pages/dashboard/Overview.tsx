@@ -12,8 +12,8 @@ import {
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
 const CHANNEL_LABEL: Record<string, string> = {
-  shopify: "Shopify", line_oa: "LINE OA", messenger: "Messenger",
-  instagram: "Instagram", web_widget: "เว็บไซต์", other: "อื่นๆ",
+  line_oa: "LINE OA", messenger: "Messenger",
+  instagram: "Instagram", web_widget: "เว็บไซต์", woocommerce: "WooCommerce", other: "อื่นๆ",
 };
 
 export default function Overview() {

@@ -73,9 +73,20 @@ Deno.serve(async (req) => {
     (featRows || []).forEach((r: any) => { feat[r.feature_key] = r.enabled; });
     const on = (k: string) => feat[k] !== false; // default on if missing
 
-    // MASTER BOT SWITCH: if the owner turned the bot off, save the customer message
-    // (so the human operator can see it), mark for human takeover, and skip AI reply.
-    if (profile && profile.bot_enabled === false) {
+    // Resolve per-channel reply mode (auto | human_only | trained_only)
+    let replyMode: "auto" | "human_only" | "trained_only" = "auto";
+    const channelKey = (body.channel as string) || "web_widget";
+    if (channelKey) {
+      const { data: integ } = await admin
+        .from("integrations")
+        .select("reply_mode")
+        .eq("user_id", ownerId)
+        .eq("provider", channelKey as any)
+        .maybeSingle();
+      if (integ?.reply_mode) replyMode = integ.reply_mode as any;
+    }
+
+    const silentlyStoreAndExit = async (reason: string) => {
       if (conversationId) {
         await admin.from("messages").insert({
           conversation_id: conversationId,
@@ -92,13 +103,40 @@ Deno.serve(async (req) => {
             unread_count: 1,
           })
           .eq("id", conversationId);
+      } else if (body.customerName) {
+        // create conversation for human follow-up
+        const { data: conv } = await admin
+          .from("conversations")
+          .insert({
+            user_id: ownerId,
+            customer_name: body.customerName,
+            channel: channelKey as any,
+            last_message: userMessageContent,
+            status: "human_takeover",
+            unread_count: 1,
+          })
+          .select()
+          .single();
+        if (conv) {
+          conversationId = conv.id;
+          await admin.from("messages").insert({
+            conversation_id: conv.id,
+            user_id: ownerId,
+            sender: "customer",
+            content: userMessageContent,
+          });
+        }
       }
-      return json({
-        reply: "",
-        skipped: true,
-        reason: "bot_disabled",
-        conversationId: conversationId ?? null,
-      });
+      return json({ reply: "", skipped: true, reason, conversationId: conversationId ?? null });
+    };
+
+    // MASTER BOT SWITCH: if owner turned bot off → silent, store for human.
+    if (profile && profile.bot_enabled === false) {
+      return await silentlyStoreAndExit("bot_disabled");
+    }
+    // Per-channel human-only mode: bot stays silent, message goes to human queue.
+    if (replyMode === "human_only") {
+      return await silentlyStoreAndExit("channel_human_only");
     }
 
     // Build conversation history + resolve customer name from conversation
@@ -126,18 +164,18 @@ Deno.serve(async (req) => {
       .join("\n\n")
       .slice(0, 6000);
 
-    // Pull store's own products from DB (preferred over Shopify)
+    // Pull store's own products from DB
     let catalogContext = "";
     const { data: ownProducts } = await admin
       .from("products")
-      .select("name, description, price, stock, category, sku")
+      .select("name, description, price, stock, category, sku, image_url")
       .eq("user_id", ownerId)
       .eq("status", "active")
       .gt("stock", 0)
       .limit(50);
     if (ownProducts && ownProducts.length) {
       catalogContext = ownProducts
-        .map((p: any) => `- ${p.name}${p.category ? ` [${p.category}]` : ""} | ฿${p.price} | สต็อก ${p.stock} ชิ้น${p.sku ? ` | SKU:${p.sku}` : ""} — ${(p.description || "").slice(0, 120)}`)
+        .map((p: any) => `- ${p.name}${p.category ? ` [${p.category}]` : ""} | ฿${p.price} | สต็อก ${p.stock} ชิ้น${p.sku ? ` | SKU:${p.sku}` : ""}${p.image_url ? ` | IMG:${p.image_url}` : ""} — ${(p.description || "").slice(0, 120)}`)
         .join("\n");
     }
 
@@ -192,10 +230,21 @@ Deno.serve(async (req) => {
 
     const orderingEnabled = on("ops_process_order");
 
+    const trainedOnlyRule = replyMode === "trained_only"
+      ? `\n\nSTRICT TRAINED-ONLY MODE (สำคัญมาก):
+- ตอบได้เฉพาะคำถามที่มีคำตอบใน KNOWLEDGE BASE หรือ LIVE PRODUCT CATALOG เท่านั้น
+- ถ้าไม่มีข้อมูลที่ตรงคำถาม → ตอบเป็นข้อความว่างเปล่าทั้งหมด (empty string) เด็ดขาด ห้ามแต่ง ห้ามทักทาย ห้ามขอโทษ — ระบบจะส่งต่อให้คนรับเอง`
+      : "";
+
     const systemPrompt = `You are an expert AI Sales & Customer Service agent for ${profile?.company_name || "this online store"}.
 Your goals: greet warmly, answer product questions, RECOMMEND products from the live catalog based on the customer's intent and purchase history, close sales, handle warranty/returns, and escalate to human when needed.
 Tone: friendly, helpful, concise.
-PRIMARY LANGUAGE: ${localeName} (locale ${localeKey}). Always answer in ${localeName} unless the customer clearly writes in another language, in which case match their language.
+
+LANGUAGE RULE (สำคัญที่สุด):
+- AUTO-DETECT ภาษาที่ลูกค้าใช้ในข้อความล่าสุด แล้วตอบกลับด้วยภาษานั้น ๆ เสมอ
+- รองรับ 40+ ภาษา: ไทย, English, 中文, 日本語, 한국어, Tiếng Việt, Bahasa Indonesia, Bahasa Melayu, Filipino, हिन्दी, العربية, Español, Português, Français, Deutsch, Русский, Italiano, Türkçe, Nederlands, ภาษาอื่น ๆ
+- ห้ามตอบเป็นภาษาอื่นที่ลูกค้าไม่ได้ใช้ ถ้าลูกค้าเปลี่ยนภาษา → เปลี่ยนตามทันที
+- Default language ถ้าตรวจไม่ได้: ${localeName}
 
 LIVE PRODUCT CATALOG (ใช้ข้อมูลนี้ในการแนะนำ — อย่าแต่งราคา/สต็อก):
 ${catalogContext || "(no catalog available)"}
@@ -206,6 +255,11 @@ ${capRules.join("\n")}
 
 KNOWLEDGE BASE:
 ${trainingContext || "(no training documents yet)"}
+${trainedOnlyRule}
+
+PRODUCT IMAGES (สำคัญ):
+- เมื่อแนะนำสินค้าที่มี IMG: url ใน catalog → แนบรูปด้วย markdown ทันที: ![ชื่อสินค้า](url)
+- ใส่รูปไว้ก่อนรายละเอียดสินค้า ลูกค้าจะเห็นรูปในแชท
 
 Rules:
 - Keep replies under 4 short sentences when possible.
@@ -284,7 +338,16 @@ ${orderingEnabled ? "" : "⚠️ ฟีเจอร์ Process Order ถูก�
     }
 
     const aiJson = await aiRes.json();
-    const rawReply: string = aiJson.choices?.[0]?.message?.content?.trim() || "ขออภัยค่ะ ดิฉันไม่สามารถตอบคำถามนี้ได้ในขณะนี้";
+    const rawReply: string = aiJson.choices?.[0]?.message?.content?.trim() || "";
+
+    // Trained-only mode: if AI returned empty (or only whitespace), stay silent.
+    if (replyMode === "trained_only" && !rawReply) {
+      return await silentlyStoreAndExit("trained_only_no_match");
+    }
+    if (!rawReply) {
+      // No fallback bot message — stay silent so customer isn't told "bot can't reply".
+      return await silentlyStoreAndExit("empty_ai_response");
+    }
 
     // Parse <<ORDER:name|qty>> markers → decrement stock + create order
     let reply = rawReply;
