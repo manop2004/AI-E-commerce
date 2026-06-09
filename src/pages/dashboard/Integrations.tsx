@@ -6,13 +6,11 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Code2, Copy, ExternalLink, Settings, Eye, EyeOff, Trash2, ShoppingBag } from "lucide-react";
+import { Check, Code2, Copy, ExternalLink, Settings, Bot, UserCog, BookOpen } from "lucide-react";
 import { ChannelSetupDialog } from "@/components/ChannelSetupDialog";
-import { Link } from "react-router-dom";
-import { SHOPIFY_STORE_PERMANENT_DOMAIN, SHOPIFY_STOREFRONT_TOKEN } from "@/integrations/shopify/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const PROVIDERS = [
-  { key: "shopify", name: "Shopify", color: "from-emerald-500/20" },
   { key: "woocommerce", name: "WooCommerce", color: "from-purple-500/20" },
   { key: "line_oa", name: "LINE OA", color: "from-green-500/20" },
   { key: "messenger", name: "Facebook Messenger", color: "from-blue-500/20" },
@@ -20,12 +18,17 @@ const PROVIDERS = [
   { key: "web_widget", name: "Website Chat Widget", color: "from-cyan-500/20" },
 ] as const;
 
+const REPLY_MODES = [
+  { value: "auto", label: "บอทตอบอัตโนมัติ", icon: Bot, hint: "บอทตอบทุกข้อความตามที่สอนไว้" },
+  { value: "trained_only", label: "ตอบเฉพาะที่สอนไว้", icon: BookOpen, hint: "ถ้าไม่รู้คำตอบ → เงียบ ให้คนรับช่วง" },
+  { value: "human_only", label: "คนตอบเท่านั้น", icon: UserCog, hint: "บอทไม่ตอบเลย เก็บข้อความให้แอดมิน" },
+] as const;
+
 export default function Integrations() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [list, setList] = useState<any[]>([]);
   const [setupProvider, setSetupProvider] = useState<"line_oa" | "messenger" | "instagram" | "woocommerce" | null>(null);
-  const [showToken, setShowToken] = useState(false);
 
   const SETUP_KEYS = new Set(["line_oa", "messenger", "instagram", "woocommerce"]);
 
@@ -46,6 +49,20 @@ export default function Integrations() {
       toast.success("Connected!");
     }
     load();
+  };
+
+  const updateReplyMode = async (key: string, mode: string) => {
+    if (!user) return;
+    setList((prev) => prev.map((i) => (i.provider === key ? { ...i, reply_mode: mode } : i)));
+    const { error } = await supabase
+      .from("integrations")
+      .upsert({ user_id: user.id, provider: key as any, reply_mode: mode } as any, { onConflict: "user_id,provider" });
+    if (error) {
+      toast.error("บันทึกโหมดบอทไม่สำเร็จ");
+      load();
+    } else {
+      toast.success("อัปเดตโหมดบอทแล้ว");
+    }
   };
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -80,20 +97,7 @@ export default function Integrations() {
                   </div>
                   {connected && <Badge variant="outline" className="border-success/40 text-success"><Check className="h-3 w-3 mr-1" />{t("dash.connected")}</Badge>}
                 </div>
-                {p.key === "shopify" ? (
-                  <div className="flex gap-2">
-                    <Link to="/dashboard/shopify" className="flex-1">
-                      <Button variant={connected ? "outline" : "default"} className={`w-full ${!connected ? "bg-gradient-primary" : ""}`}>
-                        จัดการสินค้า →
-                      </Button>
-                    </Link>
-                    {connected && (
-                      <Button onClick={() => toggle(p.key, true)} variant="ghost" size="icon" title="ยกเลิกการเชื่อม Shopify">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    )}
-                  </div>
-                ) : SETUP_KEYS.has(p.key) ? (
+                {SETUP_KEYS.has(p.key) ? (
                   <div className="flex gap-2">
                     <Button onClick={() => setSetupProvider(p.key as any)} variant={connected ? "outline" : "default"} className={`flex-1 ${!connected ? "bg-gradient-primary" : ""}`}>
                       <Settings className="h-4 w-4" /> {connected ? "แก้ไข" : "ตั้งค่า"}
@@ -107,51 +111,32 @@ export default function Integrations() {
                     {connected ? t("dash.disconnect") : t("dash.connect")}
                   </Button>
                 )}
+                {connected && (
+                  <div className="mt-3 pt-3 border-t border-border/40">
+                    <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">โหมดการตอบของบอท</div>
+                    <Select value={item?.reply_mode || "auto"} onValueChange={(v) => updateReplyMode(p.key, v)}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {REPLY_MODES.map((m) => (
+                          <SelectItem key={m.value} value={m.value}>
+                            <div className="flex items-center gap-2">
+                              <m.icon className="h-3.5 w-3.5" />
+                              <span>{m.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      {REPLY_MODES.find((m) => m.value === (item?.reply_mode || "auto"))?.hint}
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
           );
         })}
       </div>
-
-      {/* Shopify credentials card */}
-      <Card className="p-6 bg-gradient-card border-border/50">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-10 w-10 rounded-lg bg-emerald-500/15 grid place-items-center">
-            <ShoppingBag className="h-5 w-5 text-emerald-400" />
-          </div>
-          <div className="flex-1">
-            <div className="font-display font-semibold text-lg">Shopify Store ของคุณ</div>
-            <div className="text-xs text-muted-foreground">ข้อมูลร้านที่เชื่อมต่อกับระบบ AI</div>
-          </div>
-          <a href={`https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/admin`} target="_blank" rel="noreferrer">
-            <Button size="sm" variant="outline"><ExternalLink className="h-4 w-4" /> Shopify Admin</Button>
-          </a>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Store Domain</div>
-            <div className="flex items-center gap-2 bg-background/60 border border-border/50 rounded-lg p-2 font-mono text-xs">
-              <span className="flex-1 truncate">{SHOPIFY_STORE_PERMANENT_DOMAIN}</span>
-              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => copy(SHOPIFY_STORE_PERMANENT_DOMAIN)}><Copy className="h-3.5 w-3.5" /></Button>
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Storefront API Token</div>
-            <div className="flex items-center gap-2 bg-background/60 border border-border/50 rounded-lg p-2 font-mono text-xs">
-              <span className="flex-1 truncate">
-                {showToken ? SHOPIFY_STOREFRONT_TOKEN : "•".repeat(28) + SHOPIFY_STOREFRONT_TOKEN.slice(-4)}
-              </span>
-              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setShowToken(!showToken)}>
-                {showToken ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-              </Button>
-              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => copy(SHOPIFY_STOREFRONT_TOKEN)}><Copy className="h-3.5 w-3.5" /></Button>
-            </div>
-          </div>
-        </div>
-        <div className="mt-3 text-xs text-muted-foreground">
-          💡 ร้านนี้เป็น sandbox store (ฟรี) — พิมพ์ <code className="bg-muted px-1 rounded">Claim Store</code> ในแชท Lovable เพื่อรับ trial 30 วันและเข้า Shopify Admin จริง
-        </div>
-      </Card>
 
       {/* Web widget embed */}
       <Card id="widget" className="p-6 bg-gradient-card border-border/50">
@@ -161,7 +146,7 @@ export default function Integrations() {
           </div>
           <div>
             <div className="font-display font-semibold text-lg">Web Chat Widget</div>
-            <div className="text-xs text-muted-foreground">วาง snippet นี้ก่อนปิด &lt;/body&gt; บนเว็บไซต์ของคุณ</div>
+            <div className="text-xs text-muted-foreground">วาง snippet นี้ก่อนปิด &lt;/body&gt; บนเว็บไซต์ของคุณ — ปุ่มแชทจะโผล่มุมขวาล่างทันที</div>
           </div>
         </div>
 
@@ -179,10 +164,14 @@ export default function Integrations() {
           </a>
         </div>
 
-        <div className="mt-4 grid sm:grid-cols-3 gap-3 text-sm text-muted-foreground">
-          <div><span className="text-foreground font-semibold">1.</span> ลูกค้าเข้าเว็บคุณ</div>
-          <div><span className="text-foreground font-semibold">2.</span> เห็นปุ่มแชทมุมขวาล่าง</div>
-          <div><span className="text-foreground font-semibold">3.</span> AI ตอบทันที 24/7</div>
+        <div className="mt-4 rounded-lg bg-primary/5 border border-primary/20 p-3 text-xs text-muted-foreground">
+          <div className="font-semibold text-foreground mb-1">✅ ใช้ได้จริง — ทดสอบยังไง?</div>
+          <ol className="list-decimal list-inside space-y-0.5">
+            <li>กด <span className="font-semibold">Preview widget</span> เพื่อดูหน้าตาแชทก่อน</li>
+            <li>คัดลอก snippet ไปวางในไฟล์ HTML / theme ของเว็บคุณ (ก่อน <code className="bg-muted px-1 rounded">&lt;/body&gt;</code>)</li>
+            <li>เปิดเว็บคุณ — จะเห็นปุ่มแชทกลมๆ มุมขวาล่างทันที กดเปิดได้</li>
+            <li>ทุกข้อความที่ลูกค้าส่งมาจะมาโผล่ที่หน้า Live Chat ของ Dashboard</li>
+          </ol>
         </div>
       </Card>
 
