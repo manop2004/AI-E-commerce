@@ -13,7 +13,7 @@ export const en = {
     title1: "AI Commerce Agent",
     title2: "that sells for you 24/7",
     subtitle:
-      "AI platform for online merchants — chat, close deals, recommend products, check stock, and serve customers automatically. Connect Shopify, Lazada, Shopee, LINE, Messenger in one click.",
+      "AI platform for online merchants — chat, close deals, recommend products, check stock, and serve customers automatically. Connect LINE, Messenger, Instagram, Lazada, Shopee in one click.",
     ctaPrimary: "Start free",
     ctaSecondary: "Watch demo",
     socialProof: "Trusted by 1,200+ brands worldwide",
@@ -50,7 +50,7 @@ export const en = {
     title: "What customers say",
     items: [
       { name: "Patrick T.", role: "Beauty brand owner", quote: "Monthly revenue up 42% in the first quarter. We now run with one admin." },
-      { name: "Napa S.", role: "Shopify Store", quote: "Closing orders at 3am now, even international customers chat seamlessly." },
+      { name: "Napa S.", role: "Online Store", quote: "Closing orders at 3am now, even international customers chat seamlessly." },
       { name: "Wittaya K.", role: "IT retailer", quote: "Cross-sell runs itself. Average order value jumped 1.8x." },
     ],
   },
@@ -73,7 +73,7 @@ export const en = {
       { q: "Is it hard to set up?", a: "Not at all. Connect your store in one click — no code required, AI helps you set everything up." },
       { q: "Does the AI sound human?", a: "Powered by latest GPT/Gemini models. Natural conversations, learns your brand's tone of voice." },
       { q: "Do I need to pay to start?", a: "First 1,000 messages are free. No credit card required. Upgrade when ready." },
-      { q: "Can I connect my existing store?", a: "Yes — Shopify, WooCommerce, Lazada, Shopee, LINE OA, Messenger, Instagram, or your own website." },
+      { q: "Can I connect my existing store?", a: "Yes — WooCommerce, Lazada, Shopee, LINE OA, Messenger, Instagram, WhatsApp, or your own website via the Web Chat Widget." },
       { q: "Is my data secure?", a: "Encrypted end-to-end. ISO 27001 certified servers. PDPA & GDPR compliant." },
     ],
   },

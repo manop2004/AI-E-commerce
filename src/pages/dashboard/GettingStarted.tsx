@@ -36,7 +36,7 @@ export default function GettingStarted() {
           id: "connect",
           icon: Plug,
           title: "1. เชื่อมร้านค้า / ช่องทางขาย",
-          desc: "เชื่อม Shopify, LINE OA, Messenger, Instagram หรือเว็บไซต์ของคุณ",
+          desc: "เชื่อม LINE OA, Messenger, Instagram, WooCommerce หรือฝัง Web Chat Widget บนเว็บคุณ",
           href: "/dashboard/integrations",
           cta: "เชื่อมต่อร้าน",
           done: !!integ?.length,
