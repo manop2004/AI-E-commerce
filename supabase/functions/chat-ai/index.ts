@@ -138,32 +138,6 @@ Deno.serve(async (req) => {
     if (replyMode === "human_only") {
       return await silentlyStoreAndExit("channel_human_only");
     }
-    // Old block kept below removed in favor of helper above
-    if (false) {
-      if (conversationId) {
-        await admin.from("messages").insert({
-          conversation_id: conversationId,
-          user_id: ownerId,
-          sender: "customer",
-          content: userMessageContent,
-        });
-        await admin
-          .from("conversations")
-          .update({
-            last_message: userMessageContent,
-            last_message_at: new Date().toISOString(),
-            status: "human_takeover",
-            unread_count: 1,
-          })
-          .eq("id", conversationId);
-      }
-      return json({
-        reply: "",
-        skipped: true,
-        reason: "bot_disabled",
-        conversationId: conversationId ?? null,
-      });
-    }
 
     // Build conversation history + resolve customer name from conversation
     let history: { role: string; content: string }[] = [];
