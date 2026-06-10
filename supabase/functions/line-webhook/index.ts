@@ -79,7 +79,13 @@ Deno.serve(async (req) => {
         }),
       });
       const aiJson = await aiRes.json();
-      const reply: string = aiJson.reply || "ขออภัยค่ะ ดิฉันไม่สามารถตอบได้ในขณะนี้";
+      const reply: string = (aiJson.reply || "").trim();
+
+      // If bot is silenced (human_only / trained_only with no match / feature off) → DO NOT reply.
+      // This prevents the bot from interrupting LINE OA auto-replies or duplicating greetings.
+      if (!reply || aiJson.skipped) {
+        continue;
+      }
 
       // Reply via LINE
       if (replyToken) {
