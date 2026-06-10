@@ -111,6 +111,8 @@ export function ChannelSetupDialog({
             : provider === "messenger" ? "Facebook Page"
             : provider === "instagram" ? "Instagram"
             : provider === "woocommerce" ? (config.store_url || "WooCommerce")
+            : provider === "shopee" ? "Shopee Shop"
+            : provider === "lazada" ? "Lazada Shop"
             : "Channel",
           connected_at: new Date().toISOString(),
           config,
