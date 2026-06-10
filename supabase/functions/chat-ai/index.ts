@@ -138,6 +138,10 @@ Deno.serve(async (req) => {
     if (replyMode === "human_only") {
       return await silentlyStoreAndExit("channel_human_only");
     }
+    // If "ตอบแชท 24/7" feature is OFF → bot is paused entirely.
+    if (feat["cs_chat_24_7"] === false) {
+      return await silentlyStoreAndExit("chat_feature_disabled");
+    }
 
     // Build conversation history + resolve customer name from conversation
     let history: { role: string; content: string }[] = [];
@@ -219,7 +223,7 @@ Deno.serve(async (req) => {
     capRules.push(on("cs_order_check") ? "- ✅ ช่วยเช็คสถานะออเดอร์ได้" : "- ❌ ห้ามให้ข้อมูลสถานะออเดอร์ ให้โอนหาเจ้าหน้าที่");
     capRules.push(on("cs_tracking") ? "- ✅ ช่วยเช็ค Tracking พัสดุได้" : "- ❌ ห้ามให้ข้อมูล Tracking พัสดุ");
     capRules.push(on("cs_faq") ? "- ✅ ตอบ FAQ จาก KNOWLEDGE BASE ได้" : "- ❌ ห้ามตอบ FAQ ให้โอนหาเจ้าหน้าที่");
-    capRules.push(on("cs_multilang") ? "- ✅ ตอบได้หลายภาษาตามที่ลูกค้าใช้" : `- ❌ ตอบเป็น ${localeName} เท่านั้น แม้ลูกค้าจะใช้ภาษาอื่น`);
+    capRules.push("- ✅ ตอบได้ทุกภาษาตามที่ลูกค้าใช้ (40+ ภาษา) — ดู LANGUAGE RULE ด้านบน");
     // Ops
     capRules.push(on("ops_stock") ? "- ✅ บอกสต็อกสินค้าได้" : "- ❌ ห้ามเปิดเผยจำนวนสต็อก");
     capRules.push(on("ops_process_order") ? "- ✅ สร้างออเดอร์ให้ลูกค้าได้ (ใช้ <<ORDER:...>> marker)" : "- ❌ ห้ามสร้างออเดอร์ ห้ามใส่ <<ORDER:...>> marker ไม่ว่ากรณีใด ให้บอกลูกค้าว่าเจ้าหน้าที่จะติดต่อกลับเพื่อยืนยัน");
@@ -236,15 +240,16 @@ Deno.serve(async (req) => {
 - ถ้าไม่มีข้อมูลที่ตรงคำถาม → ตอบเป็นข้อความว่างเปล่าทั้งหมด (empty string) เด็ดขาด ห้ามแต่ง ห้ามทักทาย ห้ามขอโทษ — ระบบจะส่งต่อให้คนรับเอง`
       : "";
 
-    const systemPrompt = `You are an expert AI Sales & Customer Service agent for ${profile?.company_name || "this online store"}.
+    const systemPrompt = `[LANGUAGE RULE — HIGHEST PRIORITY, OVERRIDES EVERYTHING BELOW]
+You MUST detect the language of the customer's LATEST message and respond ENTIRELY in that exact same language. This rule overrides every other instruction.
+- If the customer writes in English → reply 100% in English. If Chinese → 100% Chinese. If Japanese → 100% Japanese. If Spanish, French, German, Korean, Vietnamese, Indonesian, Malay, Filipino, Hindi, Arabic, Portuguese, Russian, Italian, Turkish, Dutch, Polish, Swedish, Norwegian, Danish, Finnish, Czech, Greek, Hebrew, Bengali, Tamil, Urdu, Persian, Burmese, Khmer, Lao, Mongolian, Swahili, Ukrainian, Romanian, Hungarian, etc. → reply 100% in that language.
+- Supports 40+ languages. NEVER mix Thai into a non-Thai reply. NEVER default to Thai if the customer wrote in another language.
+- Only when the customer's language cannot be detected at all, fall back to ${localeName}.
+- If the customer switches language mid-conversation, switch with them immediately.
+
+You are an expert AI Sales & Customer Service agent for ${profile?.company_name || "this online store"}.
 Your goals: greet warmly, answer product questions, RECOMMEND products from the live catalog based on the customer's intent and purchase history, close sales, handle warranty/returns, and escalate to human when needed.
 Tone: friendly, helpful, concise.
-
-LANGUAGE RULE (สำคัญที่สุด):
-- AUTO-DETECT ภาษาที่ลูกค้าใช้ในข้อความล่าสุด แล้วตอบกลับด้วยภาษานั้น ๆ เสมอ
-- รองรับ 40+ ภาษา: ไทย, English, 中文, 日本語, 한국어, Tiếng Việt, Bahasa Indonesia, Bahasa Melayu, Filipino, हिन्दी, العربية, Español, Português, Français, Deutsch, Русский, Italiano, Türkçe, Nederlands, ภาษาอื่น ๆ
-- ห้ามตอบเป็นภาษาอื่นที่ลูกค้าไม่ได้ใช้ ถ้าลูกค้าเปลี่ยนภาษา → เปลี่ยนตามทันที
-- Default language ถ้าตรวจไม่ได้: ${localeName}
 
 LIVE PRODUCT CATALOG (ใช้ข้อมูลนี้ในการแนะนำ — อย่าแต่งราคา/สต็อก):
 ${catalogContext || "(no catalog available)"}

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Copy, ExternalLink } from "lucide-react";
 
-type Provider = "line_oa" | "messenger" | "instagram" | "woocommerce";
+type Provider = "line_oa" | "messenger" | "instagram" | "woocommerce" | "shopee" | "lazada";
 
 const FIELDS: Record<Provider, { key: string; label: string; help: string; placeholder?: string }[]> = {
   line_oa: [
@@ -50,6 +50,16 @@ const FIELDS: Record<Provider, { key: string; label: string; help: string; place
     { key: "consumer_key", label: "Consumer Key", help: "WooCommerce → Settings → Advanced → REST API → Add key (Read permission)" },
     { key: "consumer_secret", label: "Consumer Secret", help: "ได้พร้อมกับ Consumer Key — เก็บไว้ดีๆ ไม่แสดงอีกหลังสร้าง" },
   ],
+  shopee: [
+    { key: "shop_id", label: "Shop ID", help: "ดูได้ที่ Seller Centre → Account & Security", placeholder: "เช่น 123456789" },
+    { key: "partner_id", label: "Partner ID", help: "จาก Shopee Open Platform → My Apps" },
+    { key: "partner_key", label: "Partner Key", help: "Secret key คู่กับ Partner ID — เก็บไว้ดี ๆ" },
+  ],
+  lazada: [
+    { key: "seller_id", label: "Seller ID", help: "ดูได้ที่ Lazada Seller Center → My Account" },
+    { key: "app_key", label: "App Key", help: "จาก Lazada Open Platform → Create App" },
+    { key: "app_secret", label: "App Secret", help: "ได้พร้อมกับ App Key" },
+  ],
 };
 
 const TITLES: Record<Provider, string> = {
@@ -57,6 +67,8 @@ const TITLES: Record<Provider, string> = {
   messenger: "ตั้งค่า Facebook Messenger",
   instagram: "ตั้งค่า Instagram DM",
   woocommerce: "เชื่อมต่อ WooCommerce",
+  shopee: "เชื่อมต่อ Shopee",
+  lazada: "เชื่อมต่อ Lazada",
 };
 
 export function ChannelSetupDialog({
@@ -111,6 +123,8 @@ export function ChannelSetupDialog({
             : provider === "messenger" ? "Facebook Page"
             : provider === "instagram" ? "Instagram"
             : provider === "woocommerce" ? (config.store_url || "WooCommerce")
+            : provider === "shopee" ? "Shopee Shop"
+            : provider === "lazada" ? "Lazada Shop"
             : "Channel",
           connected_at: new Date().toISOString(),
           config,
