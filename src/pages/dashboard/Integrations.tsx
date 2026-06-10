@@ -8,10 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Code2, Copy, ExternalLink, Settings, Bot, UserCog, BookOpen } from "lucide-react";
 import { ChannelSetupDialog } from "@/components/ChannelSetupDialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const PROVIDERS = [
   { key: "woocommerce", name: "WooCommerce", color: "from-purple-500/20" },
+  { key: "shopee", name: "Shopee", color: "from-orange-500/20" },
+  { key: "lazada", name: "Lazada", color: "from-blue-500/20" },
   { key: "line_oa", name: "LINE OA", color: "from-green-500/20" },
   { key: "messenger", name: "Facebook Messenger", color: "from-blue-500/20" },
   { key: "instagram", name: "Instagram DM", color: "from-pink-500/20" },
@@ -28,9 +32,9 @@ export default function Integrations() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [list, setList] = useState<any[]>([]);
-  const [setupProvider, setSetupProvider] = useState<"line_oa" | "messenger" | "instagram" | "woocommerce" | null>(null);
+  const [setupProvider, setSetupProvider] = useState<"line_oa" | "messenger" | "instagram" | "woocommerce" | "shopee" | "lazada" | null>(null);
 
-  const SETUP_KEYS = new Set(["line_oa", "messenger", "instagram", "woocommerce"]);
+  const SETUP_KEYS = new Set(["line_oa", "messenger", "instagram", "woocommerce", "shopee", "lazada"]);
 
   const load = async () => {
     if (!user) return;
