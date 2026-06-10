@@ -152,7 +152,7 @@ export default function ChatWidget() {
   });
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-background text-foreground">
+    <div className="h-screen w-screen flex flex-col bg-background text-foreground relative">
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border/50 bg-card/40">
         <div className="h-9 w-9 rounded-lg bg-gradient-primary grid place-items-center shadow-glow">
           <Sparkles className="h-5 w-5 text-primary-foreground" />
