@@ -43,44 +43,62 @@ export type Database = {
       }
       conversations: {
         Row: {
+          budget_range: string | null
           channel: Database["public"]["Enums"]["integration_provider"]
           created_at: string
           customer_avatar: string | null
+          customer_intent: string | null
           customer_name: string
           external_id: string | null
           id: string
+          interested_categories: string[] | null
           last_message: string | null
           last_message_at: string
+          lead_score: number
           lead_tag: Database["public"]["Enums"]["lead_tag"] | null
+          preferred_language: string | null
           status: Database["public"]["Enums"]["conversation_status"]
+          summary: string | null
           unread_count: number
           user_id: string
         }
         Insert: {
+          budget_range?: string | null
           channel: Database["public"]["Enums"]["integration_provider"]
           created_at?: string
           customer_avatar?: string | null
+          customer_intent?: string | null
           customer_name: string
           external_id?: string | null
           id?: string
+          interested_categories?: string[] | null
           last_message?: string | null
           last_message_at?: string
+          lead_score?: number
           lead_tag?: Database["public"]["Enums"]["lead_tag"] | null
+          preferred_language?: string | null
           status?: Database["public"]["Enums"]["conversation_status"]
+          summary?: string | null
           unread_count?: number
           user_id: string
         }
         Update: {
+          budget_range?: string | null
           channel?: Database["public"]["Enums"]["integration_provider"]
           created_at?: string
           customer_avatar?: string | null
+          customer_intent?: string | null
           customer_name?: string
           external_id?: string | null
           id?: string
+          interested_categories?: string[] | null
           last_message?: string | null
           last_message_at?: string
+          lead_score?: number
           lead_tag?: Database["public"]["Enums"]["lead_tag"] | null
+          preferred_language?: string | null
           status?: Database["public"]["Enums"]["conversation_status"]
+          summary?: string | null
           unread_count?: number
           user_id?: string
         }
@@ -278,9 +296,13 @@ export type Database = {
           closed_by_ai: boolean
           created_at: string
           customer_name: string
+          customer_phone: string | null
           id: string
+          notes: string | null
           order_number: string
           product_name: string
+          quantity: number
+          shipping_address: string | null
           status: string
           user_id: string
         }
@@ -290,9 +312,13 @@ export type Database = {
           closed_by_ai?: boolean
           created_at?: string
           customer_name: string
+          customer_phone?: string | null
           id?: string
+          notes?: string | null
           order_number: string
           product_name: string
+          quantity?: number
+          shipping_address?: string | null
           status?: string
           user_id: string
         }
@@ -302,9 +328,13 @@ export type Database = {
           closed_by_ai?: boolean
           created_at?: string
           customer_name?: string
+          customer_phone?: string | null
           id?: string
+          notes?: string | null
           order_number?: string
           product_name?: string
+          quantity?: number
+          shipping_address?: string | null
           status?: string
           user_id?: string
         }
