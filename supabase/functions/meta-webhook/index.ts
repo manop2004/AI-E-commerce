@@ -89,7 +89,8 @@ Deno.serve(async (req) => {
           body: JSON.stringify({ ownerId, conversationId: conv.id, message: text, channel: platform }),
         });
         const aiJson = await aiRes.json();
-        const reply: string = aiJson.reply || "ขออภัยค่ะ";
+        const reply: string = (aiJson.reply || "").trim();
+        if (!reply || aiJson.skipped) continue; // silent → don't reply
 
         // Send back via Graph API
         await fetch(`https://graph.facebook.com/v19.0/me/messages?access_token=${pageToken}`, {
