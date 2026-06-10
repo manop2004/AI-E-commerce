@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
     capRules.push(on("cs_order_check") ? "- ✅ ช่วยเช็คสถานะออเดอร์ได้" : "- ❌ ห้ามให้ข้อมูลสถานะออเดอร์ ให้โอนหาเจ้าหน้าที่");
     capRules.push(on("cs_tracking") ? "- ✅ ช่วยเช็ค Tracking พัสดุได้" : "- ❌ ห้ามให้ข้อมูล Tracking พัสดุ");
     capRules.push(on("cs_faq") ? "- ✅ ตอบ FAQ จาก KNOWLEDGE BASE ได้" : "- ❌ ห้ามตอบ FAQ ให้โอนหาเจ้าหน้าที่");
-    capRules.push(on("cs_multilang") ? "- ✅ ตอบได้หลายภาษาตามที่ลูกค้าใช้" : `- ❌ ตอบเป็น ${localeName} เท่านั้น แม้ลูกค้าจะใช้ภาษาอื่น`);
+    capRules.push("- ✅ ตอบได้ทุกภาษาตามที่ลูกค้าใช้ (40+ ภาษา) — ดู LANGUAGE RULE ด้านบน");
     // Ops
     capRules.push(on("ops_stock") ? "- ✅ บอกสต็อกสินค้าได้" : "- ❌ ห้ามเปิดเผยจำนวนสต็อก");
     capRules.push(on("ops_process_order") ? "- ✅ สร้างออเดอร์ให้ลูกค้าได้ (ใช้ <<ORDER:...>> marker)" : "- ❌ ห้ามสร้างออเดอร์ ห้ามใส่ <<ORDER:...>> marker ไม่ว่ากรณีใด ให้บอกลูกค้าว่าเจ้าหน้าที่จะติดต่อกลับเพื่อยืนยัน");
