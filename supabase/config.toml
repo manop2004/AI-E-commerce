@@ -2,3 +2,6 @@ project_id = "scjbepgyhpnnjuzclrmm"
 
 [functions.voice-recommend]
 verify_jwt = false
+
+[functions.checkout]
+verify_jwt = false

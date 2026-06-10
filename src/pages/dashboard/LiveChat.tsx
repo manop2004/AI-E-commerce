@@ -141,6 +141,29 @@ export default function LiveChat() {
                   </Button>
                 </div>
               </div>
+              {(active.customer_intent || active.summary || (active.interested_categories && active.interested_categories.length) || active.lead_score > 0) && (
+                <div className="px-4 py-3 border-b border-border/40 bg-card/30 space-y-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="font-semibold text-muted-foreground">AI วิเคราะห์ลูกค้า:</span>
+                    {active.lead_score > 0 && (
+                      <Badge variant="outline" className={active.lead_score >= 70 ? "border-destructive/40 text-destructive" : active.lead_score >= 40 ? "border-warning/40 text-warning" : ""}>
+                        Lead {active.lead_score}/100
+                      </Badge>
+                    )}
+                    {active.customer_intent && <Badge variant="secondary">{active.customer_intent}</Badge>}
+                    {active.budget_range && <Badge variant="outline">งบ: {active.budget_range}</Badge>}
+                    {active.preferred_language && <Badge variant="outline">🌐 {active.preferred_language}</Badge>}
+                  </div>
+                  {active.interested_categories && active.interested_categories.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {active.interested_categories.map((c: string) => (
+                        <Badge key={c} variant="outline" className="text-[10px]">{c}</Badge>
+                      ))}
+                    </div>
+                  )}
+                  {active.summary && <div className="text-xs text-muted-foreground italic">"{active.summary}"</div>}
+                </div>
+              )}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {msgs.map((m) => {
                   const isCustomer = m.sender === "customer";
