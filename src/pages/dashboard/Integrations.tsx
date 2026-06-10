@@ -86,6 +86,18 @@ export default function Integrations() {
         <h1 className="font-display text-3xl font-bold">{t("dash.integrations")}</h1>
         <p className="text-muted-foreground mt-1">เชื่อมต่อร้านค้าและช่องทางการขายของคุณ</p>
       </div>
+
+      <Alert className="border-primary/30 bg-primary/5">
+        <Info className="h-4 w-4" />
+        <AlertDescription className="text-xs">
+          <b>เคล็ดลับ:</b> ถ้า LINE OA เปิด <b>"ข้อความตอบกลับอัตโนมัติ"</b> หรือ <b>"ข้อความทักทาย"</b> ไว้แล้ว ให้เลือกโหมด
+          <span className="mx-1 px-1.5 py-0.5 rounded bg-muted text-foreground">ตอบเฉพาะที่สอนไว้</span>
+          หรือ
+          <span className="mx-1 px-1.5 py-0.5 rounded bg-muted text-foreground">คนตอบเท่านั้น</span>
+          เพื่อไม่ให้บอทตอบซ้อนกับข้อความอัตโนมัติของ LINE OA — บอทจะเงียบและส่งต่อให้แอดมินแทน
+        </AlertDescription>
+      </Alert>
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {PROVIDERS.map((p) => {
           const item = list.find((i) => i.provider === p.key);
