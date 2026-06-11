@@ -294,51 +294,77 @@ export type Database = {
           amount: number
           channel: Database["public"]["Enums"]["integration_provider"] | null
           closed_by_ai: boolean
+          conversation_id: string | null
           created_at: string
           customer_name: string
           customer_phone: string | null
+          fulfillment_status: string
           id: string
           notes: string | null
           order_number: string
           product_name: string
           quantity: number
+          shipped_at: string | null
           shipping_address: string | null
           status: string
+          status_updated_at: string
+          tracking_number: string | null
+          tracking_url: string | null
           user_id: string
         }
         Insert: {
           amount: number
           channel?: Database["public"]["Enums"]["integration_provider"] | null
           closed_by_ai?: boolean
+          conversation_id?: string | null
           created_at?: string
           customer_name: string
           customer_phone?: string | null
+          fulfillment_status?: string
           id?: string
           notes?: string | null
           order_number: string
           product_name: string
           quantity?: number
+          shipped_at?: string | null
           shipping_address?: string | null
           status?: string
+          status_updated_at?: string
+          tracking_number?: string | null
+          tracking_url?: string | null
           user_id: string
         }
         Update: {
           amount?: number
           channel?: Database["public"]["Enums"]["integration_provider"] | null
           closed_by_ai?: boolean
+          conversation_id?: string | null
           created_at?: string
           customer_name?: string
           customer_phone?: string | null
+          fulfillment_status?: string
           id?: string
           notes?: string | null
           order_number?: string
           product_name?: string
           quantity?: number
+          shipped_at?: string | null
           shipping_address?: string | null
           status?: string
+          status_updated_at?: string
+          tracking_number?: string | null
+          tracking_url?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
