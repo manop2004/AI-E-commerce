@@ -33,6 +33,7 @@ const PAYMENT_OPTIONS = [
 
 type Order = {
   id: string;
+  user_id: string;
   order_number: string;
   customer_name: string;
   customer_phone: string | null;
