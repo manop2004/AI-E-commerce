@@ -99,14 +99,16 @@ export default function ChatWidget() {
       });
       const data = await res.json();
       if (data.success) {
+        const orderNumbers = (data.orders || []).map((o: any) => o.order_number);
+        const summary = `✅ รับออเดอร์เรียบร้อย ${orderNumbers[0] || ""}\n${(data.orders || []).map((o: any) => `• ${o.product_name} x${o.quantity} = ฿${o.amount}`).join("\n")}\nยอดรวม: ฿${(data.totalAmount || 0).toLocaleString()}\nวิธีชำระเงิน: ${form.paymentMethod === "bank_transfer" ? "โอนเงิน" : "เก็บเงินปลายทาง"}\nจัดส่งถึง: ${form.address}${data.trackingUrl ? `\nติดตามสถานะ: ${data.trackingUrl}` : ""}`;
         setOrderDone({
           total: data.totalAmount || 0,
-          orderNumbers: (data.orders || []).map((o: any) => o.order_number),
+          orderNumbers,
           trackingUrl: data.trackingUrl,
         });
         setCart([]);
         setCheckoutOpen(false);
-        setMsgs((m) => [...m, { role: "assistant", content: `✅ ยืนยันออเดอร์เรียบร้อย! เลขที่: ${(data.orders || []).map((o: any) => o.order_number).join(", ")} ยอดรวม ฿${(data.totalAmount || 0).toLocaleString()}${data.trackingUrl ? `\nติดตามสถานะได้ที่: ${data.trackingUrl}` : ""}` }]);
+        setMsgs((m) => m.some((msg) => msg.content === summary) ? m : [...m, { role: "assistant", content: summary }]);
       } else {
         const fail = (data.failures || []).join(", ");
         setMsgs((m) => [...m, { role: "assistant", content: `⚠️ สั่งซื้อไม่สำเร็จ: ${fail || data.error || "เกิดข้อผิดพลาด"}` }]);
