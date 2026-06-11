@@ -22,6 +22,7 @@ const ICONS: Record<string, any> = {
   low_stock: Package,
   human_takeover: UserCog,
   new_order: ShoppingCart,
+  order_status: Truck,
 };
 
 export function NotificationsBell() {
