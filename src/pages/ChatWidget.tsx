@@ -148,7 +148,7 @@ export default function ChatWidget() {
       if (data.conversationId) setConvId(data.conversationId);
       applyCartActions(data.cartActions);
       if (data.reply) {
-        setMsgs((m) => [...m, { role: "assistant", content: data.reply }]);
+        setMsgs((m) => m.some((msg) => msg.content === data.reply) ? m : [...m, { role: "assistant", content: data.reply }]);
       }
       else if (data.error) setMsgs((m) => [...m, { role: "assistant", content: `⚠️ ${data.error}` }]);
     } catch (e: any) {
