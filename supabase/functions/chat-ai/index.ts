@@ -188,14 +188,14 @@ Deno.serve(async (req) => {
     if (resolvedCustomerName) {
       const { data: orders } = await admin
         .from("orders")
-        .select("product_name, amount, channel, created_at")
+        .select("order_number, product_name, amount, channel, fulfillment_status, tracking_number, tracking_url, created_at")
         .eq("user_id", ownerId)
         .ilike("customer_name", resolvedCustomerName)
         .order("created_at", { ascending: false })
         .limit(10);
       if (orders && orders.length) {
         purchaseHistory = orders
-          .map((o: any) => `- ${o.product_name} (${o.amount} บาท, ${o.channel || "-"})`)
+          .map((o: any) => `- ${o.order_number}: ${o.product_name} (${o.amount} บาท, ${o.channel || "-"}) | status:${o.fulfillment_status || "pending"}${o.tracking_number ? ` | tracking:${o.tracking_number}` : ""}${o.tracking_url ? ` | url:${o.tracking_url}` : ""}`)
           .join("\n");
       }
     }
@@ -276,6 +276,7 @@ Rules:
 - ถ้ามี PURCHASE HISTORY ให้แนะนำสินค้าเสริม/อัพเกรดที่เข้ากันกับสิ่งที่เคยซื้อ
 - Always end sales-intent replies with a clear next step (e.g. "ต้องการสั่งเลยไหมคะ?").
 - Never invent prices, stock, or order numbers.
+- If the customer asks about order/shipping status, answer only from PURCHASE HISTORY above. If no matching order is available, ask for order number and phone, and tell them they can use /track/${ownerId}.
 
 ORDER CONFIRMATION PROTOCOL (สำคัญมาก):
 ${orderingEnabled ? "" : "⚠️ ฟีเจอร์ Process Order ถูกปิด — ห้ามใช้ <<ORDER:...>> marker เด็ดขาด ให้บอกลูกค้าว่าเจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันออเดอร์\n"}
