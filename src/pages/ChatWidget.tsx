@@ -240,7 +240,7 @@ export default function ChatWidget() {
       {checkoutOpen && (
         <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-50 flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-            <div className="font-display font-semibold">กรอกที่อยู่จัดส่ง</div>
+            <div className="font-display font-semibold">ชำระเงินและจัดส่ง</div>
             <button onClick={() => setCheckoutOpen(false)} className="h-8 w-8 grid place-items-center rounded-lg hover:bg-muted"><X className="h-4 w-4" /></button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -263,6 +263,19 @@ export default function ChatWidget() {
             <div>
               <label className="text-xs font-medium block mb-1">ที่อยู่จัดส่ง *</label>
               <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} rows={3} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์" />
+            </div>
+            <div>
+              <label className="text-xs font-medium block mb-1">วิธีชำระเงิน *</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => setForm({ ...form, paymentMethod: "cod" })} className={`rounded-lg border px-3 py-2 text-left text-sm ${form.paymentMethod === "cod" ? "border-primary bg-primary/10" : "border-border/50 bg-background"}`}>
+                  <span className="font-medium block">เก็บเงินปลายทาง</span>
+                  <span className="text-[11px] text-muted-foreground">จ่ายเมื่อได้รับสินค้า</span>
+                </button>
+                <button onClick={() => setForm({ ...form, paymentMethod: "bank_transfer" })} className={`rounded-lg border px-3 py-2 text-left text-sm ${form.paymentMethod === "bank_transfer" ? "border-primary bg-primary/10" : "border-border/50 bg-background"}`}>
+                  <span className="font-medium block">โอนเงิน</span>
+                  <span className="text-[11px] text-muted-foreground">ร้านค้าตรวจสอบยอด</span>
+                </button>
+              </div>
             </div>
             <div>
               <label className="text-xs font-medium block mb-1">หมายเหตุ</label>
