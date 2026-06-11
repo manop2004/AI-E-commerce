@@ -22,8 +22,8 @@ export default function ChatWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [orderDone, setOrderDone] = useState<null | { total: number; orderNumbers: string[] }>(null);
-  const [form, setForm] = useState({ name: customerName === "Visitor" ? "" : customerName, phone: "", address: "", notes: "" });
+  const [orderDone, setOrderDone] = useState<null | { total: number; orderNumbers: string[]; trackingUrl?: string }>(null);
+  const [form, setForm] = useState({ name: customerName === "Visitor" ? "" : customerName, phone: "", address: "", paymentMethod: "cod", notes: "" });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -33,6 +33,20 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs, loading]);
+
+  useEffect(() => {
+    if (!convId) return;
+    const ch = supabase
+      .channel(`widget-messages-${convId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${convId}` }, (payload) => {
+        const msg = payload.new as any;
+        if (msg.sender === "ai" || msg.sender === "human") {
+          setMsgs((prev) => prev.some((m) => m.content === msg.content) ? prev : [...prev, { role: "assistant", content: msg.content }]);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [convId]);
 
   const applyCartActions = (actions?: { action: "add" | "remove"; name: string; qty: number }[]) => {
     if (!actions?.length) return;
@@ -77,6 +91,7 @@ export default function ChatWidget() {
           customerName: form.name,
           customerPhone: form.phone,
           shippingAddress: form.address,
+          paymentMethod: form.paymentMethod,
           notes: form.notes,
           channel: "web_widget",
           items: cart,
@@ -87,10 +102,11 @@ export default function ChatWidget() {
         setOrderDone({
           total: data.totalAmount || 0,
           orderNumbers: (data.orders || []).map((o: any) => o.order_number),
+          trackingUrl: data.trackingUrl,
         });
         setCart([]);
         setCheckoutOpen(false);
-        setMsgs((m) => [...m, { role: "assistant", content: `✅ ยืนยันออเดอร์เรียบร้อย! เลขที่: ${(data.orders || []).map((o: any) => o.order_number).join(", ")} ยอดรวม ฿${(data.totalAmount || 0).toLocaleString()} จัดส่งภายใน 2-3 วันทำการค่ะ 🎉` }]);
+        setMsgs((m) => [...m, { role: "assistant", content: `✅ ยืนยันออเดอร์เรียบร้อย! เลขที่: ${(data.orders || []).map((o: any) => o.order_number).join(", ")} ยอดรวม ฿${(data.totalAmount || 0).toLocaleString()}${data.trackingUrl ? `\nติดตามสถานะได้ที่: ${data.trackingUrl}` : ""}` }]);
       } else {
         const fail = (data.failures || []).join(", ");
         setMsgs((m) => [...m, { role: "assistant", content: `⚠️ สั่งซื้อไม่สำเร็จ: ${fail || data.error || "เกิดข้อผิดพลาด"}` }]);
