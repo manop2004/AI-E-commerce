@@ -16,6 +16,7 @@ interface Body {
   customerPhone: string;
   shippingAddress: string;
   notes?: string;
+  paymentMethod?: string;
   channel?: string;
   items: CartItem[];
 }
@@ -32,6 +33,9 @@ Deno.serve(async (req) => {
     const createdOrders: any[] = [];
     let totalAmount = 0;
     const failures: string[] = [];
+    const orderNumber = "#A-" + Math.floor(10000 + Math.random() * 90000);
+    const origin = req.headers.get("origin") || "";
+    const trackingUrl = origin ? `${origin}/track/${body.ownerId}?order=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(body.customerPhone)}` : null;
 
     for (const item of body.items) {
       const qty = Math.max(1, Math.floor(item.qty || 1));
@@ -49,7 +53,8 @@ Deno.serve(async (req) => {
       await admin.from("products").update({ stock: prod.stock - qty }).eq("id", prod.id);
       const { data: order } = await admin.from("orders").insert({
         user_id: body.ownerId,
-        order_number: "#A-" + Math.floor(10000 + Math.random() * 90000),
+        conversation_id: body.conversationId || null,
+        order_number: orderNumber,
         customer_name: body.customerName,
         customer_phone: body.customerPhone,
         shipping_address: body.shippingAddress,
@@ -60,13 +65,16 @@ Deno.serve(async (req) => {
         closed_by_ai: true,
         channel: (body.channel as any) || "web_widget",
         status: "pending",
+        fulfillment_status: "pending",
+        payment_method: body.paymentMethod || "cod",
+        payment_status: body.paymentMethod === "bank_transfer" ? "pending" : "unpaid",
       }).select().single();
       if (order) createdOrders.push(order);
     }
 
     // Add a system message to the conversation summarizing the order
     if (body.conversationId && createdOrders.length) {
-      const summary = `✅ รับออเดอร์เรียบร้อย\n${createdOrders.map((o: any) => `• ${o.product_name} x${o.quantity} = ฿${o.amount}`).join("\n")}\nยอดรวม: ฿${totalAmount.toLocaleString()}\nจัดส่งถึง: ${body.shippingAddress}`;
+      const summary = `✅ รับออเดอร์เรียบร้อย ${orderNumber}\n${createdOrders.map((o: any) => `• ${o.product_name} x${o.quantity} = ฿${o.amount}`).join("\n")}\nยอดรวม: ฿${totalAmount.toLocaleString()}\nวิธีชำระเงิน: ${body.paymentMethod === "bank_transfer" ? "โอนเงิน" : "เก็บเงินปลายทาง"}\nจัดส่งถึง: ${body.shippingAddress}${trackingUrl ? `\nติดตามสถานะ: ${trackingUrl}` : ""}`;
       await admin.from("messages").insert({
         conversation_id: body.conversationId,
         user_id: body.ownerId,
@@ -83,6 +91,7 @@ Deno.serve(async (req) => {
       success: createdOrders.length > 0,
       orders: createdOrders,
       totalAmount,
+      trackingUrl,
       failures,
     });
   } catch (e) {

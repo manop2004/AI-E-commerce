@@ -289,9 +289,10 @@ export default function Training() {
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows={4}
-              placeholder={isFileType ? "สรุปย่อเกี่ยวกับไฟล์นี้ (ถ้ามี)" : "พิมพ์รายละเอียดที่ต้องการให้บอทจำ..."}
+              rows={6}
+              placeholder={isFileType ? "สรุปย่อหรือกฎที่ต้องการให้บอททำตามจากไฟล์นี้ (ถ้ามี)" : "เขียนเป็นกฎสั้นๆ เช่น: ถ้าลูกค้าถามค่าส่ง ให้ตอบว่า... / ห้ามเสนอส่วนลดเอง / ถ้าลูกค้าขอแอดมินให้หยุดตอบและส่งให้คน"}
             />
+            <p className="text-xs text-muted-foreground">แนะนำให้เขียนเป็น “ถ้า...ให้...” หรือ “ห้าม/ต้อง...” บอทจะใช้เป็นกฎบังคับตอนตอบลูกค้า</p>
           </div>
           <Button
             onClick={add}

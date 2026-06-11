@@ -22,7 +22,9 @@ import Billing from "./pages/dashboard/Billing";
 import Admin from "./pages/dashboard/Admin";
 import GettingStarted from "./pages/dashboard/GettingStarted";
 import Products from "./pages/dashboard/Products";
+import Orders from "./pages/dashboard/Orders";
 import ChatWidget from "./pages/ChatWidget";
+import OrderTracking from "./pages/OrderTracking";
 import Docs from "./pages/Docs";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +41,7 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/docs" element={<Docs />} />
             <Route path="/widget/:userId" element={<ChatWidget />} />
+            <Route path="/track/:ownerId" element={<OrderTracking />} />
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/signup" element={<Signup />} />
             <Route path="/auth/forgot" element={<ForgotPassword />} />
@@ -48,6 +51,7 @@ const App = () => (
               <Route path="getting-started" element={<GettingStarted />} />
               <Route path="integrations" element={<Integrations />} />
               <Route path="products" element={<Products />} />
+              <Route path="orders" element={<Orders />} />
               <Route path="features" element={<BotFeatures />} />
               <Route path="training" element={<Training />} />
               <Route path="livechat" element={<LiveChat />} />

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bell, Package, UserCog, ShoppingCart, CheckCheck } from "lucide-react";
+import { Bell, Package, UserCog, ShoppingCart, CheckCheck, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
@@ -22,6 +22,7 @@ const ICONS: Record<string, any> = {
   low_stock: Package,
   human_takeover: UserCog,
   new_order: ShoppingCart,
+  order_status: Truck,
 };
 
 export function NotificationsBell() {

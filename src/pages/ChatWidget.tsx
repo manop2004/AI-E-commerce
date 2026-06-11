@@ -22,8 +22,8 @@ export default function ChatWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [orderDone, setOrderDone] = useState<null | { total: number; orderNumbers: string[] }>(null);
-  const [form, setForm] = useState({ name: customerName === "Visitor" ? "" : customerName, phone: "", address: "", notes: "" });
+  const [orderDone, setOrderDone] = useState<null | { total: number; orderNumbers: string[]; trackingUrl?: string }>(null);
+  const [form, setForm] = useState({ name: customerName === "Visitor" ? "" : customerName, phone: "", address: "", paymentMethod: "cod", notes: "" });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -33,6 +33,20 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs, loading]);
+
+  useEffect(() => {
+    if (!convId) return;
+    const ch = supabase
+      .channel(`widget-messages-${convId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${convId}` }, (payload) => {
+        const msg = payload.new as any;
+        if (msg.sender === "ai" || msg.sender === "human") {
+          setMsgs((prev) => prev.some((m) => m.content === msg.content) ? prev : [...prev, { role: "assistant", content: msg.content }]);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [convId]);
 
   const applyCartActions = (actions?: { action: "add" | "remove"; name: string; qty: number }[]) => {
     if (!actions?.length) return;
@@ -77,6 +91,7 @@ export default function ChatWidget() {
           customerName: form.name,
           customerPhone: form.phone,
           shippingAddress: form.address,
+          paymentMethod: form.paymentMethod,
           notes: form.notes,
           channel: "web_widget",
           items: cart,
@@ -84,13 +99,16 @@ export default function ChatWidget() {
       });
       const data = await res.json();
       if (data.success) {
+        const orderNumbers = (data.orders || []).map((o: any) => o.order_number);
+        const summary = `✅ รับออเดอร์เรียบร้อย ${orderNumbers[0] || ""}\n${(data.orders || []).map((o: any) => `• ${o.product_name} x${o.quantity} = ฿${o.amount}`).join("\n")}\nยอดรวม: ฿${(data.totalAmount || 0).toLocaleString()}\nวิธีชำระเงิน: ${form.paymentMethod === "bank_transfer" ? "โอนเงิน" : "เก็บเงินปลายทาง"}\nจัดส่งถึง: ${form.address}${data.trackingUrl ? `\nติดตามสถานะ: ${data.trackingUrl}` : ""}`;
         setOrderDone({
           total: data.totalAmount || 0,
-          orderNumbers: (data.orders || []).map((o: any) => o.order_number),
+          orderNumbers,
+          trackingUrl: data.trackingUrl,
         });
         setCart([]);
         setCheckoutOpen(false);
-        setMsgs((m) => [...m, { role: "assistant", content: `✅ ยืนยันออเดอร์เรียบร้อย! เลขที่: ${(data.orders || []).map((o: any) => o.order_number).join(", ")} ยอดรวม ฿${(data.totalAmount || 0).toLocaleString()} จัดส่งภายใน 2-3 วันทำการค่ะ 🎉` }]);
+        setMsgs((m) => m.some((msg) => msg.content === summary) ? m : [...m, { role: "assistant", content: summary }]);
       } else {
         const fail = (data.failures || []).join(", ");
         setMsgs((m) => [...m, { role: "assistant", content: `⚠️ สั่งซื้อไม่สำเร็จ: ${fail || data.error || "เกิดข้อผิดพลาด"}` }]);
@@ -130,7 +148,7 @@ export default function ChatWidget() {
       if (data.conversationId) setConvId(data.conversationId);
       applyCartActions(data.cartActions);
       if (data.reply) {
-        setMsgs((m) => [...m, { role: "assistant", content: data.reply }]);
+        setMsgs((m) => m.some((msg) => msg.content === data.reply) ? m : [...m, { role: "assistant", content: data.reply }]);
       }
       else if (data.error) setMsgs((m) => [...m, { role: "assistant", content: `⚠️ ${data.error}` }]);
     } catch (e: any) {
@@ -224,7 +242,7 @@ export default function ChatWidget() {
       {checkoutOpen && (
         <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-50 flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-            <div className="font-display font-semibold">กรอกที่อยู่จัดส่ง</div>
+            <div className="font-display font-semibold">ชำระเงินและจัดส่ง</div>
             <button onClick={() => setCheckoutOpen(false)} className="h-8 w-8 grid place-items-center rounded-lg hover:bg-muted"><X className="h-4 w-4" /></button>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -247,6 +265,19 @@ export default function ChatWidget() {
             <div>
               <label className="text-xs font-medium block mb-1">ที่อยู่จัดส่ง *</label>
               <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} rows={3} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์" />
+            </div>
+            <div>
+              <label className="text-xs font-medium block mb-1">วิธีชำระเงิน *</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => setForm({ ...form, paymentMethod: "cod" })} className={`rounded-lg border px-3 py-2 text-left text-sm ${form.paymentMethod === "cod" ? "border-primary bg-primary/10" : "border-border/50 bg-background"}`}>
+                  <span className="font-medium block">เก็บเงินปลายทาง</span>
+                  <span className="text-[11px] text-muted-foreground">จ่ายเมื่อได้รับสินค้า</span>
+                </button>
+                <button onClick={() => setForm({ ...form, paymentMethod: "bank_transfer" })} className={`rounded-lg border px-3 py-2 text-left text-sm ${form.paymentMethod === "bank_transfer" ? "border-primary bg-primary/10" : "border-border/50 bg-background"}`}>
+                  <span className="font-medium block">โอนเงิน</span>
+                  <span className="text-[11px] text-muted-foreground">ร้านค้าตรวจสอบยอด</span>
+                </button>
+              </div>
             </div>
             <div>
               <label className="text-xs font-medium block mb-1">หมายเหตุ</label>
