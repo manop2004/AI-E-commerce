@@ -258,7 +258,11 @@ ${purchaseHistory ? `PURCHASE HISTORY ของลูกค้าคนนี้
 ENABLED CAPABILITIES (สำคัญมาก — ต้องปฏิบัติตามอย่างเคร่งครัด):
 ${capRules.join("\n")}
 
-KNOWLEDGE BASE:
+TRAINING / KNOWLEDGE BASE — MANDATORY STORE RULES (สำคัญมาก):
+- Treat every item below as instructions from the shop owner, not optional reference text.
+- If training says how to reply, what to offer, warranty rules, payment rules, delivery rules, tone, prohibited answers, auto-reply behavior, or handoff rules, you MUST follow it exactly unless it conflicts with the LANGUAGE RULE or disabled feature toggles.
+- If the owner wrote a direct rule such as "ห้าม...", "ต้อง...", "ถ้าลูกค้าถาม...ให้ตอบ...", obey that rule exactly.
+- Use LIVE PRODUCT CATALOG for price/stock truth, but use TRAINING for policy, tone, FAQ, process, and custom instructions.
 ${trainingContext || "(no training documents yet)"}
 ${trainedOnlyRule}
 
