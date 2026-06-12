@@ -4,7 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { ShoppingBag, Headphones, Wrench, Megaphone } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingBag, Headphones, Wrench, Megaphone, Lock, X } from "lucide-react";
+
+const PLAN_ORDER: Record<string, number> = { free: 0, starter: 1, growth: 2, enterprise: 3 };
 
 const GROUPS = {
   Sales: { icon: ShoppingBag, color: "primary", keys: ["sales_search", "sales_recommend", "sales_crosssell", "sales_bundle", "sales_dynamic_pricing"], labels: ["Search สินค้า", "Recommend สินค้า", "Cross-sell / Upsell", "Bundle Suggestion", "Dynamic Pricing"] },
@@ -17,20 +20,44 @@ export default function BotFeatures() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [features, setFeatures] = useState<Record<string, boolean>>({});
+  const [platform, setPlatform] = useState<Record<string, { enabled: boolean; required_plan: string }>>({});
+  const [userPlan, setUserPlan] = useState<string>("free");
 
   const load = async () => {
     if (!user) return;
-    const { data } = await supabase.from("bot_features").select("*");
+    const [{ data: bf }, { data: pf }, { data: sub }] = await Promise.all([
+      supabase.from("bot_features").select("*"),
+      supabase.from("platform_features").select("*"),
+      supabase.from("subscriptions").select("plan").eq("user_id", user.id).maybeSingle(),
+    ]);
     const map: Record<string, boolean> = {};
-    data?.forEach((f) => { map[f.feature_key] = f.enabled; });
+    bf?.forEach((f) => { map[f.feature_key] = f.enabled; });
     setFeatures(map);
+    const pmap: Record<string, { enabled: boolean; required_plan: string }> = {};
+    pf?.forEach((f: any) => { pmap[f.feature_key] = { enabled: f.enabled, required_plan: f.required_plan }; });
+    setPlatform(pmap);
+    setUserPlan(sub?.plan || "free");
   };
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => {
+    load();
+    const ch = supabase.channel("platform_features").on("postgres_changes",
+      { event: "*", schema: "public", table: "platform_features" }, load).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user]);
 
   const toggle = async (key: string, val: boolean) => {
     if (!user) return;
     setFeatures((p) => ({ ...p, [key]: val }));
     await supabase.from("bot_features").update({ enabled: val }).eq("user_id", user.id).eq("feature_key", key as any);
+  };
+
+  const gateOf = (key: string) => {
+    const p = platform[key];
+    if (!p) return { ok: true, reason: "" };
+    if (!p.enabled) return { ok: false, reason: "ปิดทั้งระบบโดยผู้ดูแล" };
+    if ((PLAN_ORDER[userPlan] ?? 0) < (PLAN_ORDER[p.required_plan] ?? 0))
+      return { ok: false, reason: `ต้องใช้แพ็ค ${p.required_plan}+` };
+    return { ok: true, reason: "" };
   };
 
   return (
@@ -44,12 +71,22 @@ export default function BotFeatures() {
               <h3 className="font-display font-bold text-xl">{name}</h3>
             </div>
             <div className="space-y-3">
-              {g.keys.map((k, i) => (
-                <div key={k} className="flex items-center justify-between p-3 rounded-lg hover:bg-card/50 transition">
-                  <span className="text-sm font-medium">{g.labels[i]}</span>
-                  <Switch checked={features[k] ?? true} onCheckedChange={(v) => toggle(k, v)} />
-                </div>
-              ))}
+              {g.keys.map((k, i) => {
+                const gate = gateOf(k);
+                return (
+                  <div key={k} className={`flex items-center justify-between p-3 rounded-lg transition ${gate.ok ? "hover:bg-card/50" : "opacity-60"}`}>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium flex items-center gap-2">
+                        {g.labels[i]}
+                        {!gate.ok && <Lock className="h-3 w-3 text-muted-foreground" />}
+                      </span>
+                      {!gate.ok && <span className="text-xs text-muted-foreground">{gate.reason}</span>}
+                    </div>
+                    <Switch checked={gate.ok && (features[k] ?? true)} disabled={!gate.ok}
+                      onCheckedChange={(v) => toggle(k, v)} />
+                  </div>
+                );
+              })}
             </div>
           </Card>
         ))}

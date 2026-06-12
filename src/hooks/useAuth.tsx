@@ -26,8 +26,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(s?.user ?? null);
       if (s?.user) {
         setTimeout(async () => {
-          const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-          setIsAdmin(Array.isArray(data) && data.some((r) => r.role === "admin"));
+          const [{ data: roles }, { data: profile }] = await Promise.all([
+            supabase.from("user_roles").select("role").eq("user_id", s.user.id),
+            supabase.from("profiles").select("suspended").eq("id", s.user.id).maybeSingle(),
+          ]);
+          if (profile?.suspended) {
+            await supabase.auth.signOut();
+            alert("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
+            return;
+          }
+          setIsAdmin(Array.isArray(roles) && roles.some((r) => r.role === "admin"));
         }, 0);
       } else setIsAdmin(false);
     });

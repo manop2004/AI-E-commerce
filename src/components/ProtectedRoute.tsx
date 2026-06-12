@@ -8,6 +8,6 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: { children: R
     return <div className="flex h-screen items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
   if (!user) return <Navigate to="/auth/login" replace />;
-  if (requireAdmin && !isAdmin) return <Navigate to="/dashboard" replace />;
+  if (requireAdmin && !isAdmin) return <Navigate to="/dashboard/admin/unlock" replace />;
   return <>{children}</>;
 };

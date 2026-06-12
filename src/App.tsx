@@ -20,6 +20,7 @@ import VoiceAssistant from "./pages/dashboard/VoiceAssistant";
 import Analytics from "./pages/dashboard/Analytics";
 import Billing from "./pages/dashboard/Billing";
 import Admin from "./pages/dashboard/Admin";
+import AdminUnlock from "./pages/dashboard/AdminUnlock";
 import GettingStarted from "./pages/dashboard/GettingStarted";
 import Products from "./pages/dashboard/Products";
 import Orders from "./pages/dashboard/Orders";
@@ -58,6 +59,7 @@ const App = () => (
               <Route path="voice" element={<VoiceAssistant />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="billing" element={<Billing />} />
+              <Route path="admin/unlock" element={<AdminUnlock />} />
               <Route path="admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
