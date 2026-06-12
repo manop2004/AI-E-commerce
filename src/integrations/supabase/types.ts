@@ -372,6 +372,69 @@ export type Database = {
           },
         ]
       }
+      plans: {
+        Row: {
+          currency: string
+          features: Json
+          highlight: boolean
+          is_active: boolean
+          key: string
+          name: string
+          price_monthly: number
+          price_yearly: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          features?: Json
+          highlight?: boolean
+          is_active?: boolean
+          key: string
+          name: string
+          price_monthly?: number
+          price_yearly?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          features?: Json
+          highlight?: boolean
+          is_active?: boolean
+          key?: string
+          name?: string
+          price_monthly?: number
+          price_yearly?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_features: {
+        Row: {
+          enabled: boolean
+          feature_key: string
+          label: string
+          required_plan: string
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          feature_key: string
+          label?: string
+          required_plan?: string
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          feature_key?: string
+          label?: string
+          required_plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string | null
@@ -433,6 +496,7 @@ export type Database = {
           full_name: string | null
           id: string
           locale: string
+          suspended: boolean
           updated_at: string
         }
         Insert: {
@@ -444,6 +508,7 @@ export type Database = {
           full_name?: string | null
           id: string
           locale?: string
+          suspended?: boolean
           updated_at?: string
         }
         Update: {
@@ -455,6 +520,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           locale?: string
+          suspended?: boolean
           updated_at?: string
         }
         Relationships: []
