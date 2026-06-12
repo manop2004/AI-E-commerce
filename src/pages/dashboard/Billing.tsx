@@ -7,21 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Download } from "lucide-react";
 
-const PLANS = [
-  { key: "free", name: "Free", price: "฿0", features: ["1,000 messages/mo", "1 channel"] },
-  { key: "starter", name: "Starter", price: "฿1,490", features: ["20,000 messages/mo", "3 channels"] },
-  { key: "growth", name: "Growth", price: "฿4,990", features: ["Unlimited", "All channels"] },
-  { key: "enterprise", name: "Enterprise", price: "Custom", features: ["Custom AI", "SLA 99.9%"] },
-];
+type Plan = { key: string; name: string; price_monthly: number; features: string[]; highlight: boolean; is_active: boolean };
 
 export default function Billing() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [sub, setSub] = useState<any>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     if (!user) return;
     supabase.from("subscriptions").select("*").eq("user_id", user.id).maybeSingle().then(({ data }) => setSub(data));
+    supabase.from("plans").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
+      setPlans(((data as any) || []).map((p: any) => ({ ...p, features: Array.isArray(p.features) ? p.features : [] })));
+    });
   }, [user]);
 
   return (
@@ -40,10 +39,13 @@ export default function Billing() {
       </Card>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {PLANS.map((p) => (
-          <Card key={p.key} className={`p-6 bg-gradient-card border-border/50 ${sub?.plan === p.key ? "border-primary shadow-glow" : ""}`}>
+        {plans.map((p) => (
+          <Card key={p.key} className={`p-6 bg-gradient-card border-border/50 ${sub?.plan === p.key ? "border-primary shadow-glow" : ""} ${p.highlight ? "border-primary/60" : ""}`}>
             <div className="font-display font-bold text-lg">{p.name}</div>
-            <div className="font-display text-3xl font-bold my-3">{p.price}</div>
+            <div className="font-display text-3xl font-bold my-3">
+              {Number(p.price_monthly) === 0 ? (p.key === "enterprise" ? "Custom" : "฿0") : `฿${Number(p.price_monthly).toLocaleString()}`}
+              {Number(p.price_monthly) > 0 && <span className="text-sm font-normal text-muted-foreground">/mo</span>}
+            </div>
             <ul className="space-y-2 mb-4 text-sm">
               {p.features.map((f) => <li key={f} className="flex items-start gap-2"><Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />{f}</li>)}
             </ul>
