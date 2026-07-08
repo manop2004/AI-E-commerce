@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,6 +13,7 @@ type Plan = { key: string; name: string; price_monthly: number; features: string
 export default function Billing() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const nav = useNavigate();
   const [sub, setSub] = useState<any>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
 
@@ -49,7 +51,12 @@ export default function Billing() {
             <ul className="space-y-2 mb-4 text-sm">
               {p.features.map((f) => <li key={f} className="flex items-start gap-2"><Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />{f}</li>)}
             </ul>
-            <Button variant={sub?.plan === p.key ? "outline" : "default"} disabled={sub?.plan === p.key} className={`w-full ${sub?.plan !== p.key ? "bg-gradient-primary" : ""}`}>
+            <Button
+              variant={sub?.plan === p.key ? "outline" : "default"}
+              disabled={sub?.plan === p.key}
+              onClick={() => sub?.plan !== p.key && nav(`/dashboard/billing/checkout/${p.key}`)}
+              className={`w-full ${sub?.plan !== p.key ? "bg-gradient-primary" : ""}`}
+            >
               {sub?.plan === p.key ? "Current" : "Upgrade"}
             </Button>
           </Card>

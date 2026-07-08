@@ -47,10 +47,10 @@ export default function Integrations() {
     if (!user) return;
     if (currentlyConnected) {
       await supabase.from("integrations").update({ status: "disconnected", connected_at: null }).eq("user_id", user.id).eq("provider", key as any);
-      toast.success("Disconnected");
+      toast.success(t("dash.disconnected", "Disconnected"));
     } else {
       await supabase.from("integrations").upsert({ user_id: user.id, provider: key as any, status: "connected", store_name: `${key}-store`, connected_at: new Date().toISOString() }, { onConflict: "user_id,provider" });
-      toast.success("Connected!");
+      toast.success(t("dash.connectedStatus", "Connected!"));
     }
     load();
   };
@@ -62,10 +62,10 @@ export default function Integrations() {
       .from("integrations")
       .upsert({ user_id: user.id, provider: key as any, reply_mode: mode } as any, { onConflict: "user_id,provider" });
     if (error) {
-      toast.error("บันทึกโหมดบอทไม่สำเร็จ");
+      toast.error(t("dash.saveModeError", "บันทึกโหมดบอทไม่สำเร็จ"));
       load();
     } else {
-      toast.success("อัปเดตโหมดบอทแล้ว");
+      toast.success(t("dash.updateModeSuccess", "อัปเดตโหมดบอทแล้ว"));
     }
   };
 
@@ -77,24 +77,24 @@ export default function Integrations() {
 
   const copy = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied!");
+    toast.success(t("dash.copied", "Copied!"));
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="font-display text-3xl font-bold">{t("dash.integrations")}</h1>
-        <p className="text-muted-foreground mt-1">เชื่อมต่อร้านค้าและช่องทางการขายของคุณ</p>
+        <p className="text-muted-foreground mt-1">{t("dash.integrationsSub", "เชื่อมต่อร้านค้าและช่องทางการขายของคุณ")}</p>
       </div>
 
       <Alert className="border-primary/30 bg-primary/5">
         <Info className="h-4 w-4" />
         <AlertDescription className="text-xs">
-          <b>เคล็ดลับ:</b> ถ้า LINE OA เปิด <b>"ข้อความตอบกลับอัตโนมัติ"</b> หรือ <b>"ข้อความทักทาย"</b> ไว้แล้ว ให้เลือกโหมด
-          <span className="mx-1 px-1.5 py-0.5 rounded bg-muted text-foreground">ตอบเฉพาะที่สอนไว้</span>
-          หรือ
-          <span className="mx-1 px-1.5 py-0.5 rounded bg-muted text-foreground">คนตอบเท่านั้น</span>
-          เพื่อไม่ให้บอทตอบซ้อนกับข้อความอัตโนมัติของ LINE OA — บอทจะเงียบและส่งต่อให้แอดมินแทน
+          <b>{t("dash.tip", "เคล็ดลับ:")}</b> {t("dash.lineOaTipStart", "ถ้า LINE OA เปิด \"ข้อความตอบกลับอัตโนมัติ\" หรือ \"ข้อความทักทาย\" ไว้แล้ว ให้เลือกโหมด")}
+          <span className="mx-1 px-1.5 py-0.5 rounded bg-muted text-foreground">{t("dash.replyModes.trained_only.label", "ตอบเฉพาะที่สอนไว้")}</span>
+          {t("dash.or", "หรือ")}
+          <span className="mx-1 px-1.5 py-0.5 rounded bg-muted text-foreground">{t("dash.replyModes.human_only.label", "คนตอบเท่านั้น")}</span>
+          {t("dash.lineOaTipEnd", "เพื่อไม่ให้บอทตอบซ้อนกับข้อความอัตโนมัติของ LINE OA — บอทจะเงียบและส่งต่อให้แอดมินแทน")}
         </AlertDescription>
       </Alert>
 
@@ -116,7 +116,7 @@ export default function Integrations() {
                 {SETUP_KEYS.has(p.key) ? (
                   <div className="flex gap-2">
                     <Button onClick={() => setSetupProvider(p.key as any)} variant={connected ? "outline" : "default"} className={`flex-1 ${!connected ? "bg-gradient-primary" : ""}`}>
-                      <Settings className="h-4 w-4" /> {connected ? "แก้ไข" : "ตั้งค่า"}
+                      <Settings className="h-4 w-4" /> {connected ? t("dash.edit", "แก้ไข") : t("dash.setup", "ตั้งค่า")}
                     </Button>
                     {connected && (
                       <Button onClick={() => toggle(p.key, true)} variant="ghost" size="sm">×</Button>
@@ -129,7 +129,7 @@ export default function Integrations() {
                 )}
                 {connected && (
                   <div className="mt-3 pt-3 border-t border-border/40">
-                    <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">โหมดการตอบของบอท</div>
+                    <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">{t("dash.botReplyMode", "โหมดการตอบของบอท")}</div>
                     <Select value={item?.reply_mode || "auto"} onValueChange={(v) => updateReplyMode(p.key, v)}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -137,14 +137,14 @@ export default function Integrations() {
                           <SelectItem key={m.value} value={m.value}>
                             <div className="flex items-center gap-2">
                               <m.icon className="h-3.5 w-3.5" />
-                              <span>{m.label}</span>
+                              <span>{t(`dash.replyModes.${m.value}.label`, m.label)}</span>
                             </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <div className="text-[10px] text-muted-foreground mt-1">
-                      {REPLY_MODES.find((m) => m.value === (item?.reply_mode || "auto"))?.hint}
+                      {t(`dash.replyModes.${item?.reply_mode || "auto"}.hint`, REPLY_MODES.find((m) => m.value === (item?.reply_mode || "auto"))?.hint)}
                     </div>
                   </div>
                 )}
@@ -162,7 +162,7 @@ export default function Integrations() {
           </div>
           <div>
             <div className="font-display font-semibold text-lg">Web Chat Widget</div>
-            <div className="text-xs text-muted-foreground">วาง snippet นี้ก่อนปิด &lt;/body&gt; บนเว็บไซต์ของคุณ — ปุ่มแชทจะโผล่มุมขวาล่างทันที</div>
+            <div className="text-xs text-muted-foreground">{t("dash.widgetDesc", "วาง snippet นี้ก่อนปิด </body> บนเว็บไซต์ของคุณ — ปุ่มแชทจะโผล่มุมขวาล่างทันที")}</div>
           </div>
         </div>
 
@@ -171,22 +171,22 @@ export default function Integrations() {
         </div>
         <div className="flex gap-2 mt-3 flex-wrap">
           <Button size="sm" onClick={() => copy(embedSnippet)} disabled={!embedSnippet}>
-            <Copy className="h-4 w-4" /> Copy snippet
+            <Copy className="h-4 w-4" /> {t("dash.copySnippet", "Copy snippet")}
           </Button>
           <a href={widgetUrl} target="_blank" rel="noreferrer">
             <Button size="sm" variant="outline" disabled={!widgetUrl}>
-              <ExternalLink className="h-4 w-4" /> Preview widget
+              <ExternalLink className="h-4 w-4" /> {t("dash.previewWidget", "Preview widget")}
             </Button>
           </a>
         </div>
 
         <div className="mt-4 rounded-lg bg-primary/5 border border-primary/20 p-3 text-xs text-muted-foreground">
-          <div className="font-semibold text-foreground mb-1">✅ ใช้ได้จริง — ทดสอบยังไง?</div>
+          <div className="font-semibold text-foreground mb-1">{t("dash.widgetTestTitle", "✅ ใช้ได้จริง — ทดสอบยังไง?")}</div>
           <ol className="list-decimal list-inside space-y-0.5">
-            <li>กด <span className="font-semibold">Preview widget</span> เพื่อดูหน้าตาแชทก่อน</li>
-            <li>คัดลอก snippet ไปวางในไฟล์ HTML / theme ของเว็บคุณ (ก่อน <code className="bg-muted px-1 rounded">&lt;/body&gt;</code>)</li>
-            <li>เปิดเว็บคุณ — จะเห็นปุ่มแชทกลมๆ มุมขวาล่างทันที กดเปิดได้</li>
-            <li>ทุกข้อความที่ลูกค้าส่งมาจะมาโผล่ที่หน้า Live Chat ของ Dashboard</li>
+            <li>{t("dash.widgetStep1Start", "กด")} <span className="font-semibold">{t("dash.previewWidget", "Preview widget")}</span> {t("dash.widgetStep1End", "เพื่อดูหน้าตาแชทก่อน")}</li>
+            <li>{t("dash.widgetStep2Start", "คัดลอก snippet ไปวางในไฟล์ HTML / theme ของเว็บคุณ (ก่อน")} <code className="bg-muted px-1 rounded">&lt;/body&gt;</code>)</li>
+            <li>{t("dash.widgetStep3", "เปิดเว็บคุณ — จะเห็นปุ่มแชทกลมๆ มุมขวาล่างทันที กดเปิดได้")}</li>
+            <li>{t("dash.widgetStep4", "ทุกข้อความที่ลูกค้าส่งมาจะมาโผล่ที่หน้า Live Chat ของ Dashboard")}</li>
           </ol>
         </div>
       </Card>

@@ -31,74 +31,17 @@ export const en = {
       { t: "Slow chat replies", d: "Customers message at midnight, no one replies → lost orders" },
       { t: "Expensive support team", d: "Hiring multiple agents per store gets costly fast" },
       { t: "Failed conversions", d: "Slow answers, weak suggestions, customers leave" },
-      { t: "Lost customers", d: "No system to recover abandoned carts" },
     ],
-  },
-  features: {
-    title: "Everything your AI Bot can do",
-    subtitle: "20+ features ready to toggle on/off",
-    sales: "Sales",
-    cs: "Customer service",
-    ops: "Operations",
-    mkt: "Marketing",
-  },
-  results: {
-    title: "Real results from real merchants",
-    subtitle: "After the first 90 days",
-  },
-  testimonials: {
-    title: "What customers say",
-    items: [
-      { name: "Patrick T.", role: "Beauty brand owner", quote: "Monthly revenue up 42% in the first quarter. We now run with one admin." },
-      { name: "Napa S.", role: "Online Store", quote: "Closing orders at 3am now, even international customers chat seamlessly." },
-      { name: "Wittaya K.", role: "IT retailer", quote: "Cross-sell runs itself. Average order value jumped 1.8x." },
-    ],
-  },
-  pricing: {
-    title: "Pick the right plan",
-    subtitle: "Start free. No credit card. Cancel anytime.",
-    monthly: "/ mo",
-    popular: "Popular",
-    cta: "Get started",
-    plans: {
-      free: { name: "Free", price: "$0", desc: "Try it out, perfect for small shops", features: ["1,000 messages/mo", "1 channel", "Core features", "Community support"] },
-      starter: { name: "Starter", price: "$45", desc: "For growing stores", features: ["20,000 messages/mo", "3 channels", "All AI features", "Email support"] },
-      growth: { name: "Growth", price: "$149", desc: "Scaling seriously", features: ["Unlimited messages", "All channels", "Live takeover", "Priority support"] },
-      enterprise: { name: "Enterprise", price: "Custom", desc: "Large organizations", features: ["Everything in Growth", "Custom AI training", "99.9% SLA", "Dedicated CSM"] },
-    },
-  },
-  faq: {
-    title: "Frequently asked questions",
-    items: [
-      { q: "Is it hard to set up?", a: "Not at all. Connect your store in one click — no code required, AI helps you set everything up." },
-      { q: "Does the AI sound human?", a: "Powered by latest GPT/Gemini models. Natural conversations, learns your brand's tone of voice." },
-      { q: "Do I need to pay to start?", a: "First 1,000 messages are free. No credit card required. Upgrade when ready." },
-      { q: "Can I connect my existing store?", a: "Yes — WooCommerce, Lazada, Shopee, LINE OA, Messenger, Instagram, WhatsApp, or your own website via the Web Chat Widget." },
-      { q: "Is my data secure?", a: "Encrypted end-to-end. ISO 27001 certified servers. PDPA & GDPR compliant." },
-    ],
-  },
-  cta: {
-    title: "Ready to grow your sales?",
-    subtitle: "Start free today. No credit card. Cancel anytime.",
-    button: "Start free now",
-  },
-  footer: {
-    product: "Product",
-    company: "Company",
-    resources: "Resources",
-    legal: "Legal",
-    rights: "© 2026 AI Commerce Agent. All rights reserved.",
-    tagline: "AI that helps online merchants sell more, 24/7.",
   },
   auth: {
     signinTitle: "Welcome back",
-    signinSub: "Sign in to manage your AI Bot",
-    signupTitle: "Start for free",
-    signupSub: "Create your account and connect a store in 2 minutes",
-    email: "Email",
+    signinSub: "Log in to manage your AI Bot",
+    signupTitle: "Start free today",
+    signupSub: "Create your account and connect store within 2 minutes",
+    email: "Email address",
     password: "Password",
-    fullName: "Full name",
-    company: "Company / Store name",
+    fullName: "Full Name",
+    company: "Company / Store Name",
     forgot: "Forgot password?",
     noAccount: "Don't have an account?",
     haveAccount: "Already have an account?",
@@ -115,7 +58,9 @@ export const en = {
   },
   dash: {
     overview: "Overview",
+    gettingStarted: "Getting Started",
     integrations: "Integrations",
+    integrationsSub: "Connect your stores and sales channels",
     features: "Bot Features",
     training: "Training",
     livechat: "Live Chat",
@@ -125,27 +70,151 @@ export const en = {
     settings: "Settings",
     logout: "Sign out",
     welcome: "Hello",
-    todayRevenue: "Today's revenue",
-    todayChats: "Today's chats",
-    conversion: "Conversion rate",
-    aiOrders: "AI-closed orders",
-    aiRevenue: "AI revenue",
-    topProduct: "Top product",
-    newCustomers: "New customers",
-    returning: "Returning customers",
-    revenueTrend: "Revenue trend (30 days)",
-    channelBreakdown: "Channel breakdown",
-    recentOrders: "Recent orders",
-    recentChats: "Recent chats",
-    seedDemo: "Load demo data",
-    seeded: "Demo data ready",
+    todayRevenue: "Today's Revenue",
+    todayChats: "Today's Chats",
+    conversion: "Conversion Rate",
+    aiOrders: "AI Orders",
+    aiRevenue: "AI Revenue",
+    topProduct: "Top Products",
+    newCustomers: "New Customers",
+    returning: "Returning Customers",
+    revenueTrend: "Revenue Trend (30 days)",
+    channelBreakdown: "Sales Channels",
+    recentOrders: "Recent Orders",
+    recentChats: "Recent Chats",
+    seedDemo: "Load Demo Data",
+    seeded: "Demo data is ready",
     connect: "Connect",
     disconnect: "Disconnect",
     connected: "Connected",
     enabled: "Enabled",
     upload: "Upload",
-    takeover: "Take over",
-    sendMessage: "Send",
+    takeover: "Take over chat",
+    sendMessage: "Send message",
     typeMessage: "Type a message...",
+    tip: "Tip:",
+    lineOaTipStart: "If LINE OA has \"Auto-reply messages\" or \"Greeting messages\" enabled, please select",
+    or: "or",
+    lineOaTipEnd: "mode to prevent the bot from overlapping with LINE OA's auto-replies — the bot will remain silent and hand over to admins.",
+    edit: "Edit",
+    setup: "Setup",
+    botReplyMode: "Bot Reply Mode",
+    replyModes: {
+      auto: {
+        label: "Auto Reply",
+        hint: "Bot replies to all messages based on training data"
+      },
+      trained_only: {
+        label: "Trained Only",
+        hint: "If answer is unknown → Stay silent, let human take over"
+      },
+      human_only: {
+        label: "Human Only",
+        hint: "Bot will not reply, keep messages for admins"
+      }
+    },
+    saveModeError: "Failed to save bot mode",
+    updateModeSuccess: "Bot mode updated successfully",
+    widgetDesc: "Paste this snippet before the closing </body> tag on your website — the chat button will instantly appear at the bottom right.",
+    copySnippet: "Copy snippet",
+    previewWidget: "Preview widget",
+    widgetTestTitle: "✅ Real & Functional — How to test?",
+    widgetStep1Start: "Click",
+    widgetStep1End: "to preview the chat interface first.",
+    widgetStep2Start: "Copy the snippet and paste it into your website's HTML / theme file (before",
+    widgetStep3: "Open your website — you will instantly see a round chat button at the bottom right, click to open.",
+    widgetStep4: "All messages sent by customers will appear on the Live Chat page of your Dashboard.",
+    onboarding: {
+      badge: "Onboarding",
+      mainTitle: "Get Started in 5 Steps",
+      mainSubtitle: "Follow the steps to launch your smart store within 10 minutes.",
+      progress: "Progress",
+      completed: "Completed",
+      edit: "Edit",
+      steps: {
+        connect: {
+          title: "1. Connect Store / Sales Channels",
+          desc: "Connect LINE OA, Messenger, Instagram, WooCommerce, or embed the Web Chat Widget on your website.",
+          cta: "Connect Store"
+        },
+        train: {
+          title: "2. Train AI with Your Store Data",
+          desc: "Upload catalogs, FAQs, and brand voice so AI answers exactly like your real staff.",
+          cta: "Add Training Data"
+        },
+        features: {
+          title: "3. Enable AI Bot Features",
+          desc: "Toggle capabilities like product recommendation, order closing, FAQ handling, and cart recovery.",
+          cta: "Bot Settings"
+        },
+        embed: {
+          title: "4. Install Widget on Your Website",
+          desc: "Paste a 1-line code snippet onto your website, and customers will instantly see the chat button at the bottom right.",
+          cta: "Copy Embed Code"
+        },
+        test: {
+          title: "5. Test and Go Live",
+          desc: "Test chatting with your AI in Live Chat, monitor sales in Analytics, and then launch to real customers.",
+          cta: "Test Chat with AI"
+        }
+      }
+    },
+    integrationsPage: {
+      title: "Connect Sales Channels",
+      subtitle: "Connect your social media and e-commerce platforms to start the AI.",
+      webWidgetTitle: "Web Chat Widget (Install on Website)",
+      webWidgetDesc: "Copy this code and paste it into your website to enable the smart chat system.",
+      copySnippet: "Copy snippet",
+      previewWidget: "Preview widget",
+      howToTest: "✅ Works perfectly — How to test?",
+      testStep1: "Click Preview widget to see how the chat looks first.",
+      testStep2: "Copy the snippet and paste it into your website's HTML / theme file (before ",
+      testStep3: "Open your website — you will instantly see a round chat button at the bottom right. Click to open.",
+      testStep4: "Every message sent by customers will appear on the Live Chat dashboard page.",
+      ecommerceChannels: "E-Commerce Channels",
+      chatChannels: "Chat / Social Channels",
+      manage: "Manage",
+      loading: "Loading...",
+      copied: "Copied to clipboard!"
+    }
   },
+  features: {
+    pageTitle: "Bot Features",
+    pageDesc: "Enable or disable specific AI capabilities for your store.",
+    groups: {
+      Sales: "Sales",
+      "Customer Service": "Customer Service",
+      Operations: "Operations",
+      Marketing: "Marketing"
+    },
+    sales: {
+      search: "Product Search",
+      recommend: "Product Recommendation",
+      crosssell: "Cross-sell / Upsell",
+      bundle: "Bundle Suggestion",
+      dynamic: "Dynamic Pricing"
+    },
+    cs: {
+      chat: "24/7 Auto Chat",
+      order: "Order Status Check",
+      tracking: "Parcel Tracking",
+      faq: "FAQ Auto Reply",
+      multilang: "Multi-language Support"
+    },
+    ops: {
+      stock: "Stock Checking",
+      process: "Order Processing (Cart)",
+      warranty: "Product Claims / Warranty",
+      reorder: "Auto Re-order",
+      fraud: "Fake Slip Detection"
+    },
+    mkt: {
+      broadcast: "Promotion Broadcast",
+      recover: "Recover Abandoned Cart",
+      coupon: "Coupons & Discounts",
+      loyalty: "Loyalty Points",
+      ab: "A/B Testing"
+    },
+    requiresPlan: "Requires {{plan}} plan"
+  }
 };

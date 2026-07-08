@@ -22,16 +22,17 @@ function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
 
+  // เปลี่ยนมาใช้ t() ครอบทุกตัวเพื่อให้เปลี่ยนภาษาได้อัตโนมัติ
   const items = [
     { to: "/dashboard", icon: LayoutDashboard, label: t("dash.overview"), end: true },
-    { to: "/dashboard/getting-started", icon: Rocket, label: "Getting Started" },
+    { to: "/dashboard/getting-started", icon: Rocket, label: t("dash.gettingStarted", "Getting Started") },
     { to: "/dashboard/integrations", icon: Plug, label: t("dash.integrations") },
-    { to: "/dashboard/products", icon: Package, label: "สินค้าของร้าน" },
-    { to: "/dashboard/orders", icon: PackageCheck, label: "คำสั่งซื้อ" },
+    { to: "/dashboard/products", icon: Package, label: t("dash.products", "Store Products") },
+    { to: "/dashboard/orders", icon: PackageCheck, label: t("dash.orders", "Orders") },
     { to: "/dashboard/features", icon: ToggleRight, label: t("dash.features") },
     { to: "/dashboard/training", icon: GraduationCap, label: t("dash.training") },
     { to: "/dashboard/livechat", icon: MessagesSquare, label: t("dash.livechat") },
-    { to: "/dashboard/voice", icon: PhoneCall, label: "Voice AI (ตอนโทร)" },
+    { to: "/dashboard/voice", icon: PhoneCall, label: t("dash.voiceAi", "Voice AI") },
     { to: "/dashboard/analytics", icon: BarChart3, label: t("dash.analytics") },
     { to: "/dashboard/billing", icon: CreditCard, label: t("dash.billing") },
   ];

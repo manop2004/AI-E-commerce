@@ -6,7 +6,7 @@ export type LangCode =
 export const LANGUAGES: { code: LangCode; label: string; native: string; flag: string }[] = [
   { code: "th",    label: "Thai",                native: "ไทย",        flag: "🇹🇭" },
   { code: "en",    label: "English",             native: "English",    flag: "🇬🇧" },
-  { code: "zh",    label: "Chinese (Simplified)", native: "简体中文",   flag: "🇨🇳" },
+  { code: "zh", label: "Chinese", native: "中文", flag: "🇨🇳" },
   { code: "zh-TW", label: "Chinese (Traditional)",native: "繁體中文",   flag: "🇹🇼" },
   { code: "ja",    label: "Japanese",            native: "日本語",      flag: "🇯🇵" },
   { code: "ko",    label: "Korean",              native: "한국어",      flag: "🇰🇷" },

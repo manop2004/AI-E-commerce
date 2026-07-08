@@ -3,13 +3,15 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { th } from "./th";
 import { en } from "./en";
+import { zh } from "./zh";
 import { LANGUAGES } from "./languages";
 
-// Build resources: th + en have full translations. The other 18 languages start as
+// Build resources: th + en + zh have full translations. The other languages start as
 // English copies (full UI works) — translators can override keys later.
 const baseResources: Record<string, { translation: any }> = {
   th: { translation: th },
   en: { translation: en },
+  zh: { translation: zh },
 };
 for (const l of LANGUAGES) {
   if (!baseResources[l.code]) baseResources[l.code] = { translation: en };
