@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
@@ -30,6 +31,7 @@ type Product = {
 const empty: Partial<Product> = { name: "", description: "", sku: "", price: 0, stock: 0, low_stock_threshold: 5, status: "active", category: "" };
 
 export default function Products() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ export default function Products() {
   const openEdit = (p: Product) => { setEditing(p); setImageFile(null); setOpen(true); };
 
   const save = async () => {
-    if (!user || !editing.name?.trim()) { toast.error("กรุณาใส่ชื่อสินค้า"); return; }
+    if (!user || !editing.name?.trim()) { toast.error(t("products.errorNoName", "กรุณาใส่ชื่อสินค้า")); return; }
     setSaving(true);
     try {
       let image_url = editing.image_url || null;
@@ -85,26 +87,26 @@ export default function Products() {
       if (editing.id) {
         const { error } = await supabase.from("products").update(payload).eq("id", editing.id);
         if (error) throw error;
-        toast.success("อัปเดตสินค้าแล้ว");
+        toast.success(t("products.successUpdate", "อัปเดตสินค้าแล้ว"));
       } else {
         const { error } = await supabase.from("products").insert(payload);
         if (error) throw error;
-        toast.success("เพิ่มสินค้าแล้ว");
+        toast.success(t("products.successAdd", "เพิ่มสินค้าแล้ว"));
       }
       setOpen(false);
       load();
     } catch (e: any) {
-      toast.error(e.message || "บันทึกไม่สำเร็จ");
+      toast.error(e.message || t("products.errorSave", "บันทึกไม่สำเร็จ"));
     } finally {
       setSaving(false);
     }
   };
 
   const remove = async (id: string) => {
-    if (!confirm("ลบสินค้านี้?")) return;
+    if (!confirm(t("products.deleteConfirm", "ลบสินค้านี้?"))) return;
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("ลบแล้ว");
+    toast.success(t("products.successDelete", "ลบแล้ว"));
     load();
   };
 
@@ -115,11 +117,11 @@ export default function Products() {
       const parsed = await parseStockFile(file);
       const imported = parsed.slice(0, 1000);
       if (!imported.length) {
-        throw new Error("ไม่พบข้อมูลสินค้าในไฟล์ — กรุณาดาวน์โหลดเทมเพลตและกรอกตามตัวอย่าง (แถวแรกต้องเป็นหัวคอลัมน์: ชื่อสินค้า, ราคา, สต็อก ...)");
+        throw new Error(t("products.errorNoData", "ไม่พบข้อมูลสินค้าในไฟล์ — กรุณาดาวน์โหลดเทมเพลตและกรอกตามตัวอย่าง (แถวแรกต้องเป็นหัวคอลัมน์: ชื่อสินค้า, ราคา, สต็อก ...)"));
       }
       const noName = imported.filter((p) => !p.name?.trim()).length;
       if (noName === imported.length) {
-        throw new Error("ทุกแถวไม่มีชื่อสินค้า — เช็คคอลัมน์ 'ชื่อสินค้า' (name) ในไฟล์");
+        throw new Error(t("products.errorNoNameCol", "ทุกแถวไม่มีชื่อสินค้า — เช็คคอลัมน์ 'ชื่อสินค้า' (name) ในไฟล์"));
       }
 
       const existingBySku = new Map(items.filter((p) => p.sku).map((p) => [p.sku!.toLowerCase(), p]));
@@ -137,29 +139,27 @@ export default function Products() {
       if (inserts.length) {
         const { error } = await supabase.from("products").insert(inserts);
         if (error) {
-          console.error("Insert error", error);
-          throw new Error(`บันทึกสินค้าใหม่ไม่สำเร็จ: ${error.message}`);
+          throw new Error(`Insert Error: ${error.message}`);
         }
       }
       if (updates.length) {
         const results = await Promise.all(updates.map((u) => supabase.from("products").update(u.payload).eq("id", u.id)));
         const failed = results.find((r) => r.error);
         if (failed?.error) {
-          console.error("Update error", failed.error);
-          throw new Error(`อัปเดตสินค้าเดิมไม่สำเร็จ: ${failed.error.message}`);
+          throw new Error(`Update Error: ${failed.error.message}`);
         }
       }
 
       const { error: trainErr } = await supabase.from("training_documents").insert({
         user_id: user.id,
         doc_type: "excel",
-        title: `สต็อกสินค้า: ${file.name}`,
+        title: `Stock: ${file.name}`,
         content: buildStockTrainingContent(imported),
         status: "ready",
       });
       if (trainErr) console.error("Training insert error", trainErr);
 
-      toast.success(`นำเข้าสำเร็จ ${imported.length} รายการ (เพิ่มใหม่ ${inserts.length} / อัปเดต ${updates.length}) — AI พร้อมแนะนำสินค้าทันที`);
+      toast.success(`นำเข้าสำเร็จ ${imported.length} รายการ (เพิ่มใหม่ ${inserts.length} / อัปเดต ${updates.length})`);
       await load();
     } catch (e: any) {
       console.error("Stock import error", e);
@@ -171,17 +171,17 @@ export default function Products() {
   };
 
   const stockBadge = (p: Product) => {
-    if (p.stock === 0) return <Badge variant="outline" className="border-destructive/40 text-destructive"><AlertTriangle className="h-3 w-3 mr-1" />หมด</Badge>;
-    if (p.stock <= p.low_stock_threshold) return <Badge variant="outline" className="border-warning/40 text-warning">ใกล้หมด ({p.stock})</Badge>;
-    return <Badge variant="outline" className="border-success/40 text-success">มี {p.stock} ชิ้น</Badge>;
+    if (p.stock === 0) return <Badge variant="outline" className="border-destructive/40 text-destructive"><AlertTriangle className="h-3 w-3 mr-1" />{t("products.outOfStock", "หมด")}</Badge>;
+    if (p.stock <= p.low_stock_threshold) return <Badge variant="outline" className="border-warning/40 text-warning">{t("products.lowStock", "ใกล้หมด", { count: p.stock })} ({p.stock})</Badge>;
+    return <Badge variant="outline" className="border-success/40 text-success">{t("products.inStock", "มี {{count}} ชิ้น", { count: p.stock })}</Badge>;
   };
 
   return (
     <div className="animate-fade-in space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2"><Package className="h-7 w-7" />สินค้าของร้าน</h1>
-          <p className="text-sm text-muted-foreground">จัดการสินค้า สต็อก และราคา — AI จะใช้ข้อมูลนี้แนะนำลูกค้า</p>
+          <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2"><Package className="h-7 w-7" />{t("products.title", "สินค้าของร้าน")}</h1>
+          <p className="text-sm text-muted-foreground">{t("products.subtitle", "จัดการสินค้า สต็อก และราคา — AI จะใช้ข้อมูลนี้แนะนำลูกค้า")}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <input
@@ -192,13 +192,13 @@ export default function Products() {
             onChange={(e) => importStockFile(e.target.files?.[0])}
           />
           <Button variant="ghost" onClick={downloadStockTemplate}>
-            <Download className="h-4 w-4" />ดาวน์โหลดเทมเพลต
+            <Download className="h-4 w-4 mr-2" />{t("products.downloadTemplate", "ดาวน์โหลดเทมเพลต")}
           </Button>
           <Button variant="outline" onClick={() => importInputRef.current?.click()} disabled={importing}>
-            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            นำเข้าไฟล์สต็อก
+            {importing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+            {t("products.importStock", "นำเข้าไฟล์สต็อก")}
           </Button>
-          <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4" />เพิ่มสินค้า</Button>
+          <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4 mr-2" />{t("products.addProduct", "เพิ่มสินค้า")}</Button>
         </div>
       </div>
 
@@ -215,15 +215,15 @@ export default function Products() {
         <div className="flex items-start gap-3 text-sm text-muted-foreground">
           <FileSpreadsheet className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div className="space-y-2">
-            <div className="font-medium text-foreground">ลากไฟล์ CSV / XLSX มาวางตรงนี้ หรือกดปุ่มนำเข้าไฟล์สต็อก</div>
-            <div>รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม สูงสุด 1,000 รายการต่อครั้ง</div>
+            <div className="font-medium text-foreground">{t("products.dragDrop", "ลากไฟล์ CSV / XLSX มาวางตรงนี้ หรือกดปุ่มนำเข้าไฟล์สต็อก")}</div>
+            <div>{t("products.importNote", "รายการที่มี SKU หรือชื่อซ้ำจะอัปเดตสต็อกเดิม สูงสุด 1,000 รายการต่อครั้ง")}</div>
             <div className="rounded-md border border-border/40 bg-background/60 p-2 font-mono text-[11px] leading-5 overflow-x-auto">
-              <div className="text-foreground">ชื่อสินค้า, รหัสสินค้า, ราคา, ราคาเต็ม, สต็อก, หมวดหมู่, รายละเอียด</div>
-              <div>เสื้อยืดคอกลมสีขาว, TS-WHT-M, 290, 390, 25, เสื้อผ้า, ผ้าฝ้าย 100%</div>
-              <div>กางเกงยีนส์ทรงสลิม, JN-SLM-32, 890, 1290, 12, เสื้อผ้า, ทรงสลิม</div>
-              <div>รองเท้าผ้าใบสีดำ, SK-BLK-42, 1290, 1590, 8, รองเท้า, รุ่นคลาสสิก</div>
+              <div className="text-foreground">{t("products.headers", "ชื่อสินค้า, รหัสสินค้า, ราคา, ราคาเต็ม, สต็อก, หมวดหมู่, รายละเอียด")}</div>
+              <div>{t("products.example1", "เสื้อยืดคอกลมสีขาว, TS-WHT-M, 290, 390, 25, เสื้อผ้า, ผ้าฝ้าย 100%")}</div>
+              <div>{t("products.example2", "กางเกงยีนส์ทรงสลิม, JN-SLM-32, 890, 1290, 12, เสื้อผ้า, ทรงสลิม")}</div>
+              <div>{t("products.example3", "รองเท้าผ้าใบสีดำ, SK-BLK-42, 1290, 1590, 8, รองเท้า, รุ่นคลาสสิก")}</div>
             </div>
-            <div className="text-xs">ต้องมีแถวแรกเป็นหัวคอลัมน์ — กดปุ่ม "ดาวน์โหลดเทมเพลต" เพื่อรับไฟล์ตัวอย่าง</div>
+            <div className="text-xs">{t("products.headerNote", "ต้องมีแถวแรกเป็นหัวคอลัมน์ — กดปุ่ม 'ดาวน์โหลดเทมเพลต' เพื่อรับไฟล์ตัวอย่าง")}</div>
           </div>
         </div>
       </Card>
@@ -231,7 +231,7 @@ export default function Products() {
       <Card className="p-3 bg-gradient-card border-border/50">
         <div className="relative">
           <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาด้วยชื่อหรือ SKU..." className="pl-9" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("products.search", "ค้นหาด้วยชื่อหรือ SKU...")} className="pl-9" />
         </div>
       </Card>
 
@@ -240,8 +240,8 @@ export default function Products() {
       ) : filtered.length === 0 ? (
         <Card className="p-12 text-center bg-gradient-card border-border/50">
           <Package className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground mb-4">ยังไม่มีสินค้า เพิ่มสินค้าแรกของคุณเลย</p>
-          <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4" />เพิ่มสินค้า</Button>
+          <p className="text-muted-foreground mb-4">{t("products.emptyState", "ยังไม่มีสินค้า เพิ่มสินค้าแรกของคุณเลย")}</p>
+          <Button onClick={openNew} className="bg-gradient-primary"><Plus className="h-4 w-4 mr-2" />{t("products.addProduct", "เพิ่มสินค้า")}</Button>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -260,7 +260,7 @@ export default function Products() {
                     <div className="font-semibold truncate">{p.name}</div>
                     {p.sku && <div className="text-xs text-muted-foreground">SKU: {p.sku}</div>}
                   </div>
-                  {p.status !== "active" && <Badge variant="outline" className="text-xs">{p.status}</Badge>}
+                  {p.status !== "active" && <Badge variant="outline" className="text-xs">{t(`products.status${p.status.charAt(0).toUpperCase() + p.status.slice(1)}`, p.status)}</Badge>}
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold">฿{Number(p.price).toLocaleString()}</span>
@@ -268,8 +268,8 @@ export default function Products() {
                 </div>
                 {stockBadge(p)}
                 <div className="flex gap-2 pt-2">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => openEdit(p)}><Pencil className="h-3 w-3" />แก้ไข</Button>
-                  <Button size="sm" variant="ghost" onClick={() => remove(p.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10"><Trash2 className="h-3 w-3" /></Button>
+                  <Button size="sm" variant="outline" className="flex-1" onClick={() => openEdit(p)}><Pencil className="h-3 w-3 mr-2" />{t("products.edit", "แก้ไข")}</Button>
+                  <Button size="sm" variant="ghost" onClick={() => remove(p.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10"><Trash2 className="h-3 w-3 mr-2" />{t("products.delete", "ลบ")}</Button>
                 </div>
               </div>
             </Card>
@@ -279,67 +279,67 @@ export default function Products() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{editing.id ? "แก้ไขสินค้า" : "เพิ่มสินค้า"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing.id ? t("products.editTitle", "แก้ไขสินค้า") : t("products.addTitle", "เพิ่มสินค้า")}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>ชื่อสินค้า *</Label>
+              <Label>{t("products.name", "ชื่อสินค้า *")}</Label>
               <Input value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} maxLength={200} />
             </div>
             <div>
-              <Label>รายละเอียด</Label>
+              <Label>{t("products.description", "รายละเอียด")}</Label>
               <Textarea value={editing.description || ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} maxLength={2000} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>SKU</Label>
+                <Label>{t("products.sku", "SKU")}</Label>
                 <Input value={editing.sku || ""} onChange={(e) => setEditing({ ...editing, sku: e.target.value })} maxLength={64} />
               </div>
               <div>
-                <Label>หมวดหมู่</Label>
+                <Label>{t("products.category", "หมวดหมู่")}</Label>
                 <Input value={editing.category || ""} onChange={(e) => setEditing({ ...editing, category: e.target.value })} maxLength={64} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>ราคา (บาท) *</Label>
+                <Label>{t("products.price", "ราคา (บาท) *")}</Label>
                 <Input type="number" min={0} value={editing.price ?? 0} onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })} />
               </div>
               <div>
-                <Label>ราคาเต็ม (ขีดฆ่า)</Label>
+                <Label>{t("products.comparePrice", "ราคาเต็ม (ขีดฆ่า)")}</Label>
                 <Input type="number" min={0} value={editing.compare_at_price ?? ""} onChange={(e) => setEditing({ ...editing, compare_at_price: e.target.value ? Number(e.target.value) : null })} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>สต็อก</Label>
+                <Label>{t("products.stock", "สต็อก")}</Label>
                 <Input type="number" min={0} value={editing.stock ?? 0} onChange={(e) => setEditing({ ...editing, stock: Number(e.target.value) })} />
               </div>
               <div>
-                <Label>เตือนเมื่อเหลือ ≤</Label>
+                <Label>{t("products.lowStockAlert", "เตือนเมื่อเหลือ ≤")}</Label>
                 <Input type="number" min={0} value={editing.low_stock_threshold ?? 5} onChange={(e) => setEditing({ ...editing, low_stock_threshold: Number(e.target.value) })} />
               </div>
             </div>
             <div>
-              <Label>สถานะ</Label>
+              <Label>{t("products.status", "สถานะ")}</Label>
               <Select value={editing.status || "active"} onValueChange={(v) => setEditing({ ...editing, status: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">วางขาย</SelectItem>
-                  <SelectItem value="draft">ฉบับร่าง</SelectItem>
-                  <SelectItem value="archived">เลิกขาย</SelectItem>
+                  <SelectItem value="active">{t("products.statusActive", "วางขาย")}</SelectItem>
+                  <SelectItem value="draft">{t("products.statusDraft", "ฉบับร่าง")}</SelectItem>
+                  <SelectItem value="archived">{t("products.statusArchived", "เลิกขาย")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>รูปสินค้า</Label>
+              <Label>{t("products.image", "รูปสินค้า")}</Label>
               <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
               {editing.image_url && !imageFile && <img src={editing.image_url} alt="" className="mt-2 h-20 rounded object-cover" />}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>ยกเลิก</Button>
+            <Button variant="ghost" onClick={() => setOpen(false)}>{t("products.cancel", "ยกเลิก")}</Button>
             <Button onClick={save} disabled={saving} className="bg-gradient-primary">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}บันทึก
+              {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}{t("products.save", "บันทึก")}
             </Button>
           </DialogFooter>
         </DialogContent>

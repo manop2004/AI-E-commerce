@@ -59,6 +59,9 @@ export const zh = {
   dash: {
     overview: "概览",
     gettingStarted: "入门指南",
+    products: "店铺商品",
+    orders: "订单管理",
+    voiceAi: "语音 AI",
     integrations: "连接商店",
     integrationsSub: "连接您的店铺和销售渠道",
     features: "AI 机器人功能",
@@ -97,7 +100,7 @@ export const zh = {
     or: "或",
     lineOaTipEnd: "模式，以防止机器人与 LINE OA 的自动回复重叠 — 机器人将保持沉默并移交给管理员。",
     edit: "编辑",
-    setup: "设置",
+    setup: "设置 API",
     botReplyMode: "机器人回复模式",
     replyModes: {
       auto: {
@@ -124,59 +127,7 @@ export const zh = {
     widgetStep2Start: "复制该代码段并将其粘贴到您网站的 HTML / 主题文件中（在",
     widgetStep3: "打开您的网站 — 您将立即在右下角看到一个圆形聊天按钮，点击即可打开。",
     widgetStep4: "客户发送的所有消息都将显示在您仪表板的实时聊天 (Live Chat) 页面上。",
-    onboarding: {
-      badge: "新手引导",
-      mainTitle: "只需 5 步即可轻松开始",
-      mainSubtitle: "按照步骤操作，在 10 分钟内启动您的智能店铺。",
-      progress: "进行进度",
-      completed: "已完成",
-      edit: "编辑",
-      steps: {
-        connect: {
-          title: "1. 连接店铺 / 销售渠道",
-          desc: "连接 LINE OA、Messenger、Instagram、WooCommerce 或在您的网站上嵌入 Web Chat Widget 聊天微件。",
-          cta: "连接店铺"
-        },
-        train: {
-          title: "2. 使用您的店铺数据训练 AI",
-          desc: "上传商品目录、常见问题解答 (FAQ) 和品牌语气，使 AI 的回答更符合真实店员的表现。",
-          cta: "添加训练数据"
-        },
-        features: {
-          title: "3. 开启 AI 机器人功能",
-          desc: "自由开启或关闭诸如商品推荐、快捷下单、常见问题解答及购物车留存挽回等核心功能。",
-          cta: "机器人设置"
-        },
-        embed: {
-          title: "4. 在您的网站上安装聊天微件",
-          desc: "只需将 1 行嵌入代码粘贴到网站中，用户即可在右下角即时看到聊天按钮。",
-          cta: "复制嵌入代码"
-        },
-        test: {
-          title: "5. 测试并正式上线运营",
-          desc: "在实时聊天窗口中与 AI 进行模拟交谈，在数据分析面板监控销售表现，随后向真实用户发布。",
-          cta: "与 AI 开启测试对话"
-        }
-      }
-    },
-    integrationsPage: {
-      title: "连接销售渠道",
-      subtitle: "连接您的社交媒体和电子商务平台以启用 AI 机器人。",
-      webWidgetTitle: "Web Chat Widget (网站聊天小工具)",
-      webWidgetDesc: "将此代码复制并粘贴到您的网站中，以启用智能聊天系统。",
-      copySnippet: "复制嵌入代码",
-      previewWidget: "预览聊天组件",
-      howToTest: "✅ 真实可用 — 如何测试？",
-      testStep1: "点击 预览聊天组件 先查看聊天外观。",
-      testStep2: "复制这段嵌入代码并粘贴到您网站的 HTML / 主题文件中（在 ",
-      testStep3: "打开您的网站 — 您会立即在右下角看到一个圆形的聊天按钮，点击即可打开。",
-      testStep4: "客户发送的所有消息都将实时同步显示在 Dashboard 的 Live Chat 页面中。",
-      ecommerceChannels: "电子商务渠道",
-      chatChannels: "聊天 / 社交渠道",
-      manage: "管理",
-      loading: "加载中...",
-      copied: "已复制到剪贴板！"
-    }
+    copied: "已复制到剪贴板！"
   },
   features: {
     pageTitle: "机器人功能",
@@ -216,5 +167,281 @@ export const zh = {
       ab: "A/B 测试"
     },
     requiresPlan: "需要 {{plan}} 计划"
+  },
+  products: {
+    title: "店铺商品",
+    subtitle: "管理商品、库存和价格 — AI将利用这些数据为客户推荐",
+    downloadTemplate: "下载模板",
+    importStock: "导入库存文件",
+    addProduct: "添加商品",
+    dragDrop: "将 CSV / XLSX 文件拖至此处或点击导入按钮",
+    importNote: "具有相同 SKU 或名称的商品将更新现有库存（每次最多 1,000 条）",
+    headers: "商品名称, SKU, 价格, 原价, 库存, 分类, 描述",
+    headerNote: "第一行必须是标题 — 点击“下载模板”获取示例文件",
+    example1: "白色圆领T恤, TS-WHT-M, 290, 390, 25, 服装, 100%棉",
+    example2: "修身牛仔裤, JN-SLM-32, 890, 1290, 12, 服装, 修身款",
+    example3: "黑色运动鞋, SK-BLK-42, 1290, 1590, 8, 鞋类, 经典款",
+    search: "按名称或 SKU 搜索...",
+    emptyState: "暂无商品。立即添加您的第一件商品。",
+    outOfStock: "缺货",
+    lowStock: "库存紧张 ({{count}})",
+    inStock: "有 {{count}} 件",
+    edit: "编辑",
+    delete: "删除",
+    deleteConfirm: "确定要删除此商品吗？",
+    editTitle: "编辑商品",
+    addTitle: "添加商品",
+    name: "商品名称 *",
+    description: "描述",
+    sku: "SKU",
+    category: "分类",
+    price: "价格 *",
+    comparePrice: "原价",
+    stock: "库存",
+    lowStockAlert: "低库存阈值",
+    status: "状态",
+    statusActive: "上架",
+    statusDraft: "草稿",
+    statusArchived: "下架",
+    image: "商品图片",
+    cancel: "取消",
+    save: "保存",
+    errorNoName: "请输入商品名称",
+    successUpdate: "商品已更新",
+    successAdd: "商品已添加",
+    successDelete: "删除成功",
+    errorSave: "保存失败",
+    errorNoData: "文件中未找到商品数据 — 请下载模板并正确填写。",
+    errorNoNameCol: "未找到商品名称 — 请检查文件中的商品名称列。"
+  },
+  orders: {
+    title: "订单管理",
+    subtitle: "查看客户订单、更新状态并将自动更新发送回聊天",
+    totalOrders: "总订单",
+    processing: "处理中",
+    shipped: "已发货",
+    revenue: "总收入",
+    search: "搜索订单号、客户、电话、商品或快递单号...",
+    emptyState: "暂无订单",
+    colOrder: "订单",
+    colCustomer: "客户",
+    colProduct: "商品",
+    colAmount: "金额",
+    colStatus: "状态",
+    colChannel: "渠道",
+    colAction: "操作",
+    updateBtn: "更新",
+    manageOrder: "管理订单",
+    customerLabel: "客户",
+    productLabel: "商品",
+    shippingAddress: "送货地址",
+    notes: "备注",
+    fulfillmentStatus: "发货状态",
+    paymentStatus: "支付状态",
+    trackingNumber: "物流单号",
+    trackingPlaceholder: "例如：TH123456789",
+    trackingUrl: "物流查询链接",
+    urlPlaceholder: "https://...",
+    customerTrackingLink: "客户订单查询链接",
+    copySuccess: "查询链接已复制",
+    close: "关闭",
+    saveAndSend: "保存并发送到聊天",
+    toastUpdateExternal: "已更新并发送给客户",
+    toastUpdateChat: "已更新并将消息添加到聊天中",
+    toastError: "更新状态失败",
+    status: {
+      pending: "待确认",
+      paid: "已付款",
+      preparing: "准备中",
+      packed: "已打包",
+      shipped: "已发货",
+      delivered: "已送达",
+      cancelled: "已取消"
+    },
+    payment: {
+      unpaid: "未付款",
+      pending: "待审核",
+      paid: "已付款",
+      refunded: "已退款"
+    }
+  },
+  channels: {
+    setupTitle: "连接",
+    setupDesc: "填写开发者控制台的信息，AI机器人将在该渠道自动回复客户。",
+    apiKey: "API Key / Token",
+    apiSecret: "API Secret",
+    storeUrl: "商店 URL",
+    storeUrlHint: "例如：https://yourshop.com (结尾不要加 /)",
+    consumerKey: "Consumer Key",
+    consumerSecret: "Consumer Secret",
+    channelAccessToken: "Channel Access Token",
+    channelSecret: "Channel Secret",
+    secretHint: "与 Consumer Key 同时生成 — 请妥善保存，生成后将不再显示。",
+    apiNote: "💡 在 WooCommerce → Settings → Advanced → REST API → Add key 创建 API Key。选择权限 = Read/Write，然后粘贴到这里。",
+    comingSoon: "此渠道的连接系统正在开发中。",
+    cancel: "取消",
+    saveAndConnect: "保存并连接",
+    connectSuccess: "连接成功！",
+    connectError: "连接失败"
+  },
+  channelSetup: {
+    title: {
+      line: "设置 LINE OA",
+      messenger: "设置 Facebook Messenger",
+      instagram: "设置 Instagram DM",
+      woocommerce: "连接 WooCommerce",
+      shopee: "连接 Shopee",
+      lazada: "连接 Lazada"
+    },
+    desc: "输入开发者控制台的详细信息，AI 机器人将自动在此频道回复客户。",
+    line: {
+      help1: "在 developers.line.biz → 您的 Channel → Messaging API → Channel Access Token (long-lived) 中获取",
+      help2: "用于验证签名 (推荐)"
+    },
+    messenger: {
+      help1: "Meta App → Messenger → Settings → 从您的主页生成 Token",
+      help2: "可任意设置，但必须与 Meta App webhook 订阅中填写的完全一致",
+      placeholder2: "例如 mysecret123"
+    },
+    ig: {
+      help1: "Instagram 商业账号必须与 Facebook 主页关联",
+      help2: "与 Messenger 相同"
+    },
+    woo: {
+      help1: "例如 https://yourshop.com (结尾不要加 /)",
+      help2: "WooCommerce → Settings → Advanced → REST API → Add key (读/写权限)",
+      help3: "与 Consumer Key 一起生成 — 妥善保存，生成后将不再显示"
+    },
+    shopee: {
+      help1: "可在卖家中心 (Seller Centre) → 账户与安全 中查看",
+      placeholder1: "例如 123456789",
+      help2: "来自 Shopee 开放平台 (Open Platform) → 我的应用",
+      help3: "与 Partner ID 配对的密钥 — 请妥善保存"
+    },
+    lazada: {
+      help1: "可在 Lazada 卖家中心 → 我的账户 中查看",
+      help2: "来自 Lazada 开放平台 → 创建应用",
+      help3: "与 App Key 一起生成"
+    },
+    toast: {
+      success: "保存成功 — AI 机器人已准备好",
+      error: "保存失败",
+      copied: "复制成功！"
+    },
+    webhookLabel: "Webhook URL (复制并粘贴到开发者控制台)",
+    link: {
+      line: "打开 LINE 开发者控制台",
+      meta: "打开 Meta 开发者平台"
+    },
+    wooNote1: "💡 在此创建 API Key：",
+    wooNote2: "选择权限 (Permission) =",
+    wooNote3: "然后复制到这里",
+    btn: {
+      cancel: "取消",
+      saving: "正在保存...",
+      save: "保存并连接"
+    }
+  },
+  training: {
+    subtitle: "训练您的机器人，让它了解您的产品、品牌和回复方式",
+    types: {
+      pdf: "PDF 文档",
+      excel: "Excel 目录",
+      faq: "常见问题",
+      url: "网站链接",
+      tone: "语气基调",
+      promo: "促销规则"
+    },
+    addTitle: "添加训练数据",
+    topicLabel: "主题 / 标题",
+    topicPlaceholder: "例如：保修信息，新版常见问题",
+    dragDrop: "将文件拖放到此处，或单击以浏览 (PDF, CSV, XLSX)",
+    contentLabel: "详细信息 / 训练内容",
+    filePlaceholder: "希望机器人遵循该文件的摘要或规则（如有）",
+    textPlaceholder: "编写简短的规则，例如：如果客户询问运费，请回复... / 绝不主动提供折扣 / 如果他们要求找人工客服，请停止回复并转交人工",
+    hint: "提示：建议写成“如果...那么...”或“必须/严禁...”，机器人会将其视为严格规则。",
+    addBtn: "添加到训练系统",
+    listTitle: "已训练数据",
+    emptyState: "暂无训练数据",
+    viewTitle: "训练数据详情",
+    viewTopic: "主题",
+    viewType: "类型",
+    viewFile: "附件",
+    viewContent: "训练内容",
+    noContent: "无内容文本",
+    trainedAt: "训练时间：",
+    close: "关闭",
+    editTitle: "编辑训练数据",
+    content: "内容",
+    originalFile: "* 原始文件：",
+    fileEditNote: "(在此模式下无法编辑文件)",
+    cancel: "取消",
+    saveEdit: "保存更改",
+    defaultTopic: "训练数据",
+    toast: {
+      uploadFailed: "上传失败：",
+      noTitle: "请输入主题",
+      noData: "文件中未找到商品数据",
+      excelSuccess: "库存已导入并成功训练机器人",
+      addSuccess: "训练数据添加成功",
+      addFailed: "添加训练数据失败",
+      deleteSuccess: "删除成功",
+      updateSuccess: "更新成功"
+    },
+    confirmDelete: "确定要删除此训练数据吗？"
+  },
+  voice: {
+    title: "Voice AI 通话助手",
+    subtitle: "在与客户通话时开启麦克风 — AI 将实时捕获语音并立即推荐库存中的商品。",
+    notSupported: "此浏览器不支持 Web Speech API — 请在桌面端使用 Chrome / Edge，或在 iOS 上使用 Safari 打开。",
+    stopListening: "停止录音",
+    startListening: "开始听取通话",
+    listeningStatus: "正在听取...",
+    stockCount: "库存商品：{{count}} 件",
+    clearText: "清除文本",
+    capturedSpeech: "捕获的语音",
+    hint1: "• 必须通过 HTTPS 访问并使用 Chrome / Edge（iOS Safari 仅提供部分支持）。",
+    hint2: "• 当浏览器提示时允许麦克风权限 — 如果已拒绝，请点击 URL 栏中的 🔒 图标并更改为允许。",
+    hint3: "• 靠近麦克风清晰说话 — AI 将分析客户需求并立即从库存中推荐商品。",
+    recommendations: "AI 推荐销售商品",
+    emptyNoStock: "暂无库存商品 — 请先前往“店铺商品”页面导入 CSV/XLSX 文件。",
+    emptyNoMatch: "未找到与此语音匹配的商品 — 请试着更清晰地读出商品名称、分类或 SKU。",
+    emptyListeningHint: "说出商品名称、分类或客户提出的问题，AI 将自动进行推荐。",
+    emptyNotListeningHint: "点击“开始听取通话”按钮并开始与客户交谈。",
+    stockRemaining: "剩余：{{count}} 件",
+    copyPitchBtn: "复制话术",
+    copyFormat: "{{name}} 价格 {{price}} 泰铢 (剩余 {{stock}} 件)",
+    toast: {
+      copied: "销售话术已复制到剪贴板"
+    }
+  },
+  analytics: {
+    subtitle: "直观结果：查看客户互动量及机器人助力销售业绩。",
+    totalChats: "总聊天数",
+    totalChatsHint: "客户互动次数",
+    aiRevenue: "AI 销售额",
+    aiRevenueHint: "机器人协助完成销售",
+    orders: "订单量",
+    ordersHint: "已生成的订单",
+    conversionRate: "成交率",
+    conversionRateHint: "所有数据的平均值",
+    chartTitle: "近 7 天 AI 销售额",
+    noData: "暂无分析数据",
+    quickInsightTitle: "快速分析结论",
+    quickInsightDesc: "如果出现“聊天量大但订单量少”的情况，请在“机器人训练”页面补充商品或常见问题信息，并开通 Voice AI 查看哪些商品被频繁提及。"
+  },
+  billing: {
+    title: "账单与计划",
+    subtitle: "管理您的订阅和账单详细信息。",
+    customPrice: "定制方案",
+    perMonth: "/月",
+    currentBtn: "当前计划",
+    upgradeBtn: "升级空间",
+    currentPlan: "当前计划",
+    renewsOn: "续订日期：",
+    invoices: "发票明细",
+    status: {
+      active: "正常运行"
+    }
   }
 };

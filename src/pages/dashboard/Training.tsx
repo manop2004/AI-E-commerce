@@ -43,7 +43,7 @@ const TYPES = [
 ];
 
 export default function Training() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [docs, setDocs] = useState<any[]>([]);
   const [title, setTitle] = useState("");
@@ -94,7 +94,7 @@ export default function Training() {
         
       return pub.publicUrl;
     } catch (error: any) {
-      toast.error("Upload failed: " + error.message);
+      toast.error(t("training.toast.uploadFailed", "Upload failed: ") + error.message);
       return null;
     } finally {
       setUploading(false);
@@ -102,9 +102,9 @@ export default function Training() {
   };
 
   const add = async () => {
-    const resolvedTitle = title.trim() || file?.name || "ข้อมูลฝึกสอน";
+    const resolvedTitle = title.trim() || file?.name || t("training.defaultTopic", "ข้อมูลฝึกสอน");
     if (!user || !resolvedTitle) {
-      toast.error("กรุณาใส่หัวข้อ");
+      toast.error(t("training.toast.noTitle", "กรุณาใส่หัวข้อ"));
       return;
     }
     setUploading(true);
@@ -114,7 +114,7 @@ export default function Training() {
       if (file) {
         if (type === "excel") {
           const imported = (await parseStockFile(file)).slice(0, 1000);
-          if (!imported.length) throw new Error("ไม่พบข้อมูลสินค้าในไฟล์");
+          if (!imported.length) throw new Error(t("training.toast.noData", "ไม่พบข้อมูลสินค้าในไฟล์"));
 
           const { data: existing } = await supabase
             .from("products")
@@ -164,23 +164,23 @@ export default function Training() {
       setContent("");
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-        toast.success(type === "excel" ? "นำเข้าสต็อกและสอนบอทเรียบร้อย" : "เพิ่มข้อมูลสอนบอทแล้ว");
+        toast.success(type === "excel" ? t("training.toast.excelSuccess", "นำเข้าสต็อกและสอนบอทเรียบร้อย") : t("training.toast.addSuccess", "เพิ่มข้อมูลสอนบอทแล้ว"));
         load();
       }
     } catch (error: any) {
-      toast.error(error.message || "เพิ่มข้อมูลสอนบอทไม่สำเร็จ");
+      toast.error(error.message || t("training.toast.addFailed", "เพิ่มข้อมูลสอนบอทไม่สำเร็จ"));
     } finally {
       setUploading(false);
     }
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this training data?")) return;
+    if (!confirm(t("training.confirmDelete", "Are you sure you want to delete this training data?"))) return;
     const { error } = await supabase.from("training_documents").delete().eq("id", id);
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Deleted successfully");
+      toast.success(t("training.toast.deleteSuccess", "Deleted successfully"));
       load();
     }
   };
@@ -198,7 +198,7 @@ export default function Training() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Updated successfully");
+      toast.success(t("training.toast.updateSuccess", "Updated successfully"));
       setEditingDoc(null);
       load();
     }
@@ -210,24 +210,26 @@ export default function Training() {
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="font-display text-3xl font-bold">{t("dash.training")}</h1>
-        <p className="text-muted-foreground mt-1">สอนบอทให้รู้จักสินค้า แบรนด์ และวิธีตอบของคุณ</p>
+        <p className="text-muted-foreground mt-1">{t("training.subtitle", "สอนบอทให้รู้จักสินค้า แบรนด์ และวิธีตอบของคุณ")}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {TYPES.map((t) => (
+        {TYPES.map((tItem) => (
           <Card
-            key={t.type}
+            key={tItem.type}
             onClick={() => {
-              setType(t.type);
+              setType(tItem.type);
               setFile(null);
               if (fileInputRef.current) fileInputRef.current.value = "";
             }}
             className={`p-4 cursor-pointer transition bg-gradient-card border-border/50 hover:border-primary/40 flex flex-col items-center justify-center gap-2 text-center ${
-              type === t.type ? "border-primary shadow-glow ring-1 ring-primary/20" : ""
+              type === tItem.type ? "border-primary shadow-glow ring-1 ring-primary/20" : ""
             }`}
           >
-            <t.icon className={`h-6 w-6 ${type === t.type ? "text-primary" : "text-muted-foreground"}`} />
-            <span className={`font-medium text-xs ${type === t.type ? "text-primary" : ""}`}>{t.label}</span>
+            <tItem.icon className={`h-6 w-6 ${type === tItem.type ? "text-primary" : "text-muted-foreground"}`} />
+            <span className={`font-medium text-xs ${type === tItem.type ? "text-primary" : ""}`}>
+              {t(`training.types.${tItem.type}`, tItem.label)}
+            </span>
           </Card>
         ))}
       </div>
@@ -235,16 +237,16 @@ export default function Training() {
       <Card className="p-6 bg-gradient-card border-border/50">
         <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
           <Plus className="h-4 w-4 text-primary" />
-          เพิ่มข้อมูลฝึกสอน ({TYPES.find(t => t.type === type)?.label})
+          {t("training.addTitle", "เพิ่มข้อมูลฝึกสอน")} ({TYPES.find(tItem => tItem.type === type) ? t(`training.types.${type}`, TYPES.find(tItem => tItem.type === type)?.label as string) : ""})
         </h3>
         <div className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>หัวข้อ / ชื่อข้อมูล</Label>
+              <Label>{t("training.topicLabel", "หัวข้อ / ชื่อข้อมูล")}</Label>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="เช่น ข้อมูลการรับประกันสินค้า, FAQ ชุดใหม่"
+                placeholder={t("training.topicPlaceholder", "เช่น ข้อมูลการรับประกันสินค้า, FAQ ชุดใหม่")}
               />
             </div>
             {isFileType && (
@@ -259,7 +261,7 @@ export default function Training() {
                   if (dropped) setFile(dropped);
                 }}
               >
-                <Label>ลากไฟล์มาวาง หรือเลือกไฟล์ (PDF, CSV, XLSX)</Label>
+                <Label>{t("training.dragDrop", "ลากไฟล์มาวาง หรือเลือกไฟล์ (PDF, CSV, XLSX)")}</Label>
                 <div className="flex gap-2">
                   <Input
                     type="file"
@@ -285,14 +287,14 @@ export default function Training() {
             )}
           </div>
           <div className="space-y-2">
-            <Label>รายละเอียด / ข้อความที่ต้องการสอน</Label>
+            <Label>{t("training.contentLabel", "รายละเอียด / ข้อความที่ต้องการสอน")}</Label>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={6}
-              placeholder={isFileType ? "สรุปย่อหรือกฎที่ต้องการให้บอททำตามจากไฟล์นี้ (ถ้ามี)" : "เขียนเป็นกฎสั้นๆ เช่น: ถ้าลูกค้าถามค่าส่ง ให้ตอบว่า... / ห้ามเสนอส่วนลดเอง / ถ้าลูกค้าขอแอดมินให้หยุดตอบและส่งให้คน"}
+              placeholder={isFileType ? t("training.filePlaceholder", "สรุปย่อหรือกฎที่ต้องการให้บอททำตามจากไฟล์นี้ (ถ้ามี)") : t("training.textPlaceholder", "เขียนเป็นกฎสั้นๆ เช่น: ถ้าลูกค้าถามค่าส่ง ให้ตอบว่า... / ห้ามเสนอส่วนลดเอง / ถ้าลูกค้าขอแอดมินให้หยุดตอบและส่งให้คน")}
             />
-            <p className="text-xs text-muted-foreground">แนะนำให้เขียนเป็น “ถ้า...ให้...” หรือ “ห้าม/ต้อง...” บอทจะใช้เป็นกฎบังคับตอนตอบลูกค้า</p>
+            <p className="text-xs text-muted-foreground">{t("training.hint", "แนะนำให้เขียนเป็น “ถ้า...ให้...” หรือ “ห้าม/ต้อง...” บอทจะใช้เป็นกฎบังคับตอนตอบลูกค้า")}</p>
           </div>
           <Button
             onClick={add}
@@ -304,14 +306,14 @@ export default function Training() {
             ) : (
               <Upload className="h-4 w-4 mr-2" />
             )}
-            เพิ่มลงในระบบฝึกสอน
+            {t("training.addBtn", "เพิ่มลงในระบบฝึกสอน")}
           </Button>
         </div>
       </Card>
 
       <Card className="p-6 bg-gradient-card border-border/50">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display font-semibold">รายการที่เคยสอนแล้ว ({docs.length})</h3>
+          <h3 className="font-display font-semibold">{t("training.listTitle", "รายการที่เคยสอนแล้ว")} ({docs.length})</h3>
           {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
         
@@ -319,12 +321,12 @@ export default function Training() {
           {docs.length === 0 && !loading && (
             <div className="text-center py-12 border border-dashed rounded-lg bg-card/30">
               <HelpCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-20" />
-              <p className="text-sm text-muted-foreground">ยังไม่มีข้อมูลการฝึกสอน</p>
+              <p className="text-sm text-muted-foreground">{t("training.emptyState", "ยังไม่มีข้อมูลการฝึกสอน")}</p>
             </div>
           )}
           
           {docs.map((d) => {
-            const T = TYPES.find((t) => t.type === d.doc_type) || TYPES[0];
+            const T = TYPES.find((tItem) => tItem.type === d.doc_type) || TYPES[0];
             return (
               <div
                 key={d.id}
@@ -342,7 +344,7 @@ export default function Training() {
                     </Badge>
                   </div>
                   <div className="text-xs text-muted-foreground truncate opacity-70">
-                    {d.content || (d.url ? "Linked file: " + d.url.split("/").pop() : "No content")}
+                    {d.content || (d.url ? "Linked file: " + d.url.split("/").pop() : t("training.noContent", "No content"))}
                   </div>
                 </div>
 
@@ -384,26 +386,26 @@ export default function Training() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {viewingDoc && (() => {
-                const T = TYPES.find(t => t.type === viewingDoc.doc_type) || TYPES[0];
+                const T = TYPES.find(tItem => tItem.type === viewingDoc.doc_type) || TYPES[0];
                 return <T.icon className="h-5 w-5 text-primary" />;
               })()}
-              รายละเอียดข้อมูลฝึกสอน
+              {t("training.viewTitle", "รายละเอียดข้อมูลฝึกสอน")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label className="text-xs uppercase text-muted-foreground font-bold">หัวข้อ</Label>
+              <Label className="text-xs uppercase text-muted-foreground font-bold">{t("training.viewTopic", "หัวข้อ")}</Label>
               <div className="text-lg font-semibold mt-1">{viewingDoc?.title}</div>
             </div>
             <div>
-              <Label className="text-xs uppercase text-muted-foreground font-bold">ประเภท</Label>
+              <Label className="text-xs uppercase text-muted-foreground font-bold">{t("training.viewType", "ประเภท")}</Label>
               <div className="mt-1">
                 <Badge variant="secondary">{viewingDoc?.doc_type}</Badge>
               </div>
             </div>
             {viewingDoc?.url && (
               <div>
-                <Label className="text-xs uppercase text-muted-foreground font-bold">ไฟล์แนบ</Label>
+                <Label className="text-xs uppercase text-muted-foreground font-bold">{t("training.viewFile", "ไฟล์แนบ")}</Label>
                 <div className="mt-1">
                   <a 
                     href={viewingDoc.url} 
@@ -417,17 +419,17 @@ export default function Training() {
               </div>
             )}
             <div>
-              <Label className="text-xs uppercase text-muted-foreground font-bold">เนื้อหาที่สอน</Label>
+              <Label className="text-xs uppercase text-muted-foreground font-bold">{t("training.viewContent", "เนื้อหาที่สอน")}</Label>
               <div className="mt-1 p-4 rounded-lg bg-card/50 border border-border/40 text-sm whitespace-pre-wrap leading-relaxed max-h-[300px] overflow-y-auto">
-                {viewingDoc?.content || "ไม่มีเนื้อหาข้อความ"}
+                {viewingDoc?.content || t("training.noContent", "ไม่มีเนื้อหาข้อความ")}
               </div>
             </div>
             <div className="text-[10px] text-muted-foreground text-right">
-              สอนเมื่อ: {viewingDoc && new Date(viewingDoc.created_at).toLocaleString('th-TH')}
+              {t("training.trainedAt", "สอนเมื่อ:")} {viewingDoc && new Date(viewingDoc.created_at).toLocaleString(i18n.language === 'en' ? 'en-US' : (i18n.language === 'zh' ? 'zh-CN' : 'th-TH'))}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setViewingDoc(null)}>ปิด</Button>
+            <Button variant="outline" onClick={() => setViewingDoc(null)}>{t("training.close", "ปิด")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -436,18 +438,18 @@ export default function Training() {
       <Dialog open={!!editingDoc} onOpenChange={(open) => !open && setEditingDoc(null)}>
         <DialogContent className="max-w-2xl bg-gradient-card">
           <DialogHeader>
-            <DialogTitle>แก้ไขข้อมูลฝึกสอน</DialogTitle>
+            <DialogTitle>{t("training.editTitle", "แก้ไขข้อมูลฝึกสอน")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>หัวข้อ</Label>
+              <Label>{t("training.viewTopic", "หัวข้อ")}</Label>
               <Input
                 value={editingDoc?.title || ""}
                 onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <Label>เนื้อหา</Label>
+              <Label>{t("training.content", "เนื้อหา")}</Label>
               <Textarea
                 value={editingDoc?.content || ""}
                 onChange={(e) => setEditingDoc({ ...editingDoc, content: e.target.value })}
@@ -456,13 +458,13 @@ export default function Training() {
             </div>
             {editingDoc?.url && (
               <div className="text-xs text-muted-foreground">
-                * ไฟล์แนบเดิม: {editingDoc.url.split("/").pop()} (ไม่สามารถแก้ไขไฟล์ได้ในโหมดนี้)
+                {t("training.originalFile", "* ไฟล์แนบเดิม:")} {editingDoc.url.split("/").pop()} {t("training.fileEditNote", "(ไม่สามารถแก้ไขไฟล์ได้ในโหมดนี้)")}
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingDoc(null)}>ยกเลิก</Button>
-            <Button onClick={update} className="bg-gradient-primary">บันทึกการแก้ไข</Button>
+            <Button variant="outline" onClick={() => setEditingDoc(null)}>{t("training.cancel", "ยกเลิก")}</Button>
+            <Button onClick={update} className="bg-gradient-primary">{t("training.saveEdit", "บันทึกการแก้ไข")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

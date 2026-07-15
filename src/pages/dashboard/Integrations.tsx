@@ -6,10 +6,9 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Code2, Copy, ExternalLink, Settings, Bot, UserCog, BookOpen } from "lucide-react";
+import { Check, Code2, Copy, ExternalLink, Settings, Bot, UserCog, BookOpen, Info } from "lucide-react";
 import { ChannelSetupDialog } from "@/components/ChannelSetupDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const PROVIDERS = [
@@ -116,7 +115,7 @@ export default function Integrations() {
                 {SETUP_KEYS.has(p.key) ? (
                   <div className="flex gap-2">
                     <Button onClick={() => setSetupProvider(p.key as any)} variant={connected ? "outline" : "default"} className={`flex-1 ${!connected ? "bg-gradient-primary" : ""}`}>
-                      <Settings className="h-4 w-4" /> {connected ? t("dash.edit", "แก้ไข") : t("dash.setup", "ตั้งค่า")}
+                      <Settings className="h-4 w-4 mr-2" /> {connected ? t("dash.edit", "แก้ไข") : t("dash.setup", "ตั้งค่า")}
                     </Button>
                     {connected && (
                       <Button onClick={() => toggle(p.key, true)} variant="ghost" size="sm">×</Button>
@@ -171,11 +170,11 @@ export default function Integrations() {
         </div>
         <div className="flex gap-2 mt-3 flex-wrap">
           <Button size="sm" onClick={() => copy(embedSnippet)} disabled={!embedSnippet}>
-            <Copy className="h-4 w-4" /> {t("dash.copySnippet", "Copy snippet")}
+            <Copy className="h-4 w-4 mr-2" /> {t("dash.copySnippet", "Copy snippet")}
           </Button>
           <a href={widgetUrl} target="_blank" rel="noreferrer">
             <Button size="sm" variant="outline" disabled={!widgetUrl}>
-              <ExternalLink className="h-4 w-4" /> {t("dash.previewWidget", "Preview widget")}
+              <ExternalLink className="h-4 w-4 mr-2" /> {t("dash.previewWidget", "Preview widget")}
             </Button>
           </a>
         </div>

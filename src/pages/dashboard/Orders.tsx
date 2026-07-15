@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
@@ -13,23 +14,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PackageCheck, Search, Truck, Loader2, MessageSquare, ExternalLink, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
-
-const STATUS_OPTIONS = [
-  { value: "pending", label: "รอยืนยัน", tone: "border-warning/40 text-warning" },
-  { value: "paid", label: "ชำระเงินแล้ว", tone: "border-primary/40 text-primary" },
-  { value: "preparing", label: "กำลังจัดเตรียม", tone: "border-primary/40 text-primary" },
-  { value: "packed", label: "แพ็กแล้ว", tone: "border-primary/40 text-primary" },
-  { value: "shipped", label: "ส่งแล้ว", tone: "border-success/40 text-success" },
-  { value: "delivered", label: "สำเร็จ", tone: "border-success/40 text-success" },
-  { value: "cancelled", label: "ยกเลิก", tone: "border-destructive/40 text-destructive" },
-];
-
-const PAYMENT_OPTIONS = [
-  { value: "unpaid", label: "ยังไม่ชำระ" },
-  { value: "pending", label: "รอตรวจสอบ" },
-  { value: "paid", label: "ชำระแล้ว" },
-  { value: "refunded", label: "คืนเงินแล้ว" },
-];
 
 type Order = {
   id: string;
@@ -54,11 +38,8 @@ type Order = {
   notes: string | null;
 };
 
-function statusMeta(status?: string) {
-  return STATUS_OPTIONS.find((s) => s.value === status) || STATUS_OPTIONS[0];
-}
-
 export default function Orders() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +47,27 @@ export default function Orders() {
   const [q, setQ] = useState("");
   const [active, setActive] = useState<Order | null>(null);
   const [form, setForm] = useState({ fulfillment_status: "pending", payment_status: "unpaid", tracking_number: "", tracking_url: "" });
+
+  const STATUS_OPTIONS = useMemo(() => [
+    { value: "pending", label: t("orders.status.pending", "รอยืนยัน"), tone: "border-warning/40 text-warning" },
+    { value: "paid", label: t("orders.status.paid", "ชำระเงินแล้ว"), tone: "border-primary/40 text-primary" },
+    { value: "preparing", label: t("orders.status.preparing", "กำลังจัดเตรียม"), tone: "border-primary/40 text-primary" },
+    { value: "packed", label: t("orders.status.packed", "แพ็กแล้ว"), tone: "border-primary/40 text-primary" },
+    { value: "shipped", label: t("orders.status.shipped", "ส่งแล้ว"), tone: "border-success/40 text-success" },
+    { value: "delivered", label: t("orders.status.delivered", "สำเร็จ"), tone: "border-success/40 text-success" },
+    { value: "cancelled", label: t("orders.status.cancelled", "ยกเลิก"), tone: "border-destructive/40 text-destructive" },
+  ], [t]);
+
+  const PAYMENT_OPTIONS = useMemo(() => [
+    { value: "unpaid", label: t("orders.payment.unpaid", "ยังไม่ชำระ") },
+    { value: "pending", label: t("orders.payment.pending", "รอตรวจสอบ") },
+    { value: "paid", label: t("orders.payment.paid", "ชำระแล้ว") },
+    { value: "refunded", label: t("orders.payment.refunded", "คืนเงินแล้ว") },
+  ], [t]);
+
+  const statusMeta = (status?: string) => {
+    return STATUS_OPTIONS.find((s) => s.value === status) || STATUS_OPTIONS[0];
+  };
 
   const load = async () => {
     setLoading(true);
@@ -111,11 +113,15 @@ export default function Orders() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      toast.success(data?.externalSent ? "อัปเดตแล้ว และส่งเข้าช่องทางลูกค้าแล้ว" : "อัปเดตแล้ว และเพิ่มข้อความเข้าแชทแล้ว");
+      
+      toast.success(data?.externalSent 
+        ? t("orders.toastUpdateExternal", "อัปเดตแล้ว และส่งเข้าช่องทางลูกค้าแล้ว") 
+        : t("orders.toastUpdateChat", "อัปเดตแล้ว และเพิ่มข้อความเข้าแชทแล้ว"));
+        
       setActive(null);
       await load();
     } catch (e: any) {
-      toast.error(e.message || "อัปเดตสถานะไม่สำเร็จ");
+      toast.error(e.message || t("orders.toastError", "อัปเดตสถานะไม่สำเร็จ"));
     } finally {
       setSaving(false);
     }
@@ -125,7 +131,7 @@ export default function Orders() {
 
   const copyTracking = async (order: Order) => {
     await navigator.clipboard.writeText(trackingLink(order));
-    toast.success("คัดลอกลิงก์ติดตามแล้ว");
+    toast.success(t("orders.copySuccess", "คัดลอกลิงก์ติดตามแล้ว"));
   };
 
   const totals = useMemo(() => ({
@@ -139,22 +145,22 @@ export default function Orders() {
     <div className="animate-fade-in space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2"><PackageCheck className="h-7 w-7" />คำสั่งซื้อ</h1>
-          <p className="text-sm text-muted-foreground">ดูออเดอร์ลูกค้า อัปเดตสถานะ และส่งสถานะกลับเข้าแชทอัตโนมัติ</p>
+          <h1 className="font-display text-2xl md:text-3xl font-bold flex items-center gap-2"><PackageCheck className="h-7 w-7" />{t("orders.title", "คำสั่งซื้อ")}</h1>
+          <p className="text-sm text-muted-foreground">{t("orders.subtitle", "ดูออเดอร์ลูกค้า อัปเดตสถานะ และส่งสถานะกลับเข้าแชทอัตโนมัติ")}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">ออเดอร์ทั้งหมด</div><div className="text-2xl font-bold">{totals.count}</div></Card>
-        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">กำลังดำเนินการ</div><div className="text-2xl font-bold">{totals.pending}</div></Card>
-        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">ส่งแล้ว</div><div className="text-2xl font-bold">{totals.shipped}</div></Card>
-        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">ยอดรวม</div><div className="text-2xl font-bold">฿{totals.revenue.toLocaleString()}</div></Card>
+        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">{t("orders.totalOrders", "ออเดอร์ทั้งหมด")}</div><div className="text-2xl font-bold">{totals.count}</div></Card>
+        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">{t("orders.processing", "กำลังดำเนินการ")}</div><div className="text-2xl font-bold">{totals.pending}</div></Card>
+        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">{t("orders.shipped", "ส่งแล้ว")}</div><div className="text-2xl font-bold">{totals.shipped}</div></Card>
+        <Card className="p-4 bg-gradient-card border-border/50"><div className="text-xs text-muted-foreground">{t("orders.revenue", "ยอดรวม")}</div><div className="text-2xl font-bold">฿{totals.revenue.toLocaleString()}</div></Card>
       </div>
 
       <Card className="p-3 bg-gradient-card border-border/50">
         <div className="relative">
           <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาเลขออเดอร์ ลูกค้า เบอร์โทร สินค้า หรือเลขพัสดุ..." className="pl-9" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("orders.search", "ค้นหาเลขออเดอร์ ลูกค้า เบอร์โทร สินค้า หรือเลขพัสดุ...")} className="pl-9" />
         </div>
       </Card>
 
@@ -162,18 +168,18 @@ export default function Orders() {
         {loading ? (
           <div className="grid place-items-center py-20"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-sm text-muted-foreground">ยังไม่มีคำสั่งซื้อ</div>
+          <div className="text-center py-16 text-sm text-muted-foreground">{t("orders.emptyState", "ยังไม่มีคำสั่งซื้อ")}</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ออเดอร์</TableHead>
-                <TableHead>ลูกค้า</TableHead>
-                <TableHead>สินค้า</TableHead>
-                <TableHead>ยอด</TableHead>
-                <TableHead>สถานะ</TableHead>
-                <TableHead>ช่องทาง</TableHead>
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead>{t("orders.colOrder", "ออเดอร์")}</TableHead>
+                <TableHead>{t("orders.colCustomer", "ลูกค้า")}</TableHead>
+                <TableHead>{t("orders.colProduct", "สินค้า")}</TableHead>
+                <TableHead>{t("orders.colAmount", "ยอด")}</TableHead>
+                <TableHead>{t("orders.colStatus", "สถานะ")}</TableHead>
+                <TableHead>{t("orders.colChannel", "ช่องทาง")}</TableHead>
+                <TableHead className="text-right">{t("orders.colAction", "จัดการ")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -196,7 +202,7 @@ export default function Orders() {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {order.conversation_id && <Button asChild size="sm" variant="ghost"><Link to="/dashboard/livechat"><MessageSquare className="h-4 w-4" /></Link></Button>}
-                        <Button size="sm" variant="outline" onClick={() => openOrder(order)}><Truck className="h-4 w-4" />อัปเดต</Button>
+                        <Button size="sm" variant="outline" onClick={() => openOrder(order)}><Truck className="h-4 w-4" />{t("orders.updateBtn", "อัปเดต")}</Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -209,43 +215,43 @@ export default function Orders() {
 
       <Dialog open={!!active} onOpenChange={(open) => !open && setActive(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>จัดการคำสั่งซื้อ {active?.order_number}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t("orders.manageOrder", "จัดการคำสั่งซื้อ")} {active?.order_number}</DialogTitle></DialogHeader>
           {active && (
             <div className="space-y-5 py-2">
               <div className="grid md:grid-cols-2 gap-3 text-sm">
-                <Card className="p-3 bg-card/50 border-border/40"><div className="text-xs text-muted-foreground">ลูกค้า</div><div className="font-semibold">{active.customer_name}</div><div>{active.customer_phone || "-"}</div></Card>
-                <Card className="p-3 bg-card/50 border-border/40"><div className="text-xs text-muted-foreground">สินค้า</div><div className="font-semibold">{active.product_name} × {active.quantity}</div><div>฿{Number(active.amount).toLocaleString()}</div></Card>
+                <Card className="p-3 bg-card/50 border-border/40"><div className="text-xs text-muted-foreground">{t("orders.customerLabel", "ลูกค้า")}</div><div className="font-semibold">{active.customer_name}</div><div>{active.customer_phone || "-"}</div></Card>
+                <Card className="p-3 bg-card/50 border-border/40"><div className="text-xs text-muted-foreground">{t("orders.productLabel", "สินค้า")}</div><div className="font-semibold">{active.product_name} × {active.quantity}</div><div>฿{Number(active.amount).toLocaleString()}</div></Card>
               </div>
-              <div className="rounded-lg border border-border/40 p-3 text-sm whitespace-pre-wrap"><div className="text-xs text-muted-foreground mb-1">ที่อยู่จัดส่ง</div>{active.shipping_address || "-"}</div>
-              {active.notes && <div className="rounded-lg border border-border/40 p-3 text-sm"><div className="text-xs text-muted-foreground mb-1">หมายเหตุ</div>{active.notes}</div>}
+              <div className="rounded-lg border border-border/40 p-3 text-sm whitespace-pre-wrap"><div className="text-xs text-muted-foreground mb-1">{t("orders.shippingAddress", "ที่อยู่จัดส่ง")}</div>{active.shipping_address || "-"}</div>
+              {active.notes && <div className="rounded-lg border border-border/40 p-3 text-sm"><div className="text-xs text-muted-foreground mb-1">{t("orders.notes", "หมายเหตุ")}</div>{active.notes}</div>}
 
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>สถานะสินค้า</Label>
+                  <Label>{t("orders.fulfillmentStatus", "สถานะสินค้า")}</Label>
                   <Select value={form.fulfillment_status} onValueChange={(v) => setForm((f) => ({ ...f, fulfillment_status: v }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>สถานะชำระเงิน</Label>
+                  <Label>{t("orders.paymentStatus", "สถานะชำระเงิน")}</Label>
                   <Select value={form.payment_status} onValueChange={(v) => setForm((f) => ({ ...f, payment_status: v }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>{PAYMENT_OPTIONS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>เลขพัสดุ</Label>
-                  <Input value={form.tracking_number} onChange={(e) => setForm((f) => ({ ...f, tracking_number: e.target.value }))} placeholder="เช่น TH123456789" />
+                  <Label>{t("orders.trackingNumber", "เลขพัสดุ")}</Label>
+                  <Input value={form.tracking_number} onChange={(e) => setForm((f) => ({ ...f, tracking_number: e.target.value }))} placeholder={t("orders.trackingPlaceholder", "เช่น TH123456789")} />
                 </div>
                 <div className="space-y-2">
-                  <Label>ลิงก์ติดตามพัสดุ</Label>
-                  <Input value={form.tracking_url} onChange={(e) => setForm((f) => ({ ...f, tracking_url: e.target.value }))} placeholder="https://..." />
+                  <Label>{t("orders.trackingUrl", "ลิงก์ติดตามพัสดุ")}</Label>
+                  <Input value={form.tracking_url} onChange={(e) => setForm((f) => ({ ...f, tracking_url: e.target.value }))} placeholder={t("orders.urlPlaceholder", "https://...")} />
                 </div>
               </div>
 
               <Card className="p-3 bg-primary/5 border-primary/20 text-sm space-y-2">
-                <div className="font-medium">ลิงก์ให้ลูกค้าติดตามออเดอร์</div>
+                <div className="font-medium">{t("orders.customerTrackingLink", "ลิงก์ให้ลูกค้าติดตามออเดอร์")}</div>
                 <div className="flex gap-2">
                   <Input readOnly value={trackingLink(active)} className="text-xs" />
                   <Button variant="outline" size="icon" onClick={() => copyTracking(active)}><Copy className="h-4 w-4" /></Button>
@@ -255,9 +261,9 @@ export default function Orders() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setActive(null)}>ปิด</Button>
+            <Button variant="outline" onClick={() => setActive(null)}>{t("orders.close", "ปิด")}</Button>
             <Button onClick={saveStatus} disabled={saving} className="bg-gradient-primary">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}บันทึกและส่งเข้าแชท
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}{t("orders.saveAndSend", "บันทึกและส่งเข้าแชท")}
             </Button>
           </DialogFooter>
         </DialogContent>

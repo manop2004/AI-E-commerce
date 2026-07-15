@@ -216,5 +216,19 @@ export const th = {
       ab: "A/B Testing ข้อความ"
     },
     requiresPlan: "ต้องการแพ็กเกจ {{plan}} ขึ้นไป"
+  },
+  billing: {
+    title: "บิลลิ่งและแพ็กเกจ",
+    subtitle: "จัดการรายละเอียดการสมัครสมาชิกและแพ็กเกจของคุณ",
+    customPrice: "กำหนดเอง",
+    perMonth: "/เดือน",
+    currentBtn: "แพ็กเกจปัจจุบัน",
+    upgradeBtn: "อัปเกรด",
+    currentPlan: "แพ็กเกจปัจจุบัน",
+    renewsOn: "ต่ออายุในวันที่:",
+    invoices: "ใบเสร็จรับเงิน",
+    status: {
+      active: "ใช้งานอยู่"
+    }
   }
 };

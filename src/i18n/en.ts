@@ -59,6 +59,9 @@ export const en = {
   dash: {
     overview: "Overview",
     gettingStarted: "Getting Started",
+    products: "Store Products",
+    orders: "Orders",
+    voiceAi: "Voice AI",
     integrations: "Integrations",
     integrationsSub: "Connect your stores and sales channels",
     features: "Bot Features",
@@ -97,7 +100,7 @@ export const en = {
     or: "or",
     lineOaTipEnd: "mode to prevent the bot from overlapping with LINE OA's auto-replies — the bot will remain silent and hand over to admins.",
     edit: "Edit",
-    setup: "Setup",
+    setup: "Setup API",
     botReplyMode: "Bot Reply Mode",
     replyModes: {
       auto: {
@@ -124,59 +127,7 @@ export const en = {
     widgetStep2Start: "Copy the snippet and paste it into your website's HTML / theme file (before",
     widgetStep3: "Open your website — you will instantly see a round chat button at the bottom right, click to open.",
     widgetStep4: "All messages sent by customers will appear on the Live Chat page of your Dashboard.",
-    onboarding: {
-      badge: "Onboarding",
-      mainTitle: "Get Started in 5 Steps",
-      mainSubtitle: "Follow the steps to launch your smart store within 10 minutes.",
-      progress: "Progress",
-      completed: "Completed",
-      edit: "Edit",
-      steps: {
-        connect: {
-          title: "1. Connect Store / Sales Channels",
-          desc: "Connect LINE OA, Messenger, Instagram, WooCommerce, or embed the Web Chat Widget on your website.",
-          cta: "Connect Store"
-        },
-        train: {
-          title: "2. Train AI with Your Store Data",
-          desc: "Upload catalogs, FAQs, and brand voice so AI answers exactly like your real staff.",
-          cta: "Add Training Data"
-        },
-        features: {
-          title: "3. Enable AI Bot Features",
-          desc: "Toggle capabilities like product recommendation, order closing, FAQ handling, and cart recovery.",
-          cta: "Bot Settings"
-        },
-        embed: {
-          title: "4. Install Widget on Your Website",
-          desc: "Paste a 1-line code snippet onto your website, and customers will instantly see the chat button at the bottom right.",
-          cta: "Copy Embed Code"
-        },
-        test: {
-          title: "5. Test and Go Live",
-          desc: "Test chatting with your AI in Live Chat, monitor sales in Analytics, and then launch to real customers.",
-          cta: "Test Chat with AI"
-        }
-      }
-    },
-    integrationsPage: {
-      title: "Connect Sales Channels",
-      subtitle: "Connect your social media and e-commerce platforms to start the AI.",
-      webWidgetTitle: "Web Chat Widget (Install on Website)",
-      webWidgetDesc: "Copy this code and paste it into your website to enable the smart chat system.",
-      copySnippet: "Copy snippet",
-      previewWidget: "Preview widget",
-      howToTest: "✅ Works perfectly — How to test?",
-      testStep1: "Click Preview widget to see how the chat looks first.",
-      testStep2: "Copy the snippet and paste it into your website's HTML / theme file (before ",
-      testStep3: "Open your website — you will instantly see a round chat button at the bottom right. Click to open.",
-      testStep4: "Every message sent by customers will appear on the Live Chat dashboard page.",
-      ecommerceChannels: "E-Commerce Channels",
-      chatChannels: "Chat / Social Channels",
-      manage: "Manage",
-      loading: "Loading...",
-      copied: "Copied to clipboard!"
-    }
+    copied: "Copied!"
   },
   features: {
     pageTitle: "Bot Features",
@@ -216,5 +167,262 @@ export const en = {
       ab: "A/B Testing"
     },
     requiresPlan: "Requires {{plan}} plan"
+  },
+  products: {
+    title: "Store Products",
+    subtitle: "Manage products, stock, and pricing — AI will use this data to recommend to customers",
+    downloadTemplate: "Download Template",
+    importStock: "Import Stock File",
+    addProduct: "Add Product",
+    dragDrop: "Drag CSV / XLSX file here or click the import button",
+    importNote: "Items with duplicate SKUs or names will update existing stock (max 1,000 items per import)",
+    headers: "Product Name, SKU, Price, Compare at Price, Stock, Category, Description",
+    headerNote: "The first row must be headers — click 'Download Template' for an example file",
+    example1: "White Crewneck T-Shirt, TS-WHT-M, 290, 390, 25, Clothing, 100% Cotton",
+    example2: "Slim Fit Jeans, JN-SLM-32, 890, 1290, 12, Clothing, Slim Fit",
+    example3: "Black Sneakers, SK-BLK-42, 1290, 1590, 8, Shoes, Classic Model",
+    search: "Search by name or SKU...",
+    emptyState: "No products yet. Add your first product now.",
+    outOfStock: "Out of stock",
+    lowStock: "Low stock ({{count}})",
+    inStock: "{{count}} in stock",
+    edit: "Edit",
+    delete: "Delete",
+    deleteConfirm: "Delete this product?",
+    editTitle: "Edit Product",
+    addTitle: "Add Product",
+    name: "Product Name *",
+    description: "Description",
+    sku: "SKU",
+    category: "Category",
+    price: "Price *",
+    comparePrice: "Compare at Price",
+    stock: "Stock",
+    lowStockAlert: "Low Stock Threshold",
+    status: "Status",
+    statusActive: "Active",
+    statusDraft: "Draft",
+    statusArchived: "Archived",
+    image: "Product Image",
+    cancel: "Cancel",
+    save: "Save",
+    errorNoName: "Please enter a product name",
+    successUpdate: "Product updated",
+    successAdd: "Product added",
+    successDelete: "Deleted successfully",
+    errorSave: "Failed to save",
+    errorNoData: "No product data found in file — please download the template and fill it out correctly.",
+    errorNoNameCol: "No product names found — check the 'name' column in your file."
+  },
+  orders: {
+    title: "Orders",
+    subtitle: "View customer orders, update status, and send automatic status back to chat",
+    totalOrders: "Total Orders",
+    processing: "Processing",
+    shipped: "Shipped",
+    revenue: "Total Revenue",
+    search: "Search order number, customer, phone, product, or tracking...",
+    emptyState: "No orders yet",
+    colOrder: "Order",
+    colCustomer: "Customer",
+    colProduct: "Product",
+    colAmount: "Amount",
+    colStatus: "Status",
+    colChannel: "Channel",
+    colAction: "Actions",
+    updateBtn: "Update",
+    manageOrder: "Manage Order",
+    customerLabel: "Customer",
+    productLabel: "Product",
+    shippingAddress: "Shipping Address",
+    notes: "Notes",
+    fulfillmentStatus: "Fulfillment Status",
+    paymentStatus: "Payment Status",
+    trackingNumber: "Tracking Number",
+    trackingPlaceholder: "e.g., TH123456789",
+    trackingUrl: "Tracking URL",
+    urlPlaceholder: "https://...",
+    customerTrackingLink: "Customer tracking link",
+    copySuccess: "Tracking link copied",
+    close: "Close",
+    saveAndSend: "Save & Send to Chat",
+    toastUpdateExternal: "Updated and sent to customer's channel",
+    toastUpdateChat: "Updated and message added to chat",
+    toastError: "Failed to update status",
+    status: {
+      pending: "Pending",
+      paid: "Paid",
+      preparing: "Preparing",
+      packed: "Packed",
+      shipped: "Shipped",
+      delivered: "Delivered",
+      cancelled: "Cancelled"
+    },
+    payment: {
+      unpaid: "Unpaid",
+      pending: "Pending Verify",
+      paid: "Paid",
+      refunded: "Refunded"
+    }
+  },
+  channelSetup: {
+    title: {
+      line: "Setup LINE OA",
+      messenger: "Setup Facebook Messenger",
+      instagram: "Setup Instagram DM",
+      woocommerce: "Connect WooCommerce",
+      shopee: "Connect Shopee",
+      lazada: "Connect Lazada"
+    },
+    desc: "Enter details from the developer console. The AI Bot will automatically reply to customers in this channel.",
+    line: {
+      help1: "Find it at developers.line.biz → Your Channel → Messaging API → Channel Access Token (long-lived)",
+      help2: "Used for verifying signature (recommended)"
+    },
+    messenger: {
+      help1: "Meta App → Messenger → Settings → Generate token from your Page",
+      help2: "Can be anything, but must exactly match the verify token in your Meta App webhook subscription",
+      placeholder2: "e.g. mysecret123"
+    },
+    ig: {
+      help1: "Instagram Business Account must be linked to a Facebook Page",
+      help2: "Same as Messenger"
+    },
+    woo: {
+      help1: "e.g. https://yourshop.com (No trailing /)",
+      help2: "WooCommerce → Settings → Advanced → REST API → Add key (Read/Write permission)",
+      help3: "Generated with Consumer Key — keep it safe, it won't be shown again."
+    },
+    shopee: {
+      help1: "Found in Seller Centre → Account & Security",
+      placeholder1: "e.g. 123456789",
+      help2: "From Shopee Open Platform → My Apps",
+      help3: "Secret key paired with Partner ID — keep it safe"
+    },
+    lazada: {
+      help1: "Found in Lazada Seller Center → My Account",
+      help2: "From Lazada Open Platform → Create App",
+      help3: "Generated together with App Key"
+    },
+    toast: {
+      success: "Saved successfully — AI Bot is ready to reply",
+      error: "Failed to save",
+      copied: "Copied successfully!"
+    },
+    webhookLabel: "Webhook URL (Paste this into the Developer Console)",
+    link: {
+      line: "Open LINE Developers Console",
+      meta: "Open Meta for Developers"
+    },
+    wooNote1: "💡 Create API Key at:",
+    wooNote2: "Select Permission =",
+    wooNote3: "then paste here",
+    btn: {
+      cancel: "Cancel",
+      saving: "Saving...",
+      save: "Save and Connect"
+    }
+  },
+  training: {
+    subtitle: "Train your bot to understand your products, brand, and answering style",
+    types: {
+      pdf: "PDF Documents",
+      excel: "Excel Catalog",
+      faq: "FAQ",
+      url: "Website URL",
+      tone: "Tone of Voice",
+      promo: "Promotion Rules"
+    },
+    addTitle: "Add Training Data",
+    topicLabel: "Topic / Title",
+    topicPlaceholder: "e.g., Warranty Information, New FAQ",
+    dragDrop: "Drag and drop file here, or click to browse (PDF, CSV, XLSX)",
+    contentLabel: "Details / Training Content",
+    filePlaceholder: "Summary or rules you want the bot to follow from this file (if any)",
+    textPlaceholder: "Write short rules like: If a customer asks about shipping, reply with... / Never offer discounts / If they ask for admin, stop answering and assign to human",
+    hint: "Tip: Write as 'If... then...' or 'Must/Must not...' so the bot treats it as a strict rule.",
+    addBtn: "Add to Training System",
+    listTitle: "Trained Data",
+    emptyState: "No training data yet",
+    viewTitle: "Training Data Details",
+    viewTopic: "Topic",
+    viewType: "Type",
+    viewFile: "Attachment",
+    viewContent: "Training Content",
+    noContent: "No content text",
+    trainedAt: "Trained at:",
+    close: "Close",
+    editTitle: "Edit Training Data",
+    content: "Content",
+    originalFile: "* Original file:",
+    fileEditNote: "(File cannot be edited in this mode)",
+    cancel: "Cancel",
+    saveEdit: "Save Changes",
+    defaultTopic: "Training Data",
+    toast: {
+      uploadFailed: "Upload failed: ",
+      noTitle: "Please enter a topic",
+      noData: "No product data found in file",
+      excelSuccess: "Stock imported and bot trained successfully",
+      addSuccess: "Training data added successfully",
+      addFailed: "Failed to add training data",
+      deleteSuccess: "Deleted successfully",
+      updateSuccess: "Updated successfully"
+    },
+    confirmDelete: "Are you sure you want to delete this training data?"
+  },
+  voice: {
+    title: "Voice AI Call Assistant",
+    subtitle: "Turn on the mic during customer calls — AI will capture speech and immediately recommend products from stock.",
+    notSupported: "This browser does not support Web Speech API — Please open with Chrome / Edge on desktop, or Safari on iOS.",
+    stopListening: "Stop Listening",
+    startListening: "Start Listening",
+    listeningStatus: "Listening...",
+    stockCount: "Products in stock: {{count}} items",
+    clearText: "Clear Text",
+    capturedSpeech: "Captured Speech",
+    hint1: "• Must be accessed via HTTPS and use Chrome / Edge (Safari iOS is partially supported).",
+    hint2: "• Allow microphone access when prompted — if denied, click the 🔒 icon in the URL bar and change to Allow.",
+    hint3: "• Speak clearly near the microphone — AI will analyze customer needs and recommend stock items instantly.",
+    recommendations: "AI Recommended Products",
+    emptyNoStock: "No products in stock yet — Go to 'Store Products' page and import a CSV/XLSX file first.",
+    emptyNoMatch: "No matching products found for this speech — Try speaking the product name, category, or SKU more clearly.",
+    emptyListeningHint: "Speak product names, categories, or customer questions, and AI will automatically recommend items.",
+    emptyNotListeningHint: "Click the 'Start Listening' button and begin talking to the customer.",
+    stockRemaining: "Remaining: {{count}} pcs",
+    copyPitchBtn: "Copy Pitch Text",
+    copyFormat: "{{name}} Price {{price}} Baht ({{stock}} items remaining)",
+    toast: {
+      copied: "Sales pitch copied to clipboard"
+    }
+  },
+  analytics: {
+    subtitle: "Simple insights: track customer conversations and bot sales performance.",
+    totalChats: "Total Chats",
+    totalChatsHint: "Number of customer conversations",
+    aiRevenue: "AI Revenue",
+    aiRevenueHint: "Sales closed by bot",
+    orders: "Orders",
+    ordersHint: "Orders placed",
+    conversionRate: "Conversion Rate",
+    conversionRateHint: "Average from all data",
+    chartTitle: "AI Revenue (Last 7 Days)",
+    noData: "No analytical data available yet",
+    quickInsightTitle: "Quick Insights",
+    quickInsightDesc: "If you see 'high chats but low orders', try adding more product info/FAQs in the Training page, and check Voice AI to see which items are frequently mentioned."
+  },
+  billing: {
+    title: "Billing & Plans",
+    subtitle: "Manage your subscription and billing details.",
+    customPrice: "Custom",
+    perMonth: "/mo",
+    currentBtn: "Current",
+    upgradeBtn: "Upgrade",
+    currentPlan: "Current Plan",
+    renewsOn: "Renews on:",
+    invoices: "Invoices",
+    status: {
+      active: "Active"
+    }
   }
 };
