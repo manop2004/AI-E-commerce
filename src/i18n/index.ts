@@ -1,31 +1,20 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import { th } from "./th";
-import { en } from "./en";
-import { zh } from "./zh";
-import { LANGUAGES } from "./languages";
-
-// Build resources: th + en + zh have full translations. The other languages start as
-// English copies (full UI works) — translators can override keys later.
-const baseResources: Record<string, { translation: any }> = {
-  th: { translation: th },
-  en: { translation: en },
-  zh: { translation: zh },
-};
-for (const l of LANGUAGES) {
-  if (!baseResources[l.code]) baseResources[l.code] = { translation: en };
-}
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import { en } from './en';
+import { zh } from './zh';
 
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: baseResources,
-    fallbackLng: "th",
-    supportedLngs: LANGUAGES.map((l) => l.code),
-    interpolation: { escapeValue: false },
-    detection: { order: ["localStorage", "navigator"], caches: ["localStorage"] },
+    resources: {
+      en: { translation: en },
+      zh: { translation: zh }
+    },
+    lng: 'en', // บังคับให้ภาษาเริ่มต้นเป็นอังกฤษ
+    fallbackLng: 'en', // 🌟 จุดสำคัญ: ถ้าหาภาษาอื่นไม่เจอ ให้ดึง 'en' มาใช้เสมอ
+    interpolation: {
+      escapeValue: false 
+    }
   });
 
 export default i18n;
