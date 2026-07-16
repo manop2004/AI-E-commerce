@@ -23,6 +23,16 @@ const Landing = () => {
   const { t } = useTranslation();
   const [demoOpen, setDemoOpen] = useState(false);
 
+  // ตรวจสอบและสกัดข้อมูลจากระบบ i18n ป้องกันแอปพังถ้าข้อมูลไม่เป็นอาร์เรย์
+  const painItems = t("pain.items", { returnObjects: true });
+  const safePainItems = Array.isArray(painItems) ? painItems : [];
+
+  const testimonialItems = t("testimonials.items", { returnObjects: true });
+  const safeTestimonialItems = Array.isArray(testimonialItems) ? testimonialItems : [];
+
+  const faqItems = t("faq.items", { returnObjects: true });
+  const safeFaqItems = Array.isArray(faqItems) ? faqItems : [];
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <SiteHeader />
@@ -91,14 +101,14 @@ const Landing = () => {
             <p className="text-lg text-muted-foreground">{t("pain.subtitle")}</p>
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(t("pain.items", { returnObjects: true }) as Array<{ t: string; d: string }>).map((p, i) => (
+            {safePainItems.map((p: any, i: number) => (
               <motion.div key={i} {...fadeUp} transition={{ delay: i * 0.08, duration: 0.5 }}>
                 <Card className="p-6 h-full bg-gradient-card border-border/50 hover:border-destructive/50 transition-colors">
                   <div className="h-10 w-10 rounded-lg bg-destructive/15 text-destructive grid place-items-center mb-4">
                     <AlertTriangle className="h-5 w-5" />
                   </div>
-                  <h3 className="font-semibold mb-2">{p.t}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{p.d}</p>
+                  <h3 className="font-semibold mb-2">{p?.t}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{p?.d}</p>
                 </Card>
               </motion.div>
             ))}
@@ -189,20 +199,20 @@ const Landing = () => {
         <div className="container">
           <motion.h2 {...fadeUp} className="font-display text-4xl md:text-5xl font-bold text-center mb-16">{t("testimonials.title")}</motion.h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {(t("testimonials.items", { returnObjects: true }) as Array<{ name: string; role: string; quote: string }>).map((tm, i) => (
+            {safeTestimonialItems.map((tm: any, i: number) => (
               <motion.div key={i} {...fadeUp} transition={{ delay: i * 0.1, duration: 0.5 }}>
                 <Card className="p-8 h-full bg-gradient-card border-border/50">
                   <div className="flex gap-0.5 mb-4">
                     {[...Array(5)].map((_, j) => <Star key={j} className="h-4 w-4 fill-warning text-warning" />)}
                   </div>
-                  <p className="text-foreground/90 mb-6 leading-relaxed">"{tm.quote}"</p>
+                  <p className="text-foreground/90 mb-6 leading-relaxed">"{tm?.quote}"</p>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-primary grid place-items-center font-semibold text-primary-foreground">
-                      {tm.name.charAt(0)}
+                      {tm?.name ? tm.name.charAt(0) : ""}
                     </div>
                     <div>
-                      <div className="font-semibold text-sm">{tm.name}</div>
-                      <div className="text-xs text-muted-foreground">{tm.role}</div>
+                      <div className="font-semibold text-sm">{tm?.name}</div>
+                      <div className="text-xs text-muted-foreground">{tm?.role}</div>
                     </div>
                   </div>
                 </Card>
@@ -222,22 +232,30 @@ const Landing = () => {
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
             {(["free", "starter", "growth", "enterprise"] as const).map((k, i) => {
-              const plan = t(`pricing.plans.${k}`, { returnObjects: true }) as { name: string; price: string; desc: string; features: string[] };
+              const plan = t(`pricing.plans.${k}`, { returnObjects: true }) as any;
               const popular = k === "growth";
+
+              // ตรวจสอบความปลอดภัยของข้อมูลแพ็กเกจ
+              const hasPlanData = plan && typeof plan === "object" && !Array.isArray(plan);
+              const planName = hasPlanData ? plan.name : k;
+              const planDesc = hasPlanData ? plan.desc : "";
+              const planPrice = hasPlanData ? plan.price : "";
+              const planFeatures = hasPlanData && Array.isArray(plan.features) ? plan.features : [];
+
               return (
                 <motion.div key={k} {...fadeUp} transition={{ delay: i * 0.08, duration: 0.5 }}>
                   <Card className={`p-6 h-full flex flex-col relative ${popular ? "bg-gradient-primary/10 border-primary/50 shadow-glow" : "bg-gradient-card border-border/50"}`}>
                     {popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary border-0">{t("pricing.popular")}</Badge>}
                     <div className="mb-4">
-                      <div className="font-display text-xl font-bold mb-1">{plan.name}</div>
-                      <p className="text-sm text-muted-foreground">{plan.desc}</p>
+                      <div className="font-display text-xl font-bold mb-1">{planName}</div>
+                      <p className="text-sm text-muted-foreground">{planDesc}</p>
                     </div>
                     <div className="mb-6">
-                      <span className="font-display text-4xl font-bold">{plan.price}</span>
-                      {plan.price !== "Custom" && <span className="text-muted-foreground text-sm ml-1">{t("pricing.monthly")}</span>}
+                      <span className="font-display text-4xl font-bold">{planPrice}</span>
+                      {planPrice !== "Custom" && <span className="text-muted-foreground text-sm ml-1">{t("pricing.monthly")}</span>}
                     </div>
                     <ul className="space-y-2.5 mb-6 flex-1">
-                      {plan.features.map((f, j) => (
+                      {planFeatures.map((f: string, j: number) => (
                         <li key={j} className="flex items-start gap-2 text-sm">
                           <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /> <span>{f}</span>
                         </li>
@@ -261,17 +279,17 @@ const Landing = () => {
         <div className="container max-w-3xl">
           <motion.h2 {...fadeUp} className="font-display text-4xl md:text-5xl font-bold text-center mb-12">{t("faq.title")}</motion.h2>
           <Accordion type="single" collapsible className="space-y-3">
-            {(t("faq.items", { returnObjects: true }) as Array<{ q: string; a: string }>).map((item, i) => (
+            {safeFaqItems.map((item: any, i: number) => (
               <AccordionItem key={i} value={`i${i}`} className="bg-gradient-card border border-border/50 rounded-xl px-6">
-                <AccordionTrigger className="text-left hover:no-underline font-semibold">{item.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">{item.a}</AccordionContent>
+                <AccordionTrigger className="text-left hover:no-underline font-semibold">{item?.q}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">{item?.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* FINAL FINAL CTA */}
       <section className="py-24">
         <div className="container">
           <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl bg-gradient-primary p-12 md:p-20 text-center shadow-glow">
@@ -313,10 +331,10 @@ const FeatureGroup = ({ title, icon, items, gradient }: { title: string; icon: R
           <h3 className="font-display text-2xl font-bold">{title}</h3>
         </div>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {items.map((it, i) => (
+          {items?.map((it, i) => (
             <li key={i} className="flex items-center gap-2.5 text-sm text-foreground/90">
-              <div className="h-7 w-7 rounded-md bg-card grid place-items-center text-primary">{it.i}</div>
-              {it.t}
+              <div className="h-7 w-7 rounded-md bg-card grid place-items-center text-primary">{it?.i}</div>
+              {it?.t}
             </li>
           ))}
         </ul>
