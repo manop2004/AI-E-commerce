@@ -84,7 +84,9 @@ const Landing = () => {
       {/* INTEGRATIONS MARQUEE */}
       <section id="integrations" className="py-16 border-y border-border/40">
         <div className="container">
-          <p className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-widest">เชื่อมต่อได้ทุกแพลตฟอร์ม · Connect everywhere</p>
+          <p className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-widest">
+            {t("เชื่อมต่อได้ทุกแพลตฟอร์ม")} · CONNECT EVERYWHERE
+          </p>
           <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-muted-foreground">
             {["WooCommerce", "Lazada", "Shopee", "LINE OA", "Messenger", "Instagram", "WhatsApp", "Web Widget"].map((n) => (
               <div key={n} className="font-display text-xl md:text-2xl font-semibold opacity-60 hover:opacity-100 hover:text-foreground transition">{n}</div>
@@ -132,11 +134,11 @@ const Landing = () => {
               icon={<ShoppingBag className="h-5 w-5" />}
               gradient="from-primary/20 to-transparent"
               items={[
-                { i: <Search className="h-4 w-4" />, t: "Search สินค้า" },
-                { i: <Sparkles className="h-4 w-4" />, t: "Recommend สินค้า" },
-                { i: <TrendingUp className="h-4 w-4" />, t: "Cross-sell / Upsell" },
-                { i: <Boxes className="h-4 w-4" />, t: "Bundle Suggestion" },
-                { i: <DollarSign className="h-4 w-4" />, t: "Dynamic Pricing" },
+                { i: <Search className="h-4 w-4" />, t: t("Search สินค้า") },
+                { i: <Sparkles className="h-4 w-4" />, t: t("Recommend สินค้า") },
+                { i: <TrendingUp className="h-4 w-4" />, t: t("features.sales.crosssell", "Cross-sell / Upsell") },
+                { i: <Boxes className="h-4 w-4" />, t: t("features.sales.bundle", "Bundle Suggestion") },
+                { i: <DollarSign className="h-4 w-4" />, t: t("features.sales.dynamic", "Dynamic Pricing") },
               ]}
             />
             <FeatureGroup
@@ -144,11 +146,11 @@ const Landing = () => {
               icon={<Headphones className="h-5 w-5" />}
               gradient="from-secondary/20 to-transparent"
               items={[
-                { i: <MessageSquare className="h-4 w-4" />, t: "ตอบแชท 24/7" },
-                { i: <Package className="h-4 w-4" />, t: "เช็คออเดอร์" },
-                { i: <Globe className="h-4 w-4" />, t: "Tracking พัสดุ" },
-                { i: <Bot className="h-4 w-4" />, t: "FAQ Auto Reply" },
-                { i: <Languages className="h-4 w-4" />, t: "Multi-language" },
+                { i: <MessageSquare className="h-4 w-4" />, t: t("ตอบแชท 24/7") },
+                { i: <Package className="h-4 w-4" />, t: t("เช็คออเดอร์") },
+                { i: <Globe className="h-4 w-4" />, t: t("Tracking พัสดุ") },
+                { i: <Bot className="h-4 w-4" />, t: t("features.cs.faq", "FAQ Auto Reply") },
+                { i: <Languages className="h-4 w-4" />, t: t("features.cs.multilang", "Multi-language") },
               ]}
             />
             <FeatureGroup
@@ -156,11 +158,11 @@ const Landing = () => {
               icon={<Wrench className="h-5 w-5" />}
               gradient="from-accent/20 to-transparent"
               items={[
-                { i: <Boxes className="h-4 w-4" />, t: "Check Stock" },
-                { i: <ShoppingCart className="h-4 w-4" />, t: "Process Order" },
-                { i: <Shield className="h-4 w-4" />, t: "Warranty Claim" },
-                { i: <RefreshCw className="h-4 w-4" />, t: "Auto Reorder" },
-                { i: <AlertTriangle className="h-4 w-4" />, t: "Fraud Detection" },
+                { i: <Boxes className="h-4 w-4" />, t: t("features.ops.stock", "Check Stock") },
+                { i: <ShoppingCart className="h-4 w-4" />, t: t("features.ops.process", "Process Order") },
+                { i: <Shield className="h-4 w-4" />, t: t("features.ops.warranty", "Warranty Claim") },
+                { i: <RefreshCw className="h-4 w-4" />, t: t("features.ops.reorder", "Auto Reorder") },
+                { i: <AlertTriangle className="h-4 w-4" />, t: t("features.ops.fraud", "Fraud Detection") },
               ]}
             />
             <FeatureGroup
@@ -168,11 +170,11 @@ const Landing = () => {
               icon={<Megaphone className="h-5 w-5" />}
               gradient="from-primary/20 to-secondary/20"
               items={[
-                { i: <Users className="h-4 w-4" />, t: "Segment ลูกค้า" },
-                { i: <Target className="h-4 w-4" />, t: "Personalized Promo" },
-                { i: <RotateCcw className="h-4 w-4" />, t: "Cart Recovery" },
-                { i: <TrendingDown className="h-4 w-4" />, t: "Predict Churn" },
-                { i: <BarChart3 className="h-4 w-4" />, t: "Ads Audience AI" },
+                { i: <Users className="h-4 w-4" />, t: t("Segment ลูกค้า") },
+                { i: <Target className="h-4 w-4" />, t: t("features.mkt.promo", "Personalized Promo") },
+                { i: <RotateCcw className="h-4 w-4" />, t: t("features.mkt.recover", "Cart Recovery") },
+                { i: <TrendingDown className="h-4 w-4" />, t: t("features.mkt.churn", "Predict Churn") },
+                { i: <BarChart3 className="h-4 w-4" />, t: t("features.mkt.ads", "Ads Audience AI") },
               ]}
             />
           </div>
@@ -187,9 +189,9 @@ const Landing = () => {
             <p className="text-lg text-muted-foreground">{t("results.subtitle")}</p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <ResultCard big="+42%" label="Revenue uplift" sub="เฉลี่ยใน 90 วันแรก" />
-            <ResultCard big="3.2x" label="Conversion rate" sub="เทียบกับก่อนใช้" />
-            <ResultCard big="-78%" label="Response time" sub="ตอบลูกค้าเร็วกว่าเดิม" />
+            <ResultCard big="+42%" label={t("results.revenue", "Revenue uplift")} sub={t("เฉลี่ยใน 90 วันแรก")} />
+            <ResultCard big="3.2x" label={t("results.conversion", "Conversion rate")} sub={t("เทียบกับก่อนใช้")} />
+            <ResultCard big="-78%" label={t("results.response", "Response time")} sub={t("ตอบลูกค้าเร็วกว่าเดิม")} />
           </div>
         </div>
       </section>

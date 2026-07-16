@@ -1,4 +1,18 @@
 export const en = {
+  // =========================================================
+  // 🎯 คีย์ดักจับสำหรับกรณีเรียก t("ภาษาไทย") ตรง ๆ ใน Component
+  // =========================================================
+  "เชื่อมต่อได้ทุกแพลตฟอร์ม": "Connect to all platforms",
+  "Search สินค้า": "Product Search",
+  "Recommend สินค้า": "Product Recommendation",
+  "ตอบแชท 24/7": "24/7 Auto Chat",
+  "เช็คออเดอร์": "Order Status Check",
+  "Tracking พัสดุ": "Parcel Tracking",
+  "Segment ลูกค้า": "Customer Segmentation",
+  "เฉลี่ยใน 90 วันแรก": "Average in the first 90 days",
+  "เทียบกับก่อนใช้": "Compared to before",
+  "ตอบลูกค้าเร็วกว่าเดิม": "Faster response than before",
+
   brand: "AI Commerce Agent",
   nav: {
     features: "Features",
@@ -17,6 +31,11 @@ export const en = {
     ctaPrimary: "Start free",
     ctaSecondary: "Watch demo",
     socialProof: "Trusted by 1,200+ brands worldwide",
+    connect: "Connect Everywhere",
+    connectEverywhere: "Connect Everywhere",
+    integrations: "Connect Everywhere",
+    integrationsTitle: "Connect Everywhere",
+    "เชื่อมต่อได้ทุกแพลตฟอร์ม": "Connect to all platforms",
   },
   stats: {
     revenue: "Revenue uplift",
@@ -31,6 +50,7 @@ export const en = {
       { t: "Slow chat replies", d: "Customers message at midnight, no one replies → lost orders" },
       { t: "Expensive support team", d: "Hiring multiple agents per store gets costly fast" },
       { t: "Failed conversions", d: "Slow answers, weak suggestions, customers leave" },
+      { t: "Abandoned carts", d: "No automated system to follow up on abandoned carts" },
     ],
   },
   auth: {
@@ -129,7 +149,30 @@ export const en = {
     widgetStep4: "All messages sent by customers will appear on the Live Chat page of your Dashboard.",
     copied: "Copied!"
   },
+
+  integrations: {
+    title: "Connect Everywhere",
+    subtitle: "Connect with every platform",
+    connectTitle: "Connect Everywhere",
+    connectEverywhere: "Connect Everywhere",
+    "เชื่อมต่อได้ทุกแพลตฟอร์ม": "Connect to all platforms",
+  },
+  connect: {
+    title: "Connect Everywhere",
+    subtitle: "Connect with every platform",
+    connectEverywhere: "Connect Everywhere",
+    "เชื่อมต่อได้ทุกแพลตฟอร์ม": "Connect to all platforms",
+  },
+
   features: {
+    title: "Everything the AI Bot can do",
+    subtitle: "20+ ready-to-use features. Toggle on/off instantly.",
+    
+    landingSales: "Sales",
+    landingCs: "Customer Service",
+    landingOps: "Operations",
+    landingMkt: "Marketing",
+
     pageTitle: "Bot Features",
     pageDesc: "Enable or disable specific AI capabilities for your store.",
     groups: {
@@ -139,35 +182,166 @@ export const en = {
       Marketing: "Marketing"
     },
     sales: {
+      title: "Sales",
       search: "Product Search",
+      searchProduct: "Product Search",
+      search_product: "Product Search",
+      "Search สินค้า": "Product Search",
       recommend: "Product Recommendation",
+      recommendProduct: "Product Recommendation",
+      recommend_product: "Product Recommendation",
+      "Recommend สินค้า": "Product Recommendation",
       crosssell: "Cross-sell / Upsell",
       bundle: "Bundle Suggestion",
       dynamic: "Dynamic Pricing"
     },
     cs: {
+      title: "Customer Service",
       chat: "24/7 Auto Chat",
+      chat247: "24/7 Auto Chat",
+      autoChat: "24/7 Auto Chat",
+      reply247: "24/7 Auto Chat",
+      chatSupport: "24/7 Chat Support",
+      "ตอบแชท 24/7": "24/7 Auto Chat",
       order: "Order Status Check",
+      checkOrder: "Order Status Check",
+      orderCheck: "Order Status Check",
+      orderStatus: "Order Status Check",
+      "เช็คออเดอร์": "Order Status Check",
       tracking: "Parcel Tracking",
+      trackParcel: "Parcel Tracking",
+      parcelTracking: "Parcel Tracking",
+      track: "Parcel Tracking",
+      "Tracking พัสดุ": "Parcel Tracking",
+      faq: "FAQ Auto Reply",
+      multilang: "Multi-language Support",
+      multilingual: "Multi-language Support"
+    },
+    ops: {
+      title: "Operations",
+      stock: "Stock Checking",
+      checkStock: "Check Stock",
+      process: "Order Processing (Cart)",
+      processOrder: "Process Order",
+      warranty: "Product Claims / Warranty",
+      warrantyClaim: "Warranty Claim",
+      reorder: "Auto Re-order",
+      autoReorder: "Auto Reorder",
+      fraud: "Fake Slip Detection",
+      fraudDetection: "Fraud Detection"
+    },
+    mkt: {
+      title: "Marketing",
+      broadcast: "Promotion Broadcast",
+      recover: "Recover Abandoned Cart",
+      cartRecovery: "Cart Recovery",
+      coupon: "Coupons & Discounts",
+      loyalty: "Loyalty Points",
+      ab: "A/B Testing",
+      segment: "Customer Segmentation",
+      segmentation: "Customer Segmentation",
+      customerSegment: "Customer Segmentation",
+      segmentCustomers: "Customer Segmentation",
+      "Segment ลูกค้า": "Customer Segmentation",
+      ads: "Ads Audience AI",
+      adsAudience: "Ads Audience AI",
+      promo: "Personalized Promo",
+      personalizedPromo: "Personalized Promo",
+      churn: "Predict Churn",
+      predictChurn: "Predict Churn"
+    },
+    requiresPlan: "Requires {{plan}} plan"
+  },
+
+  landingFeatures: {
+    title: "Everything the AI Bot can do",
+    subtitle: "20+ ready-to-use features. Toggle on/off instantly.",
+    sales: {
+      title: "Sales",
+      search: "Product Search",
+      searchProduct: "Product Search",
+      "Search สินค้า": "Product Search",
+      recommend: "Product Recommendation",
+      recommendProduct: "Product Recommendation",
+      "Recommend สินค้า": "Product Recommendation",
+      crosssell: "Cross-sell / Upsell",
+      bundle: "Bundle Suggestion",
+      dynamic: "Dynamic Pricing"
+    },
+    cs: {
+      title: "Customer Service",
+      chat: "24/7 Auto Chat",
+      chat247: "24/7 Auto Chat",
+      "ตอบแชท 24/7": "24/7 Auto Chat",
+      order: "Order Status Check",
+      checkOrder: "Order Status Check",
+      "เช็คออเดอร์": "Order Status Check",
+      tracking: "Parcel Tracking",
+      trackParcel: "Parcel Tracking",
+      "Tracking พัสดุ": "Parcel Tracking",
       faq: "FAQ Auto Reply",
       multilang: "Multi-language Support"
     },
     ops: {
-      stock: "Stock Checking",
-      process: "Order Processing (Cart)",
-      warranty: "Product Claims / Warranty",
-      reorder: "Auto Re-order",
-      fraud: "Fake Slip Detection"
+      title: "Operations",
+      stock: "Check Stock",
+      checkStock: "Check Stock",
+      process: "Process Order",
+      processOrder: "Process Order",
+      warranty: "Warranty Claim",
+      warrantyClaim: "Warranty Claim",
+      reorder: "Auto Reorder",
+      autoReorder: "Auto Reorder",
+      fraud: "Fraud Detection",
+      fraudDetection: "Fraud Detection"
     },
     mkt: {
-      broadcast: "Promotion Broadcast",
-      recover: "Recover Abandoned Cart",
-      coupon: "Coupons & Discounts",
-      loyalty: "Loyalty Points",
-      ab: "A/B Testing"
-    },
-    requiresPlan: "Requires {{plan}} plan"
+      title: "Marketing",
+      segment: "Customer Segmentation",
+      segmentation: "Customer Segmentation",
+      "Segment ลูกค้า": "Customer Segmentation",
+      cartRecovery: "Cart Recovery",
+      recover: "Cart Recovery",
+      ads: "Ads Audience AI",
+      adsAudience: "Ads Audience AI",
+      promo: "Personalized Promo",
+      personalizedPromo: "Personalized Promo",
+      churn: "Predict Churn",
+      predictChurn: "Predict Churn"
+    }
   },
+
+  results: {
+    title: "Real results from our customers",
+    subtitle: "After the first 90 days of use",
+    "เฉลี่ยใน 90 วันแรก": "Average in the first 90 days",
+    "เทียบกับก่อนใช้": "Compared to before",
+    "ตอบลูกค้าเร็วกว่าเดิม": "Faster response than before",
+    items: [
+      { value: "+42%", label: "Revenue uplift", desc: "Average in the first 90 days" },
+      { value: "3.2x", label: "Conversion rate", desc: "Compared to before" },
+      { value: "-78%", label: "Response time", desc: "Faster response than before" }
+    ],
+    revenue: "Revenue uplift",
+    revenueDesc: "Average in the first 90 days",
+    revenueSub: "Average in the first 90 days",
+    revenueDetail: "Average in the first 90 days",
+    avg90days: "Average in the first 90 days",
+    revenueStats: "Average in the first 90 days",
+    conversion: "Conversion rate",
+    conversionDesc: "Compared to before",
+    conversionSub: "Compared to before",
+    conversionDetail: "Compared to before",
+    compareBefore: "Compared to before",
+    conversionStats: "Compared to before",
+    response: "Response time",
+    responseDesc: "Faster response than before",
+    responseSub: "Faster response than before",
+    responseDetail: "Faster response than before",
+    fasterResponse: "Faster response than before",
+    responseStats: "Faster response than before"
+  },
+
   products: {
     title: "Store Products",
     subtitle: "Manage products, stock, and pricing — AI will use this data to recommend to customers",
@@ -416,7 +590,7 @@ export const en = {
     subtitle: "Manage your subscription and billing details.",
     customPrice: "Custom",
     perMonth: "/mo",
-    currentBtn: "Current",
+    currentBtn: "Current Plan",
     upgradeBtn: "Upgrade",
     currentPlan: "Current Plan",
     renewsOn: "Renews on:",
@@ -424,5 +598,101 @@ export const en = {
     status: {
       active: "Active"
     }
+  },
+  testimonials: {
+    title: "What our customers say",
+    items: [
+      { name: "Phat", role: "Cosmetics Brand Owner", quote: "Monthly sales increased by 42% in the first quarter. Admin team reduced to just 1 person." },
+      { name: "Napa", role: "Online Store Owner", quote: "Can finally close orders at 3 AM. Chatting with international customers is now a breeze." },
+      { name: "Wittaya", role: "IT Shop Owner", quote: "Automated cross-selling works wonders. Average order value went up by 1.8x." },
+    ],
+  },
+  pricing: {
+    title: "Choose the right plan",
+    subtitle: "Start for free. No credit card required. Cancel anytime.",
+    monthly: "/month",
+    popular: "POPULAR",
+    cta: "Get Started",
+    plans: {
+      free: {
+        name: "Free",
+        price: "฿0",
+        desc: "For trying out. Great for small shops.",
+        features: [
+          "1,000 messages/month",
+          "Connect 1 channel",
+          "Basic features",
+          "Community support"
+        ]
+      },
+      starter: {
+        name: "Starter",
+        price: "฿1,490",
+        desc: "For growing online stores.",
+        features: [
+          "20,000 messages/month",
+          "Connect 3 channels",
+          "All AI features",
+          "Email support"
+        ]
+      },
+      growth: {
+        name: "Growth",
+        price: "฿4,990",
+        desc: "For serious business scaling.",
+        features: [
+          "Unlimited messages",
+          "Connect all channels",
+          "Live Chat takeover",
+          "Priority support"
+        ]
+      },
+      enterprise: {
+        name: "Enterprise",
+        price: "Custom",
+        desc: "For large organizations.",
+        features: [
+          "Everything in Growth",
+          "Custom AI training",
+          "99.9% SLA",
+          "Dedicated CSM"
+        ]
+      }
+    }
+  },
+  faq: {
+    title: "Frequently Asked Questions",
+    items: [
+      { q: "Is it hard to use or set up?", a: "Not at all. Connect your store in 1 click without coding. The AI helps you set it up." },
+      { q: "Does the AI sound like a real person?", a: "We use the latest GPT/Gemini models. It responds naturally and learns your brand's Tone of Voice." },
+      { q: "Is there any upfront cost?", a: "The first 1,000 messages are free. No credit card required. Upgrade when you're ready." },
+      { q: "Can I connect it to my existing store?", a: "Yes, we support WooCommerce, Lazada, Shopee, LINE OA, Messenger, Instagram, WhatsApp, and your own website via our Web Chat Widget." },
+      { q: "Is my data secure?", a: "All data is encrypted and stored on ISO 27001 certified servers. We are fully PDPA compliant." },
+    ],
+  },
+  cta: {
+    title: "Ready to increase your sales?",
+    subtitle: "Start for free today. No credit card required. Cancel anytime.",
+    button: "Start using for free",
+  },
+  footer: {
+    product: "Product",
+    company: "Company",
+    resources: "Resources",
+    legal: "Legal",
+    rights: "© 2026 AI Commerce Agent. All rights reserved.",
+    tagline: "The AI that helps online stores sell more 24/7",
+    about: "About",
+    blog: "Blog",
+    careers: "Careers",
+    contact: "Contact",
+    privacy: "Privacy",
+    terms: "Terms",
+    pdpa: "PDPA",
+    security: "Security",
+    features: "Features",
+    pricing: "Pricing",
+    integrations: "Integrations",
+    changelog: "Changelog"
   }
 };
