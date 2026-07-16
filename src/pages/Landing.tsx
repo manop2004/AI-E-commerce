@@ -128,7 +128,7 @@ const Landing = () => {
 
           <div className="grid md:grid-cols-2 gap-6">
             <FeatureGroup
-              title={t("features.sales")}
+              title={t("features.landingSales")}
               icon={<ShoppingBag className="h-5 w-5" />}
               gradient="from-primary/20 to-transparent"
               items={[
@@ -140,7 +140,7 @@ const Landing = () => {
               ]}
             />
             <FeatureGroup
-              title={t("features.cs")}
+              title={t("features.landingCs")}
               icon={<Headphones className="h-5 w-5" />}
               gradient="from-secondary/20 to-transparent"
               items={[
@@ -152,7 +152,7 @@ const Landing = () => {
               ]}
             />
             <FeatureGroup
-              title={t("features.ops")}
+              title={t("features.landingOps")}
               icon={<Wrench className="h-5 w-5" />}
               gradient="from-accent/20 to-transparent"
               items={[
@@ -164,7 +164,7 @@ const Landing = () => {
               ]}
             />
             <FeatureGroup
-              title={t("features.mkt")}
+              title={t("features.landingMkt")}
               icon={<Megaphone className="h-5 w-5" />}
               gradient="from-primary/20 to-secondary/20"
               items={[
