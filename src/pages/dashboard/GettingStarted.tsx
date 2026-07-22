@@ -74,16 +74,16 @@ export default function GettingStarted() {
       <div>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-3">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
-          <span className="text-xs text-primary font-medium">{t("dash.onboarding.badge")}</span>
+          <span className="text-xs text-primary font-medium">{t("dash.onboarding.badge", "Onboarding")}</span>
         </div>
-        <h1 className="font-display text-3xl font-bold">{t("dash.onboarding.mainTitle")}</h1>
-        <p className="text-muted-foreground mt-1">{t("dash.onboarding.mainSubtitle")}</p>
+        <h1 className="font-display text-3xl font-bold">{t("dash.onboarding.mainTitle", "เริ่มต้นใช้งานใน 5 ขั้นตอน")}</h1>
+        <p className="text-muted-foreground mt-1">{t("dash.onboarding.mainSubtitle", "ทำตามขั้นตอนเพื่อเปิดร้านอัจฉริยะของคุณภายใน 10 นาที")}</p>
       </div>
 
       <Card className="p-6 bg-gradient-card border-border/50">
         <div className="flex items-center justify-between mb-3">
-          <div className="font-display font-semibold">{t("dash.onboarding.progress")}</div>
-          <div className="text-sm text-muted-foreground">{completed}/{steps.length} {t("dash.onboarding.completed")}</div>
+          <div className="font-display font-semibold">{t("dash.onboarding.progress", "ความคืบหน้า")}</div>
+          <div className="text-sm text-muted-foreground">{completed}/{steps.length} {t("dash.onboarding.completed", "เสร็จแล้ว")}</div>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div className="h-full bg-gradient-primary transition-all" style={{ width: `${pct}%` }} />
@@ -92,7 +92,7 @@ export default function GettingStarted() {
 
       <div className="grid gap-4">
         {loading ? (
-          <Card className="p-12 text-center text-muted-foreground">{t("common.loading")}</Card>
+          <Card className="p-12 text-center text-muted-foreground">{t("common.loading", "กำลังโหลด...")}</Card>
         ) : (
           steps.map((s) => (
             <Card key={s.id} className={`p-6 bg-gradient-card border-border/50 flex items-start gap-4 ${s.done ? "border-success/40" : ""}`}>
@@ -105,7 +105,7 @@ export default function GettingStarted() {
               </div>
               <Link to={s.href}>
                 <Button variant={s.done ? "outline" : "default"} className={s.done ? "" : "bg-gradient-primary"}>
-                  {s.done ? t("dash.onboarding.edit") : t(`dash.onboarding.steps.${s.id}.cta`)}
+                  {s.done ? t("dash.onboarding.edit", "แก้ไข") : t(`dash.onboarding.steps.${s.id}.cta`)}
                 </Button>
               </Link>
             </Card>

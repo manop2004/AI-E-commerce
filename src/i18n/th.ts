@@ -37,14 +37,10 @@ export const th = {
   features: {
     title: "ทุกอย่างที่ AI Bot ทำได้",
     subtitle: "20+ ฟีเจอร์พร้อมใช้ เปิด/ปิดได้ทันที",
-    
-    // ✅ เพิ่ม 4 บรรทัดนี้สำหรับ Landing Page เพื่อไม่ให้ชื่อชนกับหลังบ้าน
     landingSales: "ฝ่ายขาย",
     landingCs: "บริการลูกค้า",
     landingOps: "ปฏิบัติการ",
     landingMkt: "การตลาด",
-
-    // ✅ ข้อมูลฟีเจอร์ของระบบหลังบ้าน (Dashboard) คืนกลับมาครบถ้วน
     pageTitle: "ฟีเจอร์ AI Bot",
     pageDesc: "เปิดหรือปิดความสามารถของ AI ในร้านค้าของคุณตามต้องการ",
     groups: {
@@ -124,10 +120,24 @@ export const th = {
     button: "เริ่มใช้ฟรีตอนนี้",
   },
   footer: {
+    desc: "AI ที่ช่วยร้านค้าออนไลน์ขายได้มากขึ้น 24 ชั่วโมง",
     product: "ผลิตภัณฑ์",
     company: "บริษัท",
     resources: "ทรัพยากร",
     legal: "กฎหมาย",
+    features: "ฟีเจอร์",
+    pricing: "ราคา",
+    integrations: "เชื่อมต่อ",
+    changelog: "อัปเดตระบบ",
+    about: "เกี่ยวกับเรา",
+    blog: "บล็อก",
+    careers: "ร่วมงานกับเรา",
+    contact: "ติดต่อเรา",
+    privacy: "นโยบายความเป็นส่วนตัว",
+    terms: "เงื่อนไขการใช้งาน",
+    pdpa: "PDPA",
+    security: "ความปลอดภัย",
+    copyright: "© 2026 AI Commerce Agent. สงวนลิขสิทธิ์",
     rights: "© 2026 AI Commerce Agent. สงวนลิขสิทธิ์",
     tagline: "AI ที่ช่วยร้านค้าออนไลน์ขายได้มากขึ้น 24 ชั่วโมง",
   },
@@ -213,21 +223,6 @@ export const th = {
     widgetStep2Start: "คัดลอก snippet ไปวางในไฟล์ HTML / theme ของเว็บคุณ (ก่อน",
     widgetStep3: "เปิดเว็บคุณ — จะเห็นปุ่มแชทกลมๆ มุมขวาล่างทันที กดเปิดได้",
     widgetStep4: "ทุกข้อความที่ลูกค้าส่งมาจะมาโผล่ที่หน้า Live Chat ของ Dashboard",
-    onboarding: {
-      badge: "Onboarding",
-      mainTitle: "เริ่มต้นใช้งานใน 5 ขั้นตอน",
-      mainSubtitle: "ทำตามขั้นตอนเพื่อเปิดร้านอัจฉริยะของคุณภายใน 10 นาที",
-      progress: "ความคืบหน้า",
-      completed: "เสร็จแล้ว",
-      edit: "แก้ไข",
-      steps: {
-        connect: { title: "1. เชื่อมร้านค้า / ช่องทางขาย", desc: "เชื่อม LINE OA, Messenger, Instagram, WooCommerce หรือฝัง Web Chat Widget บนเว็บคุณ", cta: "เชื่อมต่อร้าน" },
-        train: { title: "2. เทรน AI ด้วยข้อมูลร้านคุณ", desc: "อัปโหลด catalog, FAQ, brand voice เพื่อให้ AI ตอบเหมือนพนักงานร้านคุณจริงๆ", cta: "เพิ่มข้อมูลเทรน" },
-        features: { title: "3. เปิดฟีเจอร์ AI Bot", desc: "เลือกเปิด/ปิดความสามารถ เช่น แนะนำสินค้า, ปิดออเดอร์, ตอบ FAQ, recover cart", cta: "ตั้งค่า Bot" },
-        embed: { title: "4. ติดตั้ง Widget บนเว็บคุณ", desc: "วาง snippet 1 บรรทัดบนเว็บไซต์เพื่อเปิดใช้งานระบบแชทอัจฉริยะ", cta: "คัดลอกโค้ด" },
-        test: { title: "5. ทดสอบและใช้งานจริง", desc: "ทดลองแชทกับ AI ในหน้า Live Chat, ตรวจสอบยอดขาย และเปิดตัวสู่ลูกค้าจริง", cta: "ทดลองแชทกับ AI" }
-      }
-    },
     integrationsPage: {
       title: "เชื่อมต่อช่องทางการขาย",
       subtitle: "เชื่อมต่อโซเชียลมีเดียและแพลตฟอร์มอีคอมเมิร์ซของคุณเพื่อเริ่มให้ AI ทำงาน",
@@ -245,6 +240,41 @@ export const th = {
       manage: "จัดการ",
       loading: "กำลังโหลด...",
       copied: "คัดลอกลงคลิปบอร์ดแล้ว!"
+    },
+    onboarding: {
+      badge: "Onboarding",
+      mainTitle: "เริ่มต้นใช้งานใน 5 ขั้นตอน",
+      mainSubtitle: "ทำตามขั้นตอนเพื่อเปิดร้านอัจฉริยะของคุณภายใน 10 นาที",
+      progress: "ความคืบหน้า",
+      completed: "เสร็จแล้ว",
+      edit: "แก้ไข",
+      steps: {
+        connect: {
+          title: "1. เชื่อมร้านค้า / ช่องทางขาย",
+          desc: "เชื่อม LINE OA, Messenger, Instagram, WooCommerce หรือฝัง Web Chat Widget บนเว็บคุณ",
+          cta: "เชื่อมต่อร้าน"
+        },
+        train: {
+          title: "2. เทรน AI ด้วยข้อมูลร้านคุณ",
+          desc: "อัปโหลด catalog, FAQ, brand voice เพื่อให้ AI ตอบเหมือนพนักงานร้านคุณจริงๆ",
+          cta: "เพิ่มข้อมูลเทรน"
+        },
+        features: {
+          title: "3. เปิดฟีเจอร์ AI Bot",
+          desc: "เลือกเปิด/ปิดความสามารถ เช่น แนะนำสินค้า, ปิดออเดอร์, ตอบ FAQ, recover cart",
+          cta: "ตั้งค่า Bot"
+        },
+        embed: {
+          title: "4. ติดตั้ง Widget บนเว็บคุณ",
+          desc: "วาง snippet 1 บรรทัดบนเว็บโฮสต์เพื่อเปิดใช้งานระบบแชตอัจฉริยะ",
+          cta: "คัดลอกโค้ด"
+        },
+        test: {
+          title: "5. ทดสอบและใช้งานจริง",
+          desc: "ทดสอบแชตกับ AI ในหน้า Live Chat, ตรวจสอบข้อความตอบ และเปิดรับลูกค้าจริง",
+          cta: "ทดสอบแชตกับ AI"
+        }
+      }
     }
   },
   billing: {

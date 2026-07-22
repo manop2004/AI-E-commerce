@@ -24,6 +24,9 @@ export const zh = {
     cost: "降低客服成本",
     coverage: "24/7 随时随地销售",
   },
+  integrations: {
+    subtitle: "连接所有平台",
+  },
   pain: {
     title: "在线商家每天面临的问题",
     subtitle: "我们将为您彻底解决这些烦恼",
@@ -31,6 +34,7 @@ export const zh = {
       { t: "回复太慢", d: "客户在深夜发消息，无人回复 → 订单流失" },
       { t: "客服团队成本高", d: "每家店雇佣多名客服，费用快速上涨" },
       { t: "转化率低下", d: "回复不及时、推荐不精准，导致客户流失" },
+      { t: "客户反复询问相同问题", d: "每天处理上百个重复 FAQ，效率低下" },
     ],
   },
   auth: {
@@ -127,9 +131,46 @@ export const zh = {
     widgetStep2Start: "复制该代码段并将其粘贴到您网站的 HTML / 主题文件中（在",
     widgetStep3: "打开您的网站 — 您将立即在右下角看到一个圆形聊天按钮，点击即可打开。",
     widgetStep4: "客户发送的所有消息都将显示在您仪表板的实时聊天 (Live Chat) 页面上。",
-    copied: "已复制到剪贴板！"
+    copied: "已复制到剪贴板！",
+    onboarding: {
+      badge: "Onboarding",
+      mainTitle: "只需 5 个步骤即可开始使用",
+      mainSubtitle: "按照步骤操作，在 10 分钟内开启您的智能店铺",
+      progress: "进度",
+      completed: "已完成",
+      edit: "编辑",
+      steps: {
+        connect: {
+          title: "1. 连接店铺 / 销售渠道",
+          desc: "连接 LINE OA、Messenger、Instagram、WooCommerce 或在您的网站上嵌入 Web Chat Widget",
+          cta: "连接店铺"
+        },
+        train: {
+          title: "2. 使用店铺数据训练 AI",
+          desc: "上传商品目录、FAQ、品牌语气，让 AI 像真正的店员一样回答",
+          cta: "添加训练数据"
+        },
+        features: {
+          title: "3. 开启 AI Bot 功能",
+          desc: "选择开启/关闭功能，如商品推荐、自动结账、回答 FAQ、挽回购物车",
+          cta: "设置 Bot"
+        },
+        embed: {
+          title: "4. 在您的网站上安装 Widget",
+          desc: "在网站主机上粘贴 1 行代码以启用智能聊天系统",
+          cta: "复制代码"
+        },
+        test: {
+          title: "5. 测试并上线使用",
+          desc: "在 Live Chat 页面与 AI 测试对话，检查回复内容，并准备接待真实客户",
+          cta: "与 AI 测试对话"
+        }
+      }
+    }
   },
   features: {
+    title: "AI 机器人具备的一切功能",
+    subtitle: "20+ 项即用功能，可随时开启/关闭",
     pageTitle: "机器人功能",
     pageDesc: "开启或关闭商店的特定 AI 功能。",
     groups: {
@@ -139,11 +180,11 @@ export const zh = {
       Marketing: "市场营销"
     },
     sales: {
-      search: "商品搜索",
-      recommend: "商品推荐",
-      crosssell: "交叉销售 / 向上销售",
-      bundle: "捆绑销售建议",
-      dynamic: "动态定价"
+      search: "Search 商品",
+      recommend: "Recommend 商品",
+      crosssell: "Cross-sell / Upsell",
+      bundle: "Bundle Suggestion",
+      dynamic: "Dynamic Pricing"
     },
     cs: {
       chat: "24/7 全天候聊天",
@@ -160,8 +201,12 @@ export const zh = {
       fraud: "虚假交易凭证检测"
     },
     mkt: {
-      broadcast: "促销广播",
+      segment: "客户细分",
+      promo: "个性化促销",
       recover: "挽回遗弃购物车",
+      churn: "流失风险预测",
+      ads: "AI 广告受众推荐",
+      broadcast: "促销广播",
       coupon: "优惠券和折扣",
       loyalty: "会员积分",
       ab: "A/B 测试"
@@ -430,6 +475,72 @@ export const zh = {
     quickInsightTitle: "快速分析结论",
     quickInsightDesc: "如果出现“聊天量大但订单量少”的情况，请在“机器人训练”页面补充商品或常见问题信息，并开通 Voice AI 查看哪些商品被频繁提及。"
   },
+  results: {
+    title: "客户真实反馈",
+    subtitle: "使用前 90 天后",
+    revenue: "收入增长",
+    revenueSub: "前 90 天平均",
+    conversion: "转化率",
+    conversionSub: "与使用前相比",
+    response: "响应时间",
+    responseSub: "回复速度更快"
+  },
+  testimonials: {
+    title: "客户对我们的评价",
+    items: [
+      { quote: "月销售额增长了 42%，客服团队只保留了 1 个人！", name: "Khun Phat", role: "美妆品牌创始人" },
+      { quote: "凌晨三点还能自动下单，跨国客户也能无障碍沟通。", name: "Khun Nipa", role: "在线服装店" },
+      { quote: "自动 Cross-sell 功能极强，平均客单价提升了 1.8 倍！", name: "Khun Wit", role: "IT 数码店" }
+    ]
+  },
+  pricing: {
+    title: "选择适合您的套餐",
+    subtitle: "免费开始。无需信用卡。随时取消。",
+    popular: "推荐",
+    monthly: "/ 月",
+    cta: "开始使用",
+    plans: {
+      free: {
+        name: "Free",
+        desc: "适合小型店铺体验",
+        price: "฿0",
+        features: ["1,000 条消息/月", "连接 1 个渠道", "基础 AI 功能", "社区支持"]
+      },
+      starter: {
+        name: "Starter",
+        desc: "适合成长中的在线商店",
+        price: "฿1,490",
+        features: ["20,000 条消息/月", "连接 3 个渠道", "完整 AI 功能", "邮件支持"]
+      },
+      growth: {
+        name: "Growth",
+        desc: "适合认真扩展业务的企业",
+        price: "฿4,990",
+        features: ["无限制消息量", "连接所有渠道", "实时人工接管 (Takeover)", "优先技术支持"]
+      },
+      enterprise: {
+        name: "Enterprise",
+        desc: "适合大型组织",
+        price: "Custom",
+        features: ["包含 Growth 所有功能", "定制 AI 模型训练", "SLA 99.9% 保障", "专属客户经理"]
+      }
+    }
+  },
+  faq: {
+    title: "常见问题",
+    items: [
+      { q: "使用难吗？需要设置吗？", a: "非常简单！只需连接您的 LINE OA 或 Facebook Page，上传商品 CSV 文件，AI 机器人即可在 5 分钟内开始工作。" },
+      { q: "AI 回复像真人吗？", a: "非常自然。AI 模型根据您的商品和对话语气进行专门训练，能有条理地回答并推荐相关商品。" },
+      { q: "开始使用需要付费吗？", a: "完全免费！我们提供免费套餐，无需绑定信用卡即可体验。" },
+      { q: "可以连接原有的店铺吗？", a: "支持连接 WooCommerce, Shopee, Lazada, LINE OA, Facebook Messenger, Instagram, WhatsApp 等全平台。" },
+      { q: "数据安全吗？", a: "我们采用最高级别的加密技术，您的客户数据和交易隐私将被严格保护。" }
+    ]
+  },
+  cta: {
+    title: "准备好提高销量了吗？",
+    subtitle: "今天免费开始。无需信用卡。随时取消。",
+    button: "立即免费开始"
+  },
   billing: {
     title: "账单与计划",
     subtitle: "管理您的订阅和账单详细信息。",
@@ -438,10 +549,91 @@ export const zh = {
     currentBtn: "当前计划",
     upgradeBtn: "升级空间",
     currentPlan: "当前计划",
-    renewsOn: "续订日期：",
+    renewson: "续订日期：",
     invoices: "发票明细",
     status: {
       active: "正常运行"
     }
-  }
+  },
+
+  // 保持兼容旧键名 (Landing Page)
+  landingResults: {
+    title: "客户真实反馈",
+    subtitle: "使用前 90 天后",
+    revenueUplift: "收入增长",
+    revenueSub: "前 90 天平均",
+    conversionRate: "转化率",
+    conversionSub: "与使用前相比",
+    responseTime: "响应时间",
+    responseSub: "回复速度更快"
+  },
+  landingTestimonials: {
+    title: "客户对我们的评价",
+  },
+  landingPricing: {
+    title: "选择适合您的套餐",
+    subtitle: "免费开始。无需信用卡。随时取消。",
+    free: "Free",
+    freeDesc: "适合小型店铺体验",
+    starter: "Starter",
+    starterDesc: "适合成长中的在线商店",
+    growth: "Growth",
+    growthDesc: "适合认真扩展业务的企业",
+    enterprise: "Enterprise",
+    enterpriseDesc: "适合大型组织",
+    custom: "Custom",
+    month: "/ 月",
+    recommended: "推荐",
+    startBtn: "开始使用"
+  },
+  landingFaq: {
+    title: "常见问题",
+    q1: "使用难吗？需要设置吗？",
+    q2: "AI 回复像真人吗？",
+    q3: "开始使用需要付费吗？",
+    q4: "可以连接原有的店铺吗？",
+    q5: "数据安全吗？"
+  },
+  landingCta: {
+    title: "准备好提高销量了吗？",
+    subtitle: "今天免费开始。无需信用卡。随时取消。",
+    button: "立即免费开始"
+  },
+  footer: {
+    desc: "全天候 24 小时帮助在线商店提高销量的 AI",
+    product: "产品",
+    company: "公司",
+    legal: "法律",
+    features: "功能",
+    pricing: "价格",
+    integrations: "集成",
+    changelog: "更新日志",
+    about: "关于我们",
+    blog: "博客",
+    careers: "招贤纳士",
+    contact: "联系我们",
+    privacy: "隐私政策",
+    terms: "服务条款",
+    pdpa: "PDPA",
+    security: "安全",
+    copyright: "© 2026 AI Commerce Agent. 保留所有权利。"
+  },
+
+  // Fallback map
+  "เชื่อมต่อได้ทุกแพลตฟอร์ม": "连接所有平台",
+  "CONNECT EVERYWHERE": "CONNECT EVERYWHERE",
+  "ทุกอย่างที่ AI Bot ทำได้": "AI 机器人具备的一切功能",
+  "20+ ฟีเจอร์พร้อมใช้ เปิด/ปิดได้ทันที": "20+ 项即用功能，可随时开启/关闭",
+  "ฝ่ายขาย": "销售",
+  "บริการลูกค้า": "客户服务",
+  "ปฏิบัติการ": "运营管理",
+  "การตลาด": "市场营销",
+  "Search สินค้า": "搜索商品",
+  "Recommend สินค้า": "推荐商品",
+  "ตอบแชท 24/7": "24/7 自动回复",
+  "เช็คออเดอร์": "查询订单状态",
+  "Tracking พัสดุ": "包裹追踪",
+  "Segment ลูกค้า": "客户细分",
+  "AI ที่ช่วยร้านค้าออนไลน์ขายได้มากขึ้น 24 ชั่วโมง": "全天候 24 小时帮助在线商店提高销量的 AI",
+  "© 2026 AI Commerce Agent. สงวนลิขสิทธิ์": "© 2026 AI Commerce Agent. 保留所有权利。"
 };

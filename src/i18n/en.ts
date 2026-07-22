@@ -1,6 +1,6 @@
 export const en = {
   // =========================================================
-  // 🎯 คีย์ดักจับสำหรับกรณีเรียก t("ภาษาไทย") ตรง ๆ ใน Component.
+  // 🎯 Direct fallback keys for component lookup
   // =========================================================
   "เชื่อมต่อได้ทุกแพลตฟอร์ม": "Connect to all platforms",
   "Search สินค้า": "Product Search",
@@ -147,7 +147,60 @@ export const en = {
     widgetStep2Start: "Copy the snippet and paste it into your website's HTML / theme file (before",
     widgetStep3: "Open your website — you will instantly see a round chat button at the bottom right, click to open.",
     widgetStep4: "All messages sent by customers will appear on the Live Chat page of your Dashboard.",
-    copied: "Copied!"
+    copied: "Copied!",
+    integrationsPage: {
+      title: "Connect Sales Channels",
+      subtitle: "Connect your social media and e-commerce platforms to start letting AI work for you.",
+      webWidgetTitle: "Web Chat Widget (Embed on Website)",
+      webWidgetDesc: "Copy this code snippet and paste it onto your website to enable smart chat.",
+      copySnippet: "Copy Code",
+      previewWidget: "Preview Chat",
+      howToTest: "✅ Real & Functional — How to test?",
+      testStep1: "Click Preview widget to see the chat interface first.",
+      testStep2: "Copy snippet and paste it into your website's HTML / theme file (before ",
+      testStep3: "Open your website — you will instantly see a round chat button at the bottom right, click to open.",
+      testStep4: "All messages sent by customers will appear on the Live Chat page of your Dashboard.",
+      ecommerceChannels: "E-Commerce Channels",
+      chatChannels: "Chat / Social Channels",
+      manage: "Manage",
+      loading: "Loading...",
+      copied: "Copied to clipboard!"
+    },
+    onboarding: {
+      badge: "Onboarding",
+      mainTitle: "Get Started in 5 Steps",
+      mainSubtitle: "Follow the steps to launch your smart store in 10 minutes",
+      progress: "Progress",
+      completed: "completed",
+      edit: "Edit",
+      steps: {
+        connect: {
+          title: "1. Connect Store / Sales Channels",
+          desc: "Connect LINE OA, Messenger, Instagram, WooCommerce or embed Web Chat Widget on your website",
+          cta: "Connect Store"
+        },
+        train: {
+          title: "2. Train AI with Your Store Data",
+          desc: "Upload catalog, FAQ, brand voice so AI responds like your real store staff",
+          cta: "Add Training Data"
+        },
+        features: {
+          title: "3. Enable AI Bot Features",
+          desc: "Toggle features like product recommendations, closing orders, answering FAQs, cart recovery",
+          cta: "Configure Bot"
+        },
+        embed: {
+          title: "4. Install Widget on Your Website",
+          desc: "Paste a 1-line snippet on your web host to enable smart chat system",
+          cta: "Copy Code"
+        },
+        test: {
+          title: "5. Test and Go Live",
+          desc: "Test chatting with AI in Live Chat, verify replies, and open to real customers",
+          cta: "Test Chat with AI"
+        }
+      }
+    }
   },
 
   integrations: {
@@ -167,12 +220,10 @@ export const en = {
   features: {
     title: "Everything the AI Bot can do",
     subtitle: "20+ ready-to-use features. Toggle on/off instantly.",
-    
     landingSales: "Sales",
     landingCs: "Customer Service",
     landingOps: "Operations",
     landingMkt: "Marketing",
-
     pageTitle: "Bot Features",
     pageDesc: "Enable or disable specific AI capabilities for your store.",
     groups: {
@@ -676,12 +727,15 @@ export const en = {
     button: "Start using for free",
   },
   footer: {
+    desc: "The AI that helps online stores sell more 24/7",
     product: "Product",
     company: "Company",
     resources: "Resources",
     legal: "Legal",
-    rights: "© 2026 AI Commerce Agent. All rights reserved.",
-    tagline: "The AI that helps online stores sell more 24/7",
+    features: "Features",
+    pricing: "Pricing",
+    integrations: "Integrations",
+    changelog: "Changelog",
     about: "About",
     blog: "Blog",
     careers: "Careers",
@@ -690,9 +744,8 @@ export const en = {
     terms: "Terms",
     pdpa: "PDPA",
     security: "Security",
-    features: "Features",
-    pricing: "Pricing",
-    integrations: "Integrations",
-    changelog: "Changelog"
+    copyright: "© 2026 AI Commerce Agent. All rights reserved.",
+    rights: "© 2026 AI Commerce Agent. All rights reserved.",
+    tagline: "The AI that helps online stores sell more 24/7",
   }
 };

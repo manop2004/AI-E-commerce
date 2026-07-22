@@ -85,7 +85,7 @@ const Landing = () => {
       <section id="integrations" className="py-16 border-y border-border/40">
         <div className="container">
           <p className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-widest">
-            {t("เชื่อมต่อได้ทุกแพลตฟอร์ม")} · CONNECT EVERYWHERE
+            {t("integrations.subtitle", "เชื่อมต่อได้ทุกแพลตฟอร์ม")} · CONNECT EVERYWHERE
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 text-muted-foreground">
             {["WooCommerce", "Lazada", "Shopee", "LINE OA", "Messenger", "Instagram", "WhatsApp", "Web Widget"].map((n) => (
@@ -124,37 +124,37 @@ const Landing = () => {
         <div className="container relative">
           <motion.div {...fadeUp} className="max-w-2xl mx-auto text-center mb-16">
             <Badge variant="outline" className="mb-4 glass border-primary/30 text-primary">Features</Badge>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">{t("features.title")}</h2>
-            <p className="text-lg text-muted-foreground">{t("features.subtitle")}</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">{t("features.title", "ทุกอย่างที่ AI Bot ทำได้")}</h2>
+            <p className="text-lg text-muted-foreground">{t("features.subtitle", "20+ ฟีเจอร์พร้อมใช้ เปิด/ปิดได้ทันที")}</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <FeatureGroup
-              title={t("features.landingSales")}
+              title={t("features.groups.Sales", "ฝ่ายขาย")}
               icon={<ShoppingBag className="h-5 w-5" />}
               gradient="from-primary/20 to-transparent"
               items={[
-                { i: <Search className="h-4 w-4" />, t: t("Search สินค้า") },
-                { i: <Sparkles className="h-4 w-4" />, t: t("Recommend สินค้า") },
+                { i: <Search className="h-4 w-4" />, t: t("features.sales.search", "Search สินค้า") },
+                { i: <Sparkles className="h-4 w-4" />, t: t("features.sales.recommend", "Recommend สินค้า") },
                 { i: <TrendingUp className="h-4 w-4" />, t: t("features.sales.crosssell", "Cross-sell / Upsell") },
                 { i: <Boxes className="h-4 w-4" />, t: t("features.sales.bundle", "Bundle Suggestion") },
                 { i: <DollarSign className="h-4 w-4" />, t: t("features.sales.dynamic", "Dynamic Pricing") },
               ]}
             />
             <FeatureGroup
-              title={t("features.landingCs")}
+              title={t("features.groups.Customer Service", "บริการลูกค้า")}
               icon={<Headphones className="h-5 w-5" />}
               gradient="from-secondary/20 to-transparent"
               items={[
-                { i: <MessageSquare className="h-4 w-4" />, t: t("ตอบแชท 24/7") },
-                { i: <Package className="h-4 w-4" />, t: t("เช็คออเดอร์") },
-                { i: <Globe className="h-4 w-4" />, t: t("Tracking พัสดุ") },
+                { i: <MessageSquare className="h-4 w-4" />, t: t("features.cs.chat", "ตอบแชท 24/7") },
+                { i: <Package className="h-4 w-4" />, t: t("features.cs.order", "เช็คออเดอร์") },
+                { i: <Globe className="h-4 w-4" />, t: t("features.cs.tracking", "Tracking พัสดุ") },
                 { i: <Bot className="h-4 w-4" />, t: t("features.cs.faq", "FAQ Auto Reply") },
                 { i: <Languages className="h-4 w-4" />, t: t("features.cs.multilang", "Multi-language") },
               ]}
             />
             <FeatureGroup
-              title={t("features.landingOps")}
+              title={t("features.groups.Operations", "ปฏิบัติการ")}
               icon={<Wrench className="h-5 w-5" />}
               gradient="from-accent/20 to-transparent"
               items={[
@@ -166,11 +166,11 @@ const Landing = () => {
               ]}
             />
             <FeatureGroup
-              title={t("features.landingMkt")}
+              title={t("features.groups.Marketing", "การตลาด")}
               icon={<Megaphone className="h-5 w-5" />}
               gradient="from-primary/20 to-secondary/20"
               items={[
-                { i: <Users className="h-4 w-4" />, t: t("Segment ลูกค้า") },
+                { i: <Users className="h-4 w-4" />, t: t("features.mkt.segment", "Segment ลูกค้า") },
                 { i: <Target className="h-4 w-4" />, t: t("features.mkt.promo", "Personalized Promo") },
                 { i: <RotateCcw className="h-4 w-4" />, t: t("features.mkt.recover", "Cart Recovery") },
                 { i: <TrendingDown className="h-4 w-4" />, t: t("features.mkt.churn", "Predict Churn") },
@@ -185,13 +185,13 @@ const Landing = () => {
       <section className="py-24">
         <div className="container">
           <motion.div {...fadeUp} className="max-w-2xl mx-auto text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">{t("results.title")}</h2>
-            <p className="text-lg text-muted-foreground">{t("results.subtitle")}</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">{t("results.title", "ผลลัพธ์จริงจากลูกค้า")}</h2>
+            <p className="text-lg text-muted-foreground">{t("results.subtitle", "หลังใช้งาน 90 วันแรก")}</p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <ResultCard big="+42%" label={t("results.revenue", "Revenue uplift")} sub={t("เฉลี่ยใน 90 วันแรก")} />
-            <ResultCard big="3.2x" label={t("results.conversion", "Conversion rate")} sub={t("เทียบกับก่อนใช้")} />
-            <ResultCard big="-78%" label={t("results.response", "Response time")} sub={t("ตอบลูกค้าเร็วกว่าเดิม")} />
+            <ResultCard big="+42%" label={t("results.revenue", "Revenue uplift")} sub={t("results.revenueSub", "เฉลี่ยใน 90 วันแรก")} />
+            <ResultCard big="3.2x" label={t("results.conversion", "Conversion rate")} sub={t("results.conversionSub", "เทียบกับก่อนใช้")} />
+            <ResultCard big="-78%" label={t("results.response", "Response time")} sub={t("results.responseSub", "ตอบลูกค้าเร็วกว่าเดิม")} />
           </div>
         </div>
       </section>
@@ -199,7 +199,7 @@ const Landing = () => {
       {/* TESTIMONIALS */}
       <section className="py-24 relative">
         <div className="container">
-          <motion.h2 {...fadeUp} className="font-display text-4xl md:text-5xl font-bold text-center mb-16">{t("testimonials.title")}</motion.h2>
+          <motion.h2 {...fadeUp} className="font-display text-4xl md:text-5xl font-bold text-center mb-16">{t("testimonials.title", "ลูกค้าพูดถึงเรา")}</motion.h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {safeTestimonialItems.map((tm: any, i: number) => (
               <motion.div key={i} {...fadeUp} transition={{ delay: i * 0.1, duration: 0.5 }}>
@@ -229,15 +229,14 @@ const Landing = () => {
         <div className="glow-orb h-[400px] w-[600px] bg-primary/15 top-40 left-1/2 -translate-x-1/2" />
         <div className="container relative">
           <motion.div {...fadeUp} className="max-w-2xl mx-auto text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">{t("pricing.title")}</h2>
-            <p className="text-lg text-muted-foreground">{t("pricing.subtitle")}</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">{t("pricing.title", "เลือกแพ็กเกจที่ใช่")}</h2>
+            <p className="text-lg text-muted-foreground">{t("pricing.subtitle", "เริ่มฟรี ไม่ต้องใช้บัตรเครดิต ยกเลิกได้ทุกเมื่อ")}</p>
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
             {(["free", "starter", "growth", "enterprise"] as const).map((k, i) => {
               const plan = t(`pricing.plans.${k}`, { returnObjects: true }) as any;
               const popular = k === "growth";
 
-              // ตรวจสอบความปลอดภัยของข้อมูลแพ็กเกจ
               const hasPlanData = plan && typeof plan === "object" && !Array.isArray(plan);
               const planName = hasPlanData ? plan.name : k;
               const planDesc = hasPlanData ? plan.desc : "";
@@ -247,14 +246,14 @@ const Landing = () => {
               return (
                 <motion.div key={k} {...fadeUp} transition={{ delay: i * 0.08, duration: 0.5 }}>
                   <Card className={`p-6 h-full flex flex-col relative ${popular ? "bg-gradient-primary/10 border-primary/50 shadow-glow" : "bg-gradient-card border-border/50"}`}>
-                    {popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary border-0">{t("pricing.popular")}</Badge>}
+                    {popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-primary border-0">{t("pricing.popular", "แนะนำ")}</Badge>}
                     <div className="mb-4">
                       <div className="font-display text-xl font-bold mb-1">{planName}</div>
                       <p className="text-sm text-muted-foreground">{planDesc}</p>
                     </div>
                     <div className="mb-6">
                       <span className="font-display text-4xl font-bold">{planPrice}</span>
-                      {planPrice !== "Custom" && <span className="text-muted-foreground text-sm ml-1">{t("pricing.monthly")}</span>}
+                      {planPrice !== "Custom" && <span className="text-muted-foreground text-sm ml-1">{t("pricing.monthly", "/ เดือน")}</span>}
                     </div>
                     <ul className="space-y-2.5 mb-6 flex-1">
                       {planFeatures.map((f: string, j: number) => (
@@ -265,7 +264,7 @@ const Landing = () => {
                     </ul>
                     <Link to="/auth/signup">
                       <Button className={`w-full ${popular ? "bg-gradient-primary hover:opacity-90" : ""}`} variant={popular ? "default" : "outline"}>
-                        {t("pricing.cta")}
+                        {t("pricing.cta", "เริ่มใช้งาน")}
                       </Button>
                     </Link>
                   </Card>
@@ -279,7 +278,7 @@ const Landing = () => {
       {/* FAQ */}
       <section id="faq" className="py-24">
         <div className="container max-w-3xl">
-          <motion.h2 {...fadeUp} className="font-display text-4xl md:text-5xl font-bold text-center mb-12">{t("faq.title")}</motion.h2>
+          <motion.h2 {...fadeUp} className="font-display text-4xl md:text-5xl font-bold text-center mb-12">{t("faq.title", "คำถามที่พบบ่อย")}</motion.h2>
           <Accordion type="single" collapsible className="space-y-3">
             {safeFaqItems.map((item: any, i: number) => (
               <AccordionItem key={i} value={`i${i}`} className="bg-gradient-card border border-border/50 rounded-xl px-6">
@@ -291,17 +290,17 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* FINAL FINAL CTA */}
+      {/* FINAL CTA */}
       <section className="py-24">
         <div className="container">
           <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl bg-gradient-primary p-12 md:p-20 text-center shadow-glow">
             <div className="absolute inset-0 grid-bg opacity-20" />
             <div className="relative">
-              <h2 className="font-display text-4xl md:text-6xl font-bold text-primary-foreground mb-4">{t("cta.title")}</h2>
-              <p className="text-lg text-primary-foreground/80 mb-8 max-w-xl mx-auto">{t("cta.subtitle")}</p>
+              <h2 className="font-display text-4xl md:6xl font-bold text-primary-foreground mb-4">{t("cta.title", "พร้อมเพิ่มยอดขายแล้วหรือยัง?")}</h2>
+              <p className="text-lg text-primary-foreground/80 mb-8 max-w-xl mx-auto">{t("cta.subtitle", "เริ่มใช้งานวันนี้ ฟรีไม่มีบัตรเครดิต ยกเลิกได้ทุกเมื่อ")}</p>
               <Link to="/auth/signup">
                 <Button size="lg" variant="secondary" className="h-12 px-8 bg-background text-foreground hover:bg-background/90">
-                  {t("cta.button")} <ArrowRight className="ml-2 h-4 w-4" />
+                  {t("cta.button", "เริ่มใช้งานฟรีตอนนี้")} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
